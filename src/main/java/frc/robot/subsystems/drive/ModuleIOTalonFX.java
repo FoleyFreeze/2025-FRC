@@ -13,7 +13,6 @@
 
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static frc.robot.util.PhoenixUtil.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -107,7 +106,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     var driveConfig = constants.DriveMotorInitialConfigs;
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     driveConfig.Slot0 = constants.DriveMotorGains;
-    driveConfig.Feedback.SensorToMechanismRatio = 1;//constants.DriveMotorGearRatio;
+    driveConfig.Feedback.SensorToMechanismRatio = constants.DriveMotorGearRatio;
     driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = constants.SlipCurrent;
     driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -constants.SlipCurrent;
     driveConfig.CurrentLimits.StatorCurrentLimit = constants.SlipCurrent;
@@ -248,7 +247,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
   @Override
   public void setDriveVelocity(double velocityRadPerSec) {
-    double velocityRotPerSec = Units.radiansToRotations(velocityRadPerSec) * constants.DriveMotorGearRatio;
+    double velocityRotPerSec = Units.radiansToRotations(velocityRadPerSec);
     driveTalon.setControl(
         switch (constants.DriveMotorClosedLoopOutput) {
           case Voltage -> velocityVoltageRequest.withVelocity(velocityRotPerSec);
