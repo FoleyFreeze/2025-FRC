@@ -3,8 +3,6 @@ package frc.robot.subsystems.elevator;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
-
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -42,20 +40,11 @@ public class ElevatorIOHardware implements ElevatorIO {
   }
 
   @Override
-  public void setElevatorVelocity(AngularVelocity velocityRadPerSec) {
-    
-  }
+  public void setElevatorVelocity(AngularVelocity velocityRadPerSec) {}
 
   @Override
-  public void setElevatorVolts(Voltage volts) {
-
-  }
+  public void setElevatorVolts(Voltage volts) {}
 
   @Override
-  public void setElevatorPosition(Angle motorPosition) {
-
-  }
-
-
-
+  public void setElevatorPosition(Angle motorPosition) {}
 }
