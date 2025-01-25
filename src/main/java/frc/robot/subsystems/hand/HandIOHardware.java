@@ -11,21 +11,17 @@ import edu.wpi.first.units.measure.Voltage;
 public class HandIOHardware implements HandIO {
   private final SparkMax motor;
 
-  private final double handAppliedVolts;
-  private final double handCurrent;
-  private final double handTemp;
+
 
   public HandIOHardware() {
     motor = new SparkMax(0, MotorType.kBrushless);
 
-    handAppliedVolts = motor.getBusVoltage();
-    handCurrent = motor.getOutputCurrent();
-    handTemp = motor.getMotorTemperature();
+    
   }
 
   @Override
   public void updateInputs(HandIOInputs inputs) {
-    inputs.handAppliedVolts = Volts.of(motor.getBusVoltage());
+    inputs.handAppliedVolts = Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
     inputs.handCurrent = Amps.of(motor.getOutputCurrent());
     inputs.handTemp = Fahrenheit.of(motor.getMotorTemperature());
   }
