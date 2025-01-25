@@ -4,7 +4,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -34,7 +33,7 @@ public class ElevatorIOHardware implements ElevatorIO {
   private final VelocityVoltage velocityVoltageRequest = new VelocityVoltage(0.0);
 
   // torque control requests
-  //private final TorqueCurrentFOC torqueCurrentRequest = new TorqueCurrentFOC(0);
+  // private final TorqueCurrentFOC torqueCurrentRequest = new TorqueCurrentFOC(0);
   private final PositionTorqueCurrentFOC positionTorqueCurrentRequest =
       new PositionTorqueCurrentFOC(0);
   private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest =
@@ -50,7 +49,6 @@ public class ElevatorIOHardware implements ElevatorIO {
     elevatorAppliedVolts = elevatorTalon.getMotorVoltage();
     elevatorCurrent = elevatorTalon.getStatorCurrent();
     elevatorTemp = elevatorTalon.getDeviceTemp();
-    
   }
 
   @Override
