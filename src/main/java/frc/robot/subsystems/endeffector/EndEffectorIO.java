@@ -12,11 +12,11 @@ import org.littletonrobotics.junction.AutoLog;
 public interface EndEffectorIO {
   @AutoLog
   public static class EndEffectorIOInputs {
-    public Angle EndEffectorPosition = Radians.of(0);
-    public AngularVelocity EndEffectorVelocity = RadiansPerSecond.of(0);
-    public Voltage EndEffectorAppliedVolts = Volts.of(0);
-    public Current EndEffectorCurrent = Amps.of(0);
-    public Temperature EndEffectorTemp = Fahrenheit.of(0);
+    public Angle endEffectorPosition = Radians.of(0);
+    public AngularVelocity endEffectorVelocity = RadiansPerSecond.of(0);
+    public Voltage endEffectorAppliedVolts = Volts.of(0);
+    public Current endEffectorCurrent = Amps.of(0);
+    public Temperature endEffectorTemp = Fahrenheit.of(0);
     public Angle absEncAngle = Radians.of(0);
   }
 

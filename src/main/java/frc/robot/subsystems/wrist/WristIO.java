@@ -12,12 +12,12 @@ import org.littletonrobotics.junction.AutoLog;
 public interface WristIO {
   @AutoLog
   public static class WristIOInputs {
-    public boolean WristConnected = false;
-    public Angle WristPosition = Radians.of(0);
-    public AngularVelocity WristVelocity = RadiansPerSecond.of(0);
-    public Voltage WristAppliedVolts = Volts.of(0);
-    public Current WristCurrent = Amps.of(0);
-    public Temperature WristTemp = Fahrenheit.of(0);
+    public boolean wristConnected = false;
+    public Angle wristPosition = Radians.of(0);
+    public AngularVelocity wristVelocity = RadiansPerSecond.of(0);
+    public Voltage wristAppliedVolts = Volts.of(0);
+    public Current wristCurrent = Amps.of(0);
+    public Temperature wristTemp = Fahrenheit.of(0);
     public Angle absEncAngle = Radians.of(0);
   }
 
