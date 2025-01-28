@@ -11,12 +11,8 @@ import edu.wpi.first.units.measure.Voltage;
 public class HandIOHardware implements HandIO {
   private final SparkMax motor;
 
-
-
   public HandIOHardware() {
     motor = new SparkMax(0, MotorType.kBrushless);
-
-    
   }
 
   @Override

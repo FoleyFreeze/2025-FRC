@@ -68,7 +68,8 @@ public class ElevatorIOHardware implements ElevatorIO {
   @Override
   public void setElevatorVelocity(AngularVelocity velocity) {
     if (useTorqueControl) {
-      elevatorTalon.setControl(velocityTorqueCurrentRequest.withVelocity(velocity).withAcceleration(null));
+      elevatorTalon.setControl(
+          velocityTorqueCurrentRequest.withVelocity(velocity).withAcceleration(null));
     } else {
       elevatorTalon.setControl(velocityVoltageRequest.withVelocity(velocity));
     }
