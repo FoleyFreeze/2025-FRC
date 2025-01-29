@@ -1,11 +1,6 @@
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Fahrenheit;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
@@ -13,6 +8,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 
@@ -31,13 +27,12 @@ public class ArmIOHardware implements ArmIO {
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
-    // the uhhh connected thingy doesnt exist sorry :pensive:
-    inputs.armPosition = Rotations.of(encoder.getPosition());
-    inputs.armVelocity = RPM.of(encoder.getVelocity());
-    inputs.armAppliedVolts = Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
-    inputs.armCurrent = Amps.of(motor.getOutputCurrent());
-    inputs.armTemp = Fahrenheit.of(motor.getMotorTemperature());
-    inputs.absEncAngle = Radians.of(absEncoder.getPosition());
+    inputs.armPositionRad = Units.rotationsToRadians(encoder.getPosition());
+    inputs.armVelocityRadPerSec = Units.radiansPerSecondToRotationsPerMinute(encoder.getVelocity());
+    inputs.armAppliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();
+    inputs.armCurrent = motor.getOutputCurrent();
+    inputs.armTempF = motor.getMotorTemperature();
+    inputs.absEncAngleRad = absEncoder.getPosition();
   }
 
   @Override

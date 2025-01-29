@@ -1,6 +1,5 @@
 package frc.robot.subsystems.wrist;
 
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Wrist extends SubsystemBase {
@@ -15,7 +14,7 @@ public class Wrist extends SubsystemBase {
     io.updateInputs(inputs);
   }
 
-  public Voltage getVoltage() {
+  public double getVoltage() {
     return (inputs.wristAppliedVolts);
   }
 }

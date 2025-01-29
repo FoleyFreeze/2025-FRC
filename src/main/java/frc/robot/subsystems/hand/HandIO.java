@@ -10,9 +10,10 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HandIO {
   @AutoLog
   public static class HandIOInputs {
-    public Voltage handAppliedVolts = Volts.of(0);
-    public Current handCurrent = Amps.of(0);
-    public Temperature handTemp = Fahrenheit.of(0);
+    public boolean handConnected = false;
+    public double handAppliedVolts = 0;
+    public double handCurrent = 0;
+    public double handTempF = 0;
   }
 
   public default void updateInputs(HandIOInputs inputs) {}

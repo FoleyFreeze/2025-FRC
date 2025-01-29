@@ -17,9 +17,9 @@ public class HandIOHardware implements HandIO {
 
   @Override
   public void updateInputs(HandIOInputs inputs) {
-    inputs.handAppliedVolts = Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
-    inputs.handCurrent = Amps.of(motor.getOutputCurrent());
-    inputs.handTemp = Fahrenheit.of(motor.getMotorTemperature());
+    inputs.handAppliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();
+    inputs.handCurrent = motor.getOutputCurrent();
+    inputs.handTempF = motor.getMotorTemperature();
   }
 
   @Override

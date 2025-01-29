@@ -16,7 +16,7 @@ public class Hand extends SubsystemBase {
     io.updateInputs(inputs);
   }
 
-  public Voltage getVoltage() {
+  public double getVoltage() {
     return (inputs.handAppliedVolts);
   }
 }

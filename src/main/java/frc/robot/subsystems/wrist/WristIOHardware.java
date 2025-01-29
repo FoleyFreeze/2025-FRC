@@ -1,11 +1,6 @@
 package frc.robot.subsystems.wrist;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Fahrenheit;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
@@ -13,6 +8,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 
 public class WristIOHardware implements WristIO {
@@ -30,12 +26,13 @@ public class WristIOHardware implements WristIO {
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
-    inputs.wristPosition = Rotations.of(encoder.getPosition());
-    inputs.wristVelocity = RPM.of(encoder.getVelocity());
-    inputs.wristAppliedVolts = Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
-    inputs.wristCurrent = Amps.of(motor.getOutputCurrent());
-    inputs.wristTemp = Fahrenheit.of(motor.getMotorTemperature());
-    inputs.absEncAngle = Radians.of(absEncoder.getPosition());
+    inputs.wristPositionRad = Units.rotationsToRadians(encoder.getPosition());
+    inputs.wristVelocityRadPerSec =
+        Units.radiansPerSecondToRotationsPerMinute(encoder.getVelocity());
+    inputs.wristAppliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();
+    inputs.wristCurrent = motor.getOutputCurrent();
+    inputs.wristTempF = motor.getMotorTemperature();
+    inputs.absEncAngleRad = absEncoder.getPosition();
   }
 
   @Override
