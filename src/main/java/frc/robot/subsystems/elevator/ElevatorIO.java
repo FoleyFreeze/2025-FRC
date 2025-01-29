@@ -2,29 +2,24 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
     public boolean elevatorConnected = false;
-    public Angle elevatorPosition = Radians.of(0);
-    public AngularVelocity elevatorVelocity = RadiansPerSecond.of(0);
-    public Voltage elevatorAppliedVolts = Volts.of(0);
-    public Current elevatorCurrent = Amps.of(0);
-    public Temperature elevatorTemp = Fahrenheit.of(0);
+    public double elevatorPositionInches = 0;
+    public double elevatorVelocityInchesPerSec = 0;
+    public double elevatorAppliedVolts = 0;
+    public double elevatorCurrentAmps = 0;
+    public double elevatorTempFahrenheit = 0;
   }
 
   public default void updateInputs(ElevatorIOInputs inputs) {}
 
-  public default void setElevatorVelocity(AngularVelocity velocity) {}
+  public default void setElevatorVelocity(double velocity) {}
 
-  public default void setElevatorVolts(Voltage volts) {}
+  public default void setElevatorVolts(double volts) {}
 
-  public default void setElevatorPosition(Angle motorPosition) {}
+  public default void setElevatorPosition(double motorPosition) {}
 }

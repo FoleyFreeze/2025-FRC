@@ -14,6 +14,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SuperstructureLocation;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -35,11 +37,19 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorCals;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOHardware;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -52,6 +62,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private SwerveDriveSimulation driveSimulation = null;
+  private Elevator elevator = null;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -72,6 +83,9 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight),
                 (pose) -> {});
+
+        elevator = new Elevator(new ElevatorIOHardware(new ElevatorCals()));
+
         break;
 
       case SIM:
@@ -107,6 +121,8 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]),
                 driveSimulation::setSimulationWorldPose);
+
+        elevator = new Elevator(new ElevatorIOSim(new ElevatorCals()));
         break;
 
       default:
@@ -119,6 +135,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 (pose) -> {});
+
+        elevator = new Elevator(new ElevatorIO() {});
         break;
     }
 
@@ -171,7 +189,7 @@ public class RobotContainer {
             () -> new Rotation2d()));*/
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
     controller
@@ -186,6 +204,13 @@ public class RobotContainer {
                     drive)
                 .andThen(new InstantCommand(() -> SimulatedArena.getInstance().resetFieldForAuto()))
                 .ignoringDisable(true));
+
+    controller
+        .button(2)
+        .onTrue(new InstantCommand(() -> elevator.goTo(SuperstructureLocation.LEVEL4)));
+    controller
+        .button(3)
+        .onTrue(new InstantCommand(() -> elevator.goTo(SuperstructureLocation.INTAKE)));
   }
 
   /**
@@ -214,5 +239,17 @@ public class RobotContainer {
         "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(
         "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+  }
+
+  LoggedMechanism2d mechBase = new LoggedMechanism2d(20, 50);
+  LoggedMechanismRoot2d mechRoot = mechBase.getRoot("Root", 10, 0);
+  LoggedMechanismLigament2d mechElevator =
+      mechRoot.append(new LoggedMechanismLigament2d("Elevator", 0, 90));
+  LoggedMechanismLigament2d mechArm =
+      mechElevator.append(new LoggedMechanismLigament2d("Arm", .5, 60));
+
+  public void updateMechanisms() {
+    mechElevator.setLength(elevator.getHeight().in(Meters));
+    Logger.recordOutput("Mechanism", mechBase);
   }
 }

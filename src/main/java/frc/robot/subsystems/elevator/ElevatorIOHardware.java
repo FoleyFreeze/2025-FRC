@@ -1,5 +1,11 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Fahrenheit;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
@@ -27,6 +33,8 @@ public class ElevatorIOHardware implements ElevatorIO {
 
   private final boolean useTorqueControl = false;
 
+  ElevatorCals k;
+
   // velocity control requests
   private final VoltageOut voltageRequest = new VoltageOut(0);
   private final PositionVoltage positionVoltageRequest = new PositionVoltage(0.0);
@@ -41,7 +49,8 @@ public class ElevatorIOHardware implements ElevatorIO {
 
   private final Debouncer elevatorConnectedDebounce = new Debouncer(0.5);
 
-  public ElevatorIOHardware() {
+  public ElevatorIOHardware(ElevatorCals k) {
+    this.k = k;
     elevatorTalon = new TalonFX(0, "*");
 
     elevatorPosition = elevatorTalon.getPosition();
@@ -58,15 +67,17 @@ public class ElevatorIOHardware implements ElevatorIO {
             elevatorPosition, elevatorVelocity, elevatorAppliedVolts, elevatorCurrent);
 
     inputs.elevatorConnected = elevatorConnectedDebounce.calculate(elevatorStatus.isOK());
-    inputs.elevatorPosition = elevatorPosition.getValue();
-    inputs.elevatorVelocity = elevatorVelocity.getValue();
-    inputs.elevatorAppliedVolts = elevatorAppliedVolts.getValue();
-    inputs.elevatorCurrent = elevatorCurrent.getValue();
-    inputs.elevatorTemp = elevatorTemp.getValue();
+    inputs.elevatorPositionInches = elevatorPosition.getValue().in(Radians) * k.drumRadiusInches;
+    inputs.elevatorVelocityInchesPerSec =
+        elevatorVelocity.getValue().in(RadiansPerSecond) * k.drumRadiusInches;
+    inputs.elevatorAppliedVolts = elevatorAppliedVolts.getValue().in(Volts);
+    inputs.elevatorCurrentAmps = elevatorCurrent.getValue().in(Amps);
+    inputs.elevatorTempFahrenheit = elevatorTemp.getValue().in(Fahrenheit);
   }
 
   @Override
-  public void setElevatorVelocity(AngularVelocity velocity) {
+  public void setElevatorVelocity(double velocityInchesPerSec) {
+    double velocity = velocityInchesPerSec / k.drumRadiusInches;
     if (useTorqueControl) {
       elevatorTalon.setControl(
           velocityTorqueCurrentRequest.withVelocity(velocity).withAcceleration(null));
@@ -76,12 +87,13 @@ public class ElevatorIOHardware implements ElevatorIO {
   }
 
   @Override
-  public void setElevatorVolts(Voltage volts) {
+  public void setElevatorVolts(double volts) {
     elevatorTalon.setControl(voltageRequest.withOutput(volts));
   }
 
   @Override
-  public void setElevatorPosition(Angle motorPosition) {
+  public void setElevatorPosition(double motorPositionInches) {
+    double motorPosition = motorPositionInches / k.drumRadiusInches;
     if (useTorqueControl) {
       elevatorTalon.setControl(positionTorqueCurrentRequest.withPosition(motorPosition));
     } else {
