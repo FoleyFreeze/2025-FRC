@@ -1,6 +1,7 @@
 package frc.robot.subsystems.hand;
 // this is the grabby thing
 
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hand extends SubsystemBase {
@@ -15,8 +16,7 @@ public class Hand extends SubsystemBase {
     io.updateInputs(inputs);
   }
 
-  // public Amps getCurrent(){
-  //     return
-  // }
-
+  public Voltage getVoltage() {
+    return (inputs.handAppliedVolts);
+  }
 }
