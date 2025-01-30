@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
@@ -30,6 +31,11 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SuperstructureLocation;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmCals;
+import frc.robot.subsystems.arm.ArmIO;
+import frc.robot.subsystems.arm.ArmIOHardware;
+import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -63,6 +69,7 @@ public class RobotContainer {
   private final Drive drive;
   private SwerveDriveSimulation driveSimulation = null;
   private Elevator elevator = null;
+  private Arm arm = null;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -85,6 +92,7 @@ public class RobotContainer {
                 (pose) -> {});
 
         elevator = new Elevator(new ElevatorIOHardware(new ElevatorCals()));
+        arm = new Arm(new ArmIOHardware(new ArmCals()));
 
         break;
 
@@ -123,6 +131,7 @@ public class RobotContainer {
                 driveSimulation::setSimulationWorldPose);
 
         elevator = new Elevator(new ElevatorIOSim(new ElevatorCals()));
+        arm = new Arm(new ArmIOSim(new ArmCals()));
         break;
 
       default:
@@ -137,6 +146,7 @@ public class RobotContainer {
                 (pose) -> {});
 
         elevator = new Elevator(new ElevatorIO() {});
+        arm = new Arm(new ArmIO() {});
         break;
     }
 
@@ -205,12 +215,13 @@ public class RobotContainer {
                 .andThen(new InstantCommand(() -> SimulatedArena.getInstance().resetFieldForAuto()))
                 .ignoringDisable(true));
 
-    controller
-        .button(2)
-        .onTrue(new InstantCommand(() -> elevator.goTo(SuperstructureLocation.LEVEL4)));
-    controller
-        .button(3)
-        .onTrue(new InstantCommand(() -> elevator.goTo(SuperstructureLocation.INTAKE)));
+    controller.button(2).onTrue(new InstantCommand(() -> goTo(SuperstructureLocation.LEVEL4)));
+    controller.button(3).onTrue(new InstantCommand(() -> goTo(SuperstructureLocation.INTAKE)));
+  }
+
+  public void goTo(SuperstructureLocation loc) {
+    elevator.goTo(loc);
+    arm.goTo(loc);
   }
 
   /**
@@ -247,9 +258,13 @@ public class RobotContainer {
       mechRoot.append(new LoggedMechanismLigament2d("Elevator", 0, 90));
   LoggedMechanismLigament2d mechArm =
       mechElevator.append(new LoggedMechanismLigament2d("Arm", .5, 60));
+  LoggedMechanismLigament2d mechWrist =
+      mechArm.append(new LoggedMechanismLigament2d("Wrist", .3, 60));
 
   public void updateMechanisms() {
     mechElevator.setLength(elevator.getHeight().in(Meters));
+    mechArm.setAngle(arm.getAngleRads().in(Degrees));
+
     Logger.recordOutput("Mechanism", mechBase);
   }
 }

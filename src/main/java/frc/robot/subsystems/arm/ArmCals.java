@@ -2,5 +2,5 @@ package frc.robot.subsystems.arm;
 
 public class ArmCals {
 
-  double armthingradius = 1; // this is NOT the final name/info
+  double armLength = 14.375; // this is the final name/info :)
 }

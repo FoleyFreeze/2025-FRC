@@ -25,7 +25,7 @@ public class ElevatorIOSim implements ElevatorIO {
             Units.inchesToMeters(53.875),
             true,
             0,
-            0.01,
+            0.0001,
             0);
   }
 
@@ -44,7 +44,7 @@ public class ElevatorIOSim implements ElevatorIO {
   @Override
   public void setElevatorVolts(double inputVoltage) {
     this.inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
-    sim.setInputVoltage(inputVoltage);
+    sim.setInputVoltage(this.inputVoltage);
   }
 
   @Override

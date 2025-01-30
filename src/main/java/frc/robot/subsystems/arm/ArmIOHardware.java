@@ -1,7 +1,5 @@
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Rotations;
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -9,8 +7,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Voltage;
 
 public class ArmIOHardware implements ArmIO {
   private final SparkMax motor;
@@ -18,7 +14,7 @@ public class ArmIOHardware implements ArmIO {
   private final AbsoluteEncoder absEncoder;
   private SparkClosedLoopController closedLoopController;
 
-  public ArmIOHardware() {
+  public ArmIOHardware(ArmCals cals) {
     motor = new SparkMax(0, MotorType.kBrushless);
     absEncoder = motor.getAbsoluteEncoder();
     encoder = motor.getEncoder();
@@ -36,13 +32,13 @@ public class ArmIOHardware implements ArmIO {
   }
 
   @Override
-  public void setArmPosition(Angle motorPosition) {
-    closedLoopController.setReference(
-        motorPosition.in(Rotations), ControlType.kMAXMotionPositionControl);
+  public void setArmPosition(double motorPositionRad) {
+    double rotations = Units.radiansToRotations(motorPositionRad);
+    closedLoopController.setReference(rotations, ControlType.kMAXMotionPositionControl);
   }
 
   @Override
-  public void setArmVolts(Voltage volts) {
+  public void setArmVolts(double volts) {
     motor.setVoltage(volts);
   }
 }

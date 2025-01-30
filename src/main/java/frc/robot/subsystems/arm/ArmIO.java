@@ -2,8 +2,6 @@ package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
@@ -20,9 +18,9 @@ public interface ArmIO {
 
   public default void updateInputs(ArmIOInputs inputs) {}
 
-  public default void setArmVolts(Voltage volts) {}
+  public default void setArmVolts(double volts) {}
 
-  public default void setArmVelocity(double velocity) {}
+  public default void setArmVelocity(double velocityRadPerSec) {}
 
-  public default void setArmPosition(Angle motorPosition) {}
+  public default void setArmPosition(double motorPositionRad) {}
 }

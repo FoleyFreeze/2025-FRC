@@ -18,8 +18,12 @@ public class Elevator extends SubsystemBase {
 
   private SuperstructureLocation target = null;
   private Timer targetTime = new Timer();
+  double targetPosition;
+  double targetVelocity;
+  State goalState;
+  State currentState;
   private TrapezoidProfile trajectory =
-      new TrapezoidProfile(new Constraints(10.0, 10.0)); // maxVel, maxAccel
+      new TrapezoidProfile(new Constraints(40.0, 40.0)); // maxVel, maxAccel
 
   public Elevator(ElevatorIO io) {
     this.io = io;
@@ -31,15 +35,13 @@ public class Elevator extends SubsystemBase {
 
     if (target != null) {
       // motion profile to target
-      State currentState =
-          new State(inputs.elevatorPositionInches, inputs.elevatorVelocityInchesPerSec);
-      State goalState = new State(target.eleHeight.in(Inches), 0);
       State command = trajectory.calculate(0.02, currentState, goalState);
       Logger.recordOutput("Elevator/Target", goalState.position);
       Logger.recordOutput("Elevator/CommandPos", command.position);
       Logger.recordOutput("Elevator/CommandVel", command.velocity);
+      currentState = command;
       // PID to change velocity based on position error
-      double kp = 1;
+      double kp = 2;
       double ks = 1.3;
       double kv = 0.5;
       double err = command.position - inputs.elevatorPositionInches;
@@ -60,6 +62,8 @@ public class Elevator extends SubsystemBase {
 
   public void goTo(SuperstructureLocation loc) {
     target = loc;
+    goalState = new State(target.eleHeight.in(Inches), 0);
+    currentState = new State(inputs.elevatorPositionInches, inputs.elevatorVelocityInchesPerSec);
     targetTime.restart();
   }
 
