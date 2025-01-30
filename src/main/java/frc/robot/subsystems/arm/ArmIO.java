@@ -22,5 +22,7 @@ public interface ArmIO {
 
   public default void setArmVolts(Voltage volts) {}
 
+  public default void setArmVelocity(double velocity) {}
+
   public default void setArmPosition(Angle motorPosition) {}
 }

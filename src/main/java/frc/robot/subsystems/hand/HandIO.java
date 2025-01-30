@@ -2,8 +2,6 @@ package frc.robot.subsystems.hand;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
