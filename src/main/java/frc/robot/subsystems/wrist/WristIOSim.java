@@ -3,6 +3,9 @@ package frc.robot.subsystems.wrist;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.subsystems.wrist.WristIO.WristIOInputs;
 import org.littletonrobotics.junction.Logger;
@@ -19,32 +22,49 @@ public class WristIOSim implements WristIO {
   boolean isClosedLoop = false;
   double targetAngle;
 
-  ArmFeedforward ffController = new ArmFeedforward(targetAngle, pi2, inputVoltage);
-  ProfiledPIDController positionPid =
-      new ProfiledPIDController(targetAngle, pi2, inputVoltage, null);
+  ArmFeedforward ffController = new ArmFeedforward(3.6, Units.lbsToKilograms(8), 1);
+  ProfiledPIDController positionPID =
+      new ProfiledPIDController(
+          20,
+          0,
+          0, // volts/rad
+          new TrapezoidProfile.Constraints(2, 4)); // rads
 
   public WristIOSim(WristCals k) {
     this.k = k;
-    double inertiaDist = 1;
-    double inertia = 1;
+    double inertiaDist = Units.inchesToMeters(k.wristLength);
+    double inertia = Units.lbsToKilograms(8) * inertiaDist * inertiaDist;
 
     sim =
         new SingleJointedArmSim(
-            null, inertia, inertia, inertia, inertia, inertiaDist, isClosedLoop, inertia, null);
+            DCMotor.getNEO(1),
+            22.29,
+            inertia,
+            Units.inchesToMeters(k.wristLength),
+            0,
+            Math.PI,
+            true,
+            pi2,
+            0.001,
+            0);
   }
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
     if (isClosedLoop) {
-      inputVoltage = positionPid.calculate(sim.getAngleRads());
-      inputVoltage += ffController.calculate(pi2, inputVoltage);
-      Logger.recordOutput("null", 10);
-      Logger.recordOutput("1", 1);
-      inputVoltage = MathUtil.clamp(inputVoltage, 0, 0);
+      // pid to target angle
+      inputVoltage = positionPID.calculate(sim.getAngleRads());
+      inputVoltage +=
+          ffController.calculate(
+              positionPID.getSetpoint().position, positionPID.getSetpoint().velocity);
+      Logger.recordOutput("Arm/Target", positionPID.getGoal().position);
+      Logger.recordOutput("Arm/CommandPos", positionPID.getSetpoint().position);
+      Logger.recordOutput("Arm/CommandVel", positionPID.getSetpoint().velocity);
+      inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
       sim.setInputVoltage(inputVoltage);
     }
 
-    sim.update(inputVoltage);
+    sim.update(0.02);
 
     inputs.wristPositionRad = sim.getAngleRads() - pi2;
     inputs.wristVelocityRadPerSec = sim.getVelocityRadPerSec();
@@ -58,7 +78,14 @@ public class WristIOSim implements WristIO {
     // adjust position
     positionRad += pi2;
     isClosedLoop = true;
-    positionPid.setGoal(positionRad);
+    positionPID.setGoal(positionRad);
     targetAngle = positionRad;
+  }
+
+  @Override
+  public void setWristVolts(double inputVoltage) {
+    this.inputVoltage = MathUtil.clamp(inputVoltage, 0, 0);
+    isClosedLoop = false;
+    sim.setInputVoltage(this.inputVoltage);
   }
 }

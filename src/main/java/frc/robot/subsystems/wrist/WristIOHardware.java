@@ -14,7 +14,7 @@ public class WristIOHardware implements WristIO {
   private final AbsoluteEncoder absEncoder;
   private SparkClosedLoopController closedLoopController;
 
-  public WristIOHardware() {
+  public WristIOHardware(WristCals k) {
     motor = new SparkMax(0, MotorType.kBrushless);
     absEncoder = motor.getAbsoluteEncoder();
     encoder = motor.getEncoder();

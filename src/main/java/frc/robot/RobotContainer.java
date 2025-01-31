@@ -48,6 +48,11 @@ import frc.robot.subsystems.elevator.ElevatorCals;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOHardware;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.wrist.Wrist;
+import frc.robot.subsystems.wrist.WristCals;
+import frc.robot.subsystems.wrist.WristIO;
+import frc.robot.subsystems.wrist.WristIOHardware;
+import frc.robot.subsystems.wrist.WristIOSim;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -70,6 +75,7 @@ public class RobotContainer {
   private SwerveDriveSimulation driveSimulation = null;
   private Elevator elevator = null;
   private Arm arm = null;
+  private Wrist wrist = null;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -93,6 +99,7 @@ public class RobotContainer {
 
         elevator = new Elevator(new ElevatorIOHardware(new ElevatorCals()));
         arm = new Arm(new ArmIOHardware(new ArmCals()));
+        wrist = new Wrist(new WristIOHardware(new WristCals()));
 
         break;
 
@@ -132,6 +139,7 @@ public class RobotContainer {
 
         elevator = new Elevator(new ElevatorIOSim(new ElevatorCals()));
         arm = new Arm(new ArmIOSim(new ArmCals()));
+        wrist = new Wrist(new WristIOSim(new WristCals()));
         break;
 
       default:
@@ -147,6 +155,7 @@ public class RobotContainer {
 
         elevator = new Elevator(new ElevatorIO() {});
         arm = new Arm(new ArmIO() {});
+        wrist = new Wrist(new WristIO() {});
         break;
     }
 
@@ -222,6 +231,7 @@ public class RobotContainer {
   public void goTo(SuperstructureLocation loc) {
     elevator.goTo(loc);
     arm.goTo(loc);
+    wrist.goTo(loc);
   }
 
   /**
@@ -264,6 +274,7 @@ public class RobotContainer {
   public void updateMechanisms() {
     mechElevator.setLength(elevator.getHeight().in(Meters));
     mechArm.setAngle(arm.getAngleRads().in(Degrees));
+    mechWrist.setAngle(wrist.getAngleRads().in(Degrees));
 
     Logger.recordOutput("Mechanism", mechBase);
   }
