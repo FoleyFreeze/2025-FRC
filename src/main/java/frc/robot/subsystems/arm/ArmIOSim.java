@@ -10,8 +10,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.littletonrobotics.junction.Logger;
 
 public class ArmIOSim implements ArmIO {
-  // TODO: all numbers are zero at the moment, also the notationed overrides break everything for
-  // some reason
+
   private final SingleJointedArmSim sim;
   static final double pi2 = Math.PI / 2.0;
 

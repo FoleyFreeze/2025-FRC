@@ -1,7 +1,5 @@
 package frc.robot.subsystems.wrist;
 
-import static edu.wpi.first.units.Units.Rotations;
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -9,7 +7,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
 
 public class WristIOHardware implements WristIO {
   private final SparkMax motor;
@@ -36,8 +33,8 @@ public class WristIOHardware implements WristIO {
   }
 
   @Override
-  public void setWristPosition(Angle motorPosition) {
+  public void setWristPosition(double motorPosition) {
     closedLoopController.setReference(
-        motorPosition.in(Rotations), ControlType.kMAXMotionPositionControl);
+        Units.radiansToRotations(motorPosition), ControlType.kMAXMotionPositionControl);
   }
 }

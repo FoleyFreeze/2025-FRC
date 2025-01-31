@@ -2,8 +2,6 @@ package frc.robot.subsystems.wrist;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface WristIO {
@@ -20,7 +18,7 @@ public interface WristIO {
 
   public default void updateInputs(WristIOInputs inputs) {}
 
-  public default void setWristVolts(Voltage volts) {}
+  public default void setWristVolts(double volts) {}
 
-  public default void setWristPosition(Angle motorPosition) {}
+  public default void setWristPosition(double rads) {}
 }
