@@ -53,6 +53,10 @@ import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -108,6 +112,71 @@ public class Drive extends SubsystemBase {
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
+
+  public static Drive create() {
+    Drive drive;
+    switch (Constants.currentMode) {
+      case REAL:
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                new ModuleIOTalonFX(TunerConstants.FrontRight),
+                new ModuleIOTalonFX(TunerConstants.BackLeft),
+                new ModuleIOTalonFX(TunerConstants.BackRight),
+                (pose) -> {});
+        break;
+
+      case SIM:
+        // Create and configure a drivetrain simulation configuration
+        final DriveTrainSimulationConfig driveTrainSimulationConfig =
+            DriveTrainSimulationConfig.Default()
+                // Specify gyro type (for realistic gyro drifting and error simulation)
+                .withGyro(COTS.ofPigeon2())
+                // Specify swerve module (for realistic swerve dynamics)
+                .withSwerveModule(
+                    COTS.ofMark4(
+                        DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60
+                        DCMotor.getFalcon500(1), // Steer motor is a Falcon 500
+                        COTS.WHEELS.COLSONS.cof, // Use the COF for Colson Wheels
+                        3)) // L3 Gear ratio
+                // Configures the track length and track width (spacing between swerve modules)
+                .withTrackLengthTrackWidth(Inches.of(24), Inches.of(24))
+                // Configures the bumper size (dimensions of the robot bumper)
+                .withBumperSize(Inches.of(30), Inches.of(30));
+        SwerveDriveSimulation driveSimulation =
+            new SwerveDriveSimulation(
+                driveTrainSimulationConfig,
+                // Specify starting pose
+                new Pose2d(3, 3, new Rotation2d()));
+        // Register the drivetrain simulation to the default simulation world
+        SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIOSim(driveSimulation.getGyroSimulation()),
+                new ModuleIOSim(driveSimulation.getModules()[0]),
+                new ModuleIOSim(driveSimulation.getModules()[1]),
+                new ModuleIOSim(driveSimulation.getModules()[2]),
+                new ModuleIOSim(driveSimulation.getModules()[3]),
+                driveSimulation::setSimulationWorldPose);
+
+        break;
+
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                (pose) -> {});
+    }
+
+    return drive;
+  }
 
   public Drive(
       GyroIO gyroIO,

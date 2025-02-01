@@ -14,13 +14,11 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,33 +28,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SuperstructureLocation;
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.ArmCals;
-import frc.robot.subsystems.arm.ArmIO;
-import frc.robot.subsystems.arm.ArmIOHardware;
-import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.drive.GyroIOSim;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorCals;
-import frc.robot.subsystems.elevator.ElevatorIO;
-import frc.robot.subsystems.elevator.ElevatorIOHardware;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.wrist.Wrist;
-import frc.robot.subsystems.wrist.WristCals;
-import frc.robot.subsystems.wrist.WristIO;
-import frc.robot.subsystems.wrist.WristIOHardware;
-import frc.robot.subsystems.wrist.WristIOSim;
 import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
@@ -85,79 +62,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    switch (Constants.currentMode) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight),
-                (pose) -> {});
 
-        elevator = new Elevator(new ElevatorIOHardware(new ElevatorCals()));
-        arm = new Arm(new ArmIOHardware(new ArmCals()));
-        wrist = new Wrist(new WristIOHardware(new WristCals()));
-
-        break;
-
-      case SIM:
-        // Create and configure a drivetrain simulation configuration
-        final DriveTrainSimulationConfig driveTrainSimulationConfig =
-            DriveTrainSimulationConfig.Default()
-                // Specify gyro type (for realistic gyro drifting and error simulation)
-                .withGyro(COTS.ofPigeon2())
-                // Specify swerve module (for realistic swerve dynamics)
-                .withSwerveModule(
-                    COTS.ofMark4(
-                        DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60
-                        DCMotor.getFalcon500(1), // Steer motor is a Falcon 500
-                        COTS.WHEELS.COLSONS.cof, // Use the COF for Colson Wheels
-                        3)) // L3 Gear ratio
-                // Configures the track length and track width (spacing between swerve modules)
-                .withTrackLengthTrackWidth(Inches.of(24), Inches.of(24))
-                // Configures the bumper size (dimensions of the robot bumper)
-                .withBumperSize(Inches.of(30), Inches.of(30));
-        driveSimulation =
-            new SwerveDriveSimulation(
-                driveTrainSimulationConfig,
-                // Specify starting pose
-                new Pose2d(3, 3, new Rotation2d()));
-        // Register the drivetrain simulation to the default simulation world
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIOSim(driveSimulation.getGyroSimulation()),
-                new ModuleIOSim(driveSimulation.getModules()[0]),
-                new ModuleIOSim(driveSimulation.getModules()[1]),
-                new ModuleIOSim(driveSimulation.getModules()[2]),
-                new ModuleIOSim(driveSimulation.getModules()[3]),
-                driveSimulation::setSimulationWorldPose);
-
-        elevator = new Elevator(new ElevatorIOSim(new ElevatorCals()));
-        arm = new Arm(new ArmIOSim(new ArmCals()));
-        wrist = new Wrist(new WristIOSim(new WristCals()));
-        break;
-
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                (pose) -> {});
-
-        elevator = new Elevator(new ElevatorIO() {});
-        arm = new Arm(new ArmIO() {});
-        wrist = new Wrist(new WristIO() {});
-        break;
-    }
+    drive = Drive.create();
+    wrist = Wrist.create();
+    arm = Arm.create();
+    elevator = Elevator.create();
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

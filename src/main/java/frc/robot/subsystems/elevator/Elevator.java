@@ -8,6 +8,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.commands.SuperstructureLocation;
 import org.littletonrobotics.junction.Logger;
 
@@ -24,6 +25,25 @@ public class Elevator extends SubsystemBase {
   State currentState;
   private TrapezoidProfile trajectory =
       new TrapezoidProfile(new Constraints(40.0, 40.0)); // maxVel, maxAccel
+
+  public static Elevator create() {
+    Elevator elevator;
+    switch (Constants.currentMode) {
+      case REAL:
+        elevator = new Elevator(new ElevatorIOHardware(new ElevatorCals()));
+        break;
+
+      case SIM:
+        elevator = new Elevator(new ElevatorIOSim(new ElevatorCals()));
+        break;
+
+      default:
+        elevator = new Elevator(new ElevatorIO() {});
+        break;
+    }
+
+    return elevator;
+  }
 
   public Elevator(ElevatorIO io) {
     this.io = io;
