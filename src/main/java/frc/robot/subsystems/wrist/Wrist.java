@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Radians;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.SuperstructureLocation;
+import org.littletonrobotics.junction.Logger;
 
 public class Wrist extends SubsystemBase {
   private final WristIO io;
@@ -18,6 +19,7 @@ public class Wrist extends SubsystemBase {
 
   public void periodic() {
     io.updateInputs(inputs);
+    Logger.processInputs("Wrist", inputs);
   }
 
   public double getVoltage() {

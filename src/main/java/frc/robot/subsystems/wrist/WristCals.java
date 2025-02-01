@@ -1,5 +1,5 @@
 package frc.robot.subsystems.wrist;
 
 public class WristCals {
-  double wristLength = 16;
+  double wristLength = 6;
 }

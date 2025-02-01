@@ -22,7 +22,7 @@ public class WristIOSim implements WristIO {
   boolean isClosedLoop = false;
   double targetAngle;
 
-  ArmFeedforward ffController = new ArmFeedforward(3.6, Units.lbsToKilograms(8), 1);
+  ArmFeedforward ffController = new ArmFeedforward(3.6, Units.lbsToKilograms(5), 1);
   ProfiledPIDController positionPID =
       new ProfiledPIDController(
           20,
@@ -33,18 +33,18 @@ public class WristIOSim implements WristIO {
   public WristIOSim(WristCals k) {
     this.k = k;
     double inertiaDist = Units.inchesToMeters(k.wristLength);
-    double inertia = Units.lbsToKilograms(8) * inertiaDist * inertiaDist;
+    double inertia = Units.lbsToKilograms(5) * inertiaDist * inertiaDist;
 
     sim =
         new SingleJointedArmSim(
             DCMotor.getNEO(1),
-            22.29,
+            24.3,
             inertia,
             Units.inchesToMeters(k.wristLength),
-            0,
-            Math.PI,
-            true,
+            -pi2,
             pi2,
+            true,
+            0,
             0.001,
             0);
   }
@@ -57,16 +57,16 @@ public class WristIOSim implements WristIO {
       inputVoltage +=
           ffController.calculate(
               positionPID.getSetpoint().position, positionPID.getSetpoint().velocity);
-      Logger.recordOutput("Arm/Target", positionPID.getGoal().position);
-      Logger.recordOutput("Arm/CommandPos", positionPID.getSetpoint().position);
-      Logger.recordOutput("Arm/CommandVel", positionPID.getSetpoint().velocity);
+      Logger.recordOutput("Wrist/Target", positionPID.getGoal().position);
+      Logger.recordOutput("Wrist/CommandPos", positionPID.getSetpoint().position);
+      Logger.recordOutput("Wrist/CommandVel", positionPID.getSetpoint().velocity);
       inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
       sim.setInputVoltage(inputVoltage);
     }
 
     sim.update(0.02);
 
-    inputs.wristPositionRad = sim.getAngleRads() - pi2;
+    inputs.wristPositionRad = sim.getAngleRads();
     inputs.wristVelocityRadPerSec = sim.getVelocityRadPerSec();
     inputs.wristAppliedVolts = inputVoltage;
     inputs.wristCurrent = sim.getCurrentDrawAmps();
@@ -75,8 +75,6 @@ public class WristIOSim implements WristIO {
 
   @Override
   public void setWristPosition(double positionRad) {
-    // adjust position
-    positionRad += pi2;
     isClosedLoop = true;
     positionPID.setGoal(positionRad);
     targetAngle = positionRad;
@@ -84,7 +82,7 @@ public class WristIOSim implements WristIO {
 
   @Override
   public void setWristVolts(double inputVoltage) {
-    this.inputVoltage = MathUtil.clamp(inputVoltage, 0, 0);
+    this.inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
     isClosedLoop = false;
     sim.setInputVoltage(this.inputVoltage);
   }

@@ -74,7 +74,7 @@ public class ArmIOSim implements ArmIO {
 
   @Override
   public void setArmVolts(double inputVoltage) {
-    this.inputVoltage = MathUtil.clamp(inputVoltage, 0, 0);
+    this.inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
     isClosedLoop = false;
     sim.setInputVoltage(this.inputVoltage);
   }
