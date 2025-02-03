@@ -7,8 +7,8 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
 
 public class ArmIOHardware implements ArmIO {
@@ -24,8 +24,7 @@ public class ArmIOHardware implements ArmIO {
     closedLoopController = motor.getClosedLoopController();
 
     SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoop.pid(0, 0, 0)
-                     .outputRange(-3, 3);
+    config.closedLoop.pid(0, 0, 0).outputRange(-3, 3);
     config.closedLoopRampRate(0);
 
     config.smartCurrentLimit(40);
@@ -36,7 +35,7 @@ public class ArmIOHardware implements ArmIO {
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    //read the absolute encoder and reset the relative one
+    // read the absolute encoder and reset the relative one
     double absEncVal = absEncoder.getPosition();
     encoder.setPosition(absEncVal);
   }
