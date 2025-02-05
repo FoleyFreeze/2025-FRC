@@ -7,7 +7,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
 public enum SuperstructureLocation {
-  
   HOLD(0, 0, 0),
   LEVEL1(0, 0, 0),
   LEVEL2(0, 0, 0),

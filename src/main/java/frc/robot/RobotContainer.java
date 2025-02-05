@@ -49,10 +49,10 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   public final Drive drive;
-  public final SwerveDriveSimulation driveSimulation = null;
-  public final Elevator elevator = null;
-  public final Arm arm = null;
-  public final Wrist wrist = null;
+  public final SwerveDriveSimulation driveSimulation;
+  public final Elevator elevator;
+  public final Arm arm;
+  public final Wrist wrist;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);

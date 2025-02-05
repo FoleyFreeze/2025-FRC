@@ -20,7 +20,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -72,8 +71,8 @@ public class ElevatorIOHardware implements ElevatorIO {
     config.CurrentLimits.SupplyCurrentLowerTime = 1;
 
     config.Feedback.SensorToMechanismRatio = k.gearRatio;
-    
-    //config.MotionMagic
+
+    // config.MotionMagic
 
     config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
     config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
@@ -85,7 +84,7 @@ public class ElevatorIOHardware implements ElevatorIO {
     config.Slot0.kI = 0;
     config.Slot0.kD = 0;
 
-    //config.TorqueCurrent
+    // config.TorqueCurrent
 
     config.Voltage.PeakForwardVoltage = 6;
     config.Voltage.PeakReverseVoltage = -3;
