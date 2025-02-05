@@ -48,17 +48,25 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final Drive drive;
-  private SwerveDriveSimulation driveSimulation = null;
-  private Elevator elevator = null;
-  private Arm arm = null;
-  private Wrist wrist = null;
+  public final Drive drive;
+  public final SwerveDriveSimulation driveSimulation = null;
+  public final Elevator elevator = null;
+  public final Arm arm = null;
+  public final Wrist wrist = null;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
+  private static RobotContainer r = null;
+  public static RobotContainer getInstance(){
+    if(r == null){
+        r = new RobotContainer();
+    }
+    return r;
+  }
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
