@@ -1,5 +1,15 @@
 package frc.robot.commands;
 
-public class ComplexCommand {
+import edu.wpi.first.wpilibj2.command.Command;
 
+public class ComplexCommands {
+
+    public static Command camCoralScore() {
+        return null;
+    }
+    public static Command blindCoralScore() {
+        return null;
+    }
+
+    
 }
