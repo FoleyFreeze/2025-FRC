@@ -1,4 +1,4 @@
-package frc.robot.subsystems.hand;
+package frc.robot.subsystems.LEDs;
 
 public class LEDIO {
 
