@@ -113,6 +113,8 @@ public class Drive extends SubsystemBase {
 
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
 
+  public SwerveDriveSimulation driveSimulation;
+
   public static Drive create() {
     Drive drive;
     switch (Constants.currentMode) {
@@ -144,22 +146,24 @@ public class Drive extends SubsystemBase {
                 .withTrackLengthTrackWidth(Inches.of(24), Inches.of(24))
                 // Configures the bumper size (dimensions of the robot bumper)
                 .withBumperSize(Inches.of(30), Inches.of(30));
-        SwerveDriveSimulation driveSimulation =
+        SwerveDriveSimulation sim =
             new SwerveDriveSimulation(
                 driveTrainSimulationConfig,
                 // Specify starting pose
                 new Pose2d(3, 3, new Rotation2d()));
         // Register the drivetrain simulation to the default simulation world
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+        SimulatedArena.getInstance().addDriveTrainSimulation(sim);
         // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
-                new GyroIOSim(driveSimulation.getGyroSimulation()),
-                new ModuleIOSim(driveSimulation.getModules()[0]),
-                new ModuleIOSim(driveSimulation.getModules()[1]),
-                new ModuleIOSim(driveSimulation.getModules()[2]),
-                new ModuleIOSim(driveSimulation.getModules()[3]),
-                driveSimulation::setSimulationWorldPose);
+                new GyroIOSim(sim.getGyroSimulation()),
+                new ModuleIOSim(sim.getModules()[0]),
+                new ModuleIOSim(sim.getModules()[1]),
+                new ModuleIOSim(sim.getModules()[2]),
+                new ModuleIOSim(sim.getModules()[3]),
+                sim::setSimulationWorldPose);
+
+        drive.driveSimulation = sim;
 
         break;
 

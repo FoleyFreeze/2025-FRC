@@ -33,7 +33,6 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.wrist.Wrist;
 import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
@@ -49,7 +48,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   public final Drive drive;
-  public final SwerveDriveSimulation driveSimulation;
   public final Elevator elevator;
   public final Arm arm;
   public final Wrist wrist;
@@ -61,9 +59,10 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   private static RobotContainer r = null;
-  public static RobotContainer getInstance(){
-    if(r == null){
-        r = new RobotContainer();
+
+  public static RobotContainer getInstance() {
+    if (r == null) {
+      r = new RobotContainer();
     }
     return r;
   }
@@ -133,7 +132,7 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                     Constants.currentMode == Constants.Mode.SIM
-                        ? () -> drive.setPose(driveSimulation.getSimulatedDriveTrainPose())
+                        ? () -> drive.setPose(drive.driveSimulation.getSimulatedDriveTrainPose())
                         : () ->
                             drive.setPose(
                                 new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
@@ -172,7 +171,7 @@ public class RobotContainer {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
     Logger.recordOutput(
-        "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
+        "FieldSimulation/RobotPosition", drive.driveSimulation.getSimulatedDriveTrainPose());
     Logger.recordOutput(
         "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(
