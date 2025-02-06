@@ -11,83 +11,83 @@ import org.littletonrobotics.junction.Logger;
 
 public class ArmIOSim implements ArmIO {
 
-  private final SingleJointedArmSim sim;
-  static final double pi2 = Math.PI / 2.0;
+    private final SingleJointedArmSim sim;
+    static final double pi2 = Math.PI / 2.0;
 
-  ArmCals k;
+    ArmCals k;
 
-  double inputVoltage;
+    double inputVoltage;
 
-  boolean isClosedLoop = false;
-  double targetAngle;
+    boolean isClosedLoop = false;
+    double targetAngle;
 
-  ArmFeedforward ffController = new ArmFeedforward(3.6, Units.lbsToKilograms(8), 1);
-  ProfiledPIDController positionPID =
-      new ProfiledPIDController(
-          20,
-          0,
-          0, // volts/rad
-          new TrapezoidProfile.Constraints(2, 4)); // rads
+    ArmFeedforward ffController = new ArmFeedforward(3.6, Units.lbsToKilograms(8), 1);
+    ProfiledPIDController positionPID =
+            new ProfiledPIDController(
+                    20,
+                    0,
+                    0, // volts/rad
+                    new TrapezoidProfile.Constraints(2, 4)); // rads
 
-  public ArmIOSim(ArmCals k) {
-    this.k = k;
-    double inertiaDist = Units.inchesToMeters(k.armLength);
-    double inertia = Units.lbsToKilograms(8) * inertiaDist * inertiaDist;
+    public ArmIOSim(ArmCals k) {
+        this.k = k;
+        double inertiaDist = Units.inchesToMeters(k.armLength);
+        double inertia = Units.lbsToKilograms(8) * inertiaDist * inertiaDist;
 
-    sim =
-        new SingleJointedArmSim(
-            DCMotor.getNEO(1),
-            22.29,
-            inertia,
-            Units.inchesToMeters(k.armLength),
-            0,
-            Math.PI,
-            true,
-            pi2,
-            0.001,
-            0);
-  }
-
-  @Override
-  public void updateInputs(ArmIOInputs inputs) {
-    if (isClosedLoop) {
-      // pid to target angle
-      inputVoltage = positionPID.calculate(sim.getAngleRads());
-      inputVoltage +=
-          ffController.calculate(
-              positionPID.getSetpoint().position, positionPID.getSetpoint().velocity);
-      Logger.recordOutput("Arm/Target", positionPID.getGoal().position);
-      Logger.recordOutput("Arm/CommandPos", positionPID.getSetpoint().position);
-      Logger.recordOutput("Arm/CommandVel", positionPID.getSetpoint().velocity);
-      inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
-      sim.setInputVoltage(inputVoltage);
+        sim =
+                new SingleJointedArmSim(
+                        DCMotor.getNEO(1),
+                        22.29,
+                        inertia,
+                        Units.inchesToMeters(k.armLength),
+                        0,
+                        Math.PI,
+                        true,
+                        pi2,
+                        0.001,
+                        0);
     }
 
-    sim.update(0.02);
+    @Override
+    public void updateInputs(ArmIOInputs inputs) {
+        if (isClosedLoop) {
+            // pid to target angle
+            inputVoltage = positionPID.calculate(sim.getAngleRads());
+            inputVoltage +=
+                    ffController.calculate(
+                            positionPID.getSetpoint().position, positionPID.getSetpoint().velocity);
+            Logger.recordOutput("Arm/Target", positionPID.getGoal().position);
+            Logger.recordOutput("Arm/CommandPos", positionPID.getSetpoint().position);
+            Logger.recordOutput("Arm/CommandVel", positionPID.getSetpoint().velocity);
+            inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
+            sim.setInputVoltage(inputVoltage);
+        }
 
-    inputs.armPositionRad = sim.getAngleRads() - pi2;
-    inputs.armVelocityRadPerSec = sim.getVelocityRadPerSec();
-    inputs.armAppliedVolts = inputVoltage;
-    inputs.armCurrent = sim.getCurrentDrawAmps();
-    inputs.armTempF = 0;
-  }
+        sim.update(0.02);
 
-  @Override
-  public void setArmVolts(double inputVoltage) {
-    this.inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
-    isClosedLoop = false;
-    sim.setInputVoltage(this.inputVoltage);
-  }
+        inputs.armPositionRad = sim.getAngleRads() - pi2;
+        inputs.armVelocityRadPerSec = sim.getVelocityRadPerSec();
+        inputs.armAppliedVolts = inputVoltage;
+        inputs.armCurrent = sim.getCurrentDrawAmps();
+        inputs.armTempF = 0;
+    }
 
-  @Override
-  public void setArmPosition(double positionRad) {
-    // adjust position
-    positionRad += pi2;
-    isClosedLoop = true;
-    positionPID.setGoal(positionRad);
-    targetAngle = positionRad;
-  }
+    @Override
+    public void setArmVolts(double inputVoltage) {
+        this.inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
+        isClosedLoop = false;
+        sim.setInputVoltage(this.inputVoltage);
+    }
 
-  @Override
-  public void setArmVelocity(double velocityRadPerSec) {}
+    @Override
+    public void setArmPosition(double positionRad) {
+        // adjust position
+        positionRad += pi2;
+        isClosedLoop = true;
+        positionPID.setGoal(positionRad);
+        targetAngle = positionRad;
+    }
+
+    @Override
+    public void setArmVelocity(double velocityRadPerSec) {}
 }

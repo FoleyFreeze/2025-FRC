@@ -1,3 +1,3 @@
 package frc.robot.subsystems.hand;
 
-public class HandIOSim {}
+public class HandIOSim implements HandIO {}

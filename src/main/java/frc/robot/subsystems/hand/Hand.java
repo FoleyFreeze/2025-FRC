@@ -1,21 +1,48 @@
 package frc.robot.subsystems.hand;
 // this is the grabby thing
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import org.littletonrobotics.junction.Logger;
 
 public class Hand extends SubsystemBase {
-  private final HandIO io;
-  private final HandIOInputsAutoLogged inputs = new HandIOInputsAutoLogged();
+    private final HandIO io;
+    private final HandIOInputsAutoLogged inputs = new HandIOInputsAutoLogged();
 
-  public Hand(HandIO io) {
-    this.io = io;
-  }
+    public static Hand create() {
+        Hand hand;
+        switch (Constants.currentMode) {
+            case REAL:
+                hand = new Hand(new HandIOHardware(new HandCals()));
+                break;
 
-  public void periodic() {
-    io.updateInputs(inputs);
-  }
+            case SIM:
+                hand = new Hand(new HandIOSim());
+                break;
 
-  public double getVoltage() {
-    return (inputs.handAppliedVolts);
-  }
+            default:
+                hand = new Hand(new HandIO() {});
+                break;
+        }
+        return hand;
+    }
+
+    public Hand(HandIO io) {
+        this.io = io;
+    }
+
+    public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("Hand", inputs);
+    }
+
+    public double getVoltage() {
+        return (inputs.handAppliedVolts);
+    }
+
+    public Command setVoltage(double volts) {
+        return new RunCommand(() -> io.setHandVolts(volts), this);
+    }
 }
