@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SuperstructureLocation;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.controls.ControlBoard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hand.Hand;
@@ -53,9 +54,10 @@ public class RobotContainer {
     public final Arm arm;
     public final Wrist wrist;
     public final Hand hand;
+    public final ControlBoard controlBoard;
 
     // Controller
-    private final CommandXboxController controller = new CommandXboxController(0);
+    public final CommandXboxController controller = new CommandXboxController(0);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
