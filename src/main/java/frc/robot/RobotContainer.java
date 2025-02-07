@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.SuperstructureLocation;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -157,15 +156,19 @@ public class RobotContainer {
                                                                 .resetFieldForAuto()))
                                 .ignoringDisable(true));
 
-        controller.button(2).onTrue(new InstantCommand(() -> goTo(SuperstructureLocation.LEVEL4)));
-        controller.button(3).onTrue(new InstantCommand(() -> goTo(SuperstructureLocation.INTAKE)));
+        // controller.button(2).onTrue(new InstantCommand(() ->
+        // goTo(SuperstructureLocation.LEVEL4)));
+        // controller.button(3).onTrue(new InstantCommand(() ->
+        // goTo(SuperstructureLocation.INTAKE)));
     }
 
+    /*
     public void goTo(SuperstructureLocation loc) {
         elevator.goTo(loc);
         arm.goTo(loc);
         wrist.goTo(loc);
     }
+    */
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.

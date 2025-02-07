@@ -1,9 +1,13 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOSim implements ElevatorIO {
 
@@ -12,6 +16,13 @@ public class ElevatorIOSim implements ElevatorIO {
     ElevatorCals k;
 
     double inputVoltage;
+
+    boolean isClosedLoop;
+    double target;
+
+    ElevatorFeedforward ffController = new ElevatorFeedforward(0.1, 1.2, 0.5);
+    ProfiledPIDController positionPID =
+            new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(40, 60));
 
     public ElevatorIOSim(ElevatorCals k) {
         this.k = k;
@@ -31,6 +42,17 @@ public class ElevatorIOSim implements ElevatorIO {
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
+        if (isClosedLoop) {
+            // run pid
+            inputVoltage = positionPID.calculate(Units.metersToInches(sim.getPositionMeters()));
+            inputVoltage += ffController.calculate(positionPID.getSetpoint().velocity);
+            Logger.recordOutput("Elevator/Target", positionPID.getGoal().position);
+            Logger.recordOutput("Elevator/CommandPos", positionPID.getSetpoint().position);
+            Logger.recordOutput("Elevator/CommandVel", positionPID.getSetpoint().velocity);
+            inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
+            sim.setInputVoltage(inputVoltage);
+        }
+
         sim.update(0.02);
 
         inputs.elevatorConnected = true;
@@ -44,12 +66,17 @@ public class ElevatorIOSim implements ElevatorIO {
 
     @Override
     public void setElevatorVolts(double inputVoltage) {
+        isClosedLoop = false;
         this.inputVoltage = MathUtil.clamp(inputVoltage, -12, 12);
         sim.setInputVoltage(this.inputVoltage);
     }
 
     @Override
-    public void setElevatorPosition(double motorPositionInches) {}
+    public void setElevatorPosition(double motorPositionInches) {
+        isClosedLoop = true;
+        positionPID.setGoal(motorPositionInches);
+        target = motorPositionInches;
+    }
 
     @Override
     public void setElevatorVelocity(double velocityInchesPerSec) {}
