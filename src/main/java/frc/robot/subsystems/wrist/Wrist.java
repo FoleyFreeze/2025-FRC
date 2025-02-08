@@ -3,9 +3,12 @@ package frc.robot.subsystems.wrist;
 import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.SuperstructureLocation;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Wrist extends SubsystemBase {
@@ -45,9 +48,12 @@ public class Wrist extends SubsystemBase {
         return (inputs.wristAppliedVolts);
     }
 
-    public void goTo(SuperstructureLocation loc) {
-        target = loc;
-        setAngle(loc.armAngle);
+    public Command goTo(Supplier<SuperstructureLocation> loc) {
+        return new InstantCommand(
+                () -> {
+                    io.setWristPosition(0);
+                },
+                this);
     }
 
     public void setAngle(Angle angle) {

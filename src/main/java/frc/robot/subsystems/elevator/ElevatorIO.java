@@ -17,9 +17,9 @@ public interface ElevatorIO {
 
     public default void updateInputs(ElevatorIOInputs inputs) {}
 
-    public default void setElevatorVelocity(double velocity) {}
+    public default void setElevatorVelocity(double velocityInPerSec) {}
 
     public default void setElevatorVolts(double volts) {}
 
-    public default void setElevatorPosition(double motorPosition) {}
+    public default void setElevatorPosition(double motorPositionInches) {}
 }

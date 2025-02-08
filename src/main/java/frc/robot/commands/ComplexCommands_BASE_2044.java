@@ -2,8 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class ComplexCommands {
@@ -16,19 +14,17 @@ public class ComplexCommands {
 
     static RobotContainer r = RobotContainer.getInstance();
 
-    // notice: this is a hack
-    static Supplier<SuperstructureLocation> upProvider =
-            new Supplier<SuperstructureLocation>() {
-                public SuperstructureLocation get() {
-                    return SuperstructureLocation.LEVEL3;
-                }
-            };
-    static Supplier<SuperstructureLocation> downProvider =
-            new Supplier<SuperstructureLocation>() {
-                public SuperstructureLocation get() {
-                    return SuperstructureLocation.INTAKE;
-                }
-            };
+    //notice: this is a hack
+    static Supplier<SuperstructureLocation> upProvider = new Supplier<SuperstructureLocation>(){
+        public SuperstructureLocation get(){
+            return SuperstructureLocation.LEVEL3;
+        }
+    };
+    static Supplier<SuperstructureLocation> downProvider = new Supplier<SuperstructureLocation>(){
+        public SuperstructureLocation get(){
+            return SuperstructureLocation.INTAKE;
+        }
+    };
 
     public static Command fancyCoralScore() {
         return null;
@@ -59,21 +55,12 @@ public class ComplexCommands {
 
     // lines up with target field element
     public static Command snapToAngle() {
-        return DriveCommands.joystickDriveAtAngle(r.drive, 
-                                            () -> -r.controller.getLeftY(),
-                                            () -> -r.controller.getLeftX(),
-                                            r.controlBoard::getAlignAngle);
+        return null;
     }
-
-    DoubleSupplier ds = new DoubleSupplier() {
-        public double getAsDouble(){
-            return 7;
-        }
-    };
 
     // moves elevator to a height with arm tucked up, then deploys arm
     public static Command goToLoc(Supplier<SuperstructureLocation> p) {
-        return r.arm.goTo(p).andThen(r.elevator.goTo(p)).andThen(r.arm.goTo(p)).alongWith(r.wrist.goTo(p));
+        return r.elevator.goTo(p);
         //arm to 0, elevator move, arm out
     }
 

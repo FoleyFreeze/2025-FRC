@@ -16,19 +16,17 @@ public class ComplexCommands {
 
     static RobotContainer r = RobotContainer.getInstance();
 
-    // notice: this is a hack
-    static Supplier<SuperstructureLocation> upProvider =
-            new Supplier<SuperstructureLocation>() {
-                public SuperstructureLocation get() {
-                    return SuperstructureLocation.LEVEL3;
-                }
-            };
-    static Supplier<SuperstructureLocation> downProvider =
-            new Supplier<SuperstructureLocation>() {
-                public SuperstructureLocation get() {
-                    return SuperstructureLocation.INTAKE;
-                }
-            };
+    //notice: this is a hack
+    static Supplier<SuperstructureLocation> upProvider = new Supplier<SuperstructureLocation>(){
+        public SuperstructureLocation get(){
+            return SuperstructureLocation.LEVEL3;
+        }
+    };
+    static Supplier<SuperstructureLocation> downProvider = new Supplier<SuperstructureLocation>(){
+        public SuperstructureLocation get(){
+            return SuperstructureLocation.INTAKE;
+        }
+    };
 
     public static Command fancyCoralScore() {
         return null;
