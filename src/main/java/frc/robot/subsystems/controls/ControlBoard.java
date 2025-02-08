@@ -51,11 +51,11 @@ public class ControlBoard {
     public SuperstructureLocation getLevelFromController(CommandXboxController controller) {
         int level = 0;
         if (controller.button(8).getAsBoolean()) {
-            level = 1;
-        } else if (controller.button(9).getAsBoolean()) {
-            level = 3;
-        } else {
             level = 2;
+        } else if (controller.button(9).getAsBoolean()) {
+            level = 4;
+        } else {
+            level = 3;
         }
 
         return getLevelLocation(level);

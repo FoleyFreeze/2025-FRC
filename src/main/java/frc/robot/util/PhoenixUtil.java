@@ -23,10 +23,12 @@ import org.ironmaple.simulation.SimulatedArena;
 public class PhoenixUtil {
     /** Attempts to run the command until no error is produced. */
     public static void tryUntilOk(int maxAttempts, Supplier<StatusCode> command) {
-        for (int i = 0; i < maxAttempts; i++) {
+        int i = 0;
+        for (; i < maxAttempts; i++) {
             var error = command.get();
             if (error.isOK()) break;
         }
+        if (i == maxAttempts) System.out.println("FAILED TO APPLY CTRE COMMAND!!!!!!!!!!!!!!");
     }
 
     public static double[] getSimulationOdometryTimeStamps() {

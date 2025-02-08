@@ -7,11 +7,11 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
 public enum SuperstructureLocation {
-    HOLD(0, 0, 0),
-    LEVEL1(0, 0, 0),
-    LEVEL2(0, 0, 0),
-    LEVEL3(0, 0, 0),
-    LEVEL4(50, 60, 0),
+    HOLD(4, 0, 0),
+    LEVEL1(12, 30, 0),
+    LEVEL2(6.1, 34, 99),
+    LEVEL3(17.3, 24.3, 68),
+    LEVEL4(41.7, 37, 85),
 
     PRENET(0, 0, 0),
     NET(0, 0, 0),
@@ -26,7 +26,7 @@ public enum SuperstructureLocation {
 
     FLOOR_GATHER_ALGAE(0, 0, 0),
     SCORE_PROCESSOR(0, 0, 0),
-    INTAKE(5, -60, 0),
+    INTAKE(3, -32, -59),
     SAFE(0, 0, 0);
 
     public final Distance eleHeight;

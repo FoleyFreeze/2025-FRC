@@ -6,15 +6,15 @@ import frc.robot.RobotContainer;
 import java.util.function.Supplier;
 
 public class ComplexCommands {
-    static double intakePower = 0;
-    static double holdPower = 0;
-    static double releasePower = 0;
+    static double intakePower = 1.0;
+    static double holdPower = 0.5;
+    static double releasePower = -5;
     static double releaseTime = 0.5;
 
     static double detectHandCurrent = 0;
     static double gatherPosition = 0;
 
-    static RobotContainer r = RobotContainer.getInstance();
+    public static RobotContainer r;
 
     // notice: this is a hack
     static Supplier<SuperstructureLocation> upProvider =
@@ -81,9 +81,9 @@ public class ComplexCommands {
     // moves elevator to a height with arm tucked up, then deploys arm
     public static Command goToLoc(Supplier<SuperstructureLocation> p) {
         return r.arm.goTo(() -> SuperstructureLocation.HOLD)
-                .alongWith(r.wrist.goTo(p))
+                .alongWith(r.wrist.goToLimit(p))
                 .andThen(r.elevator.goTo(p))
-                .andThen(r.arm.goTo(p));
+                .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
         // arm to 0, elevator move, arm out
     }
 

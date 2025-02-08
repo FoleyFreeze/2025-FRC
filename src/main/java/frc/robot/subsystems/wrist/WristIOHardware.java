@@ -30,14 +30,14 @@ public class WristIOHardware implements WristIO {
         config.smartCurrentLimit(30);
         config.secondaryCurrentLimit(60);
 
-        config.encoder.positionConversionFactor(1.0 / cals.gearRatioToAbsEncoder);
+        config.encoder.positionConversionFactor(1.0 / cals.gearRatio);
         config.absoluteEncoder.positionConversionFactor(1.0 / cals.gearRatioToAbsEncoder);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
-        encoder.setPosition(absEncVal);
+        encoder.setPosition(absEncVal - 0.25); // add 0.25 revolutions to start at 90deg
     }
 
     @Override
@@ -47,13 +47,13 @@ public class WristIOHardware implements WristIO {
                 Units.radiansPerSecondToRotationsPerMinute(encoder.getVelocity());
         inputs.wristAppliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();
         inputs.wristCurrent = motor.getOutputCurrent();
-        inputs.wristTempF = motor.getMotorTemperature();
-        inputs.absEncAngleRad = absEncoder.getPosition();
+        inputs.wristTempF = motor.getMotorTemperature() * 9 / 5.0 + 32;
+        inputs.absEncAngleRad = Units.rotationsToRadians(absEncoder.getPosition());
     }
 
     @Override
     public void setWristPosition(double motorPosition) {
         closedLoopController.setReference(
-                Units.radiansToRotations(motorPosition), ControlType.kMAXMotionPositionControl);
+                Units.radiansToRotations(motorPosition), ControlType.kPosition);
     }
 }

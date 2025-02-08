@@ -37,7 +37,8 @@ public class ArmIOHardware implements ArmIO {
 
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
-        encoder.setPosition(absEncVal);
+        // encoder.setPosition(absEncVal);
+        encoder.setPosition(Units.degreesToRotations(-83)); // TODO: use abs encoder once wired up
     }
 
     @Override
@@ -47,14 +48,14 @@ public class ArmIOHardware implements ArmIO {
                 Units.radiansPerSecondToRotationsPerMinute(encoder.getVelocity());
         inputs.armAppliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();
         inputs.armCurrent = motor.getOutputCurrent();
-        inputs.armTempF = motor.getMotorTemperature();
-        inputs.absEncAngleRad = absEncoder.getPosition();
+        inputs.armTempF = motor.getMotorTemperature() * 9 / 5.0 + 32;
+        inputs.absEncAngleRad = Units.rotationsToRadians(absEncoder.getPosition());
     }
 
     @Override
     public void setArmPosition(double motorPositionRad) {
         double rotations = Units.radiansToRotations(motorPositionRad);
-        closedLoopController.setReference(rotations, ControlType.kMAXMotionPositionControl);
+        closedLoopController.setReference(rotations, ControlType.kPosition);
     }
 
     @Override

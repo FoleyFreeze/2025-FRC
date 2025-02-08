@@ -1,7 +1,9 @@
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -22,13 +24,14 @@ public class Arm extends SubsystemBase {
 
     public static Arm create() {
         Arm arm;
+        ArmCals cals = new ArmCals();
         switch (Constants.currentMode) {
             case REAL:
-                arm = new Arm(new ArmIOHardware(new ArmCals()));
+                arm = new Arm(new ArmIOHardware(cals));
                 break;
 
             case SIM:
-                arm = new Arm(new ArmIOSim(new ArmCals()));
+                arm = new Arm(new ArmIOSim(cals));
                 break;
 
             default:
@@ -36,6 +39,7 @@ public class Arm extends SubsystemBase {
                 break;
         }
 
+        arm.k = cals;
         return arm;
     }
 
@@ -46,6 +50,8 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
+
+        Logger.recordOutput("Arm/Setpoint", target == null ? 0 : target.armAngle.in(Radians));
     }
 
     public Angle getAngleRads() {
@@ -57,8 +63,22 @@ public class Arm extends SubsystemBase {
     }
 
     public Command goTo(Supplier<SuperstructureLocation> loc) {
-        return new RunCommand(() -> io.setArmPosition(loc.get().armAngle.in(Radians)), this)
-                .until(() -> atTarget(loc));
+        return new RunCommand(
+                        () -> {
+                            target = loc.get();
+                            io.setArmPosition(target.armAngle.in(Radians));
+                        },
+                        this)
+                .until(() -> atTarget(loc))
+                .finallyDo(
+                        b -> {
+                            if (!b)
+                                System.out.format(
+                                        "Arm completed at %.1f with err %.1f\n",
+                                        loc.get().armAngle.in(Degrees),
+                                        Units.radiansToDegrees(inputs.armPositionRad)
+                                                - loc.get().armAngle.in(Degrees));
+                        });
     }
 
     public boolean atTarget(Supplier<SuperstructureLocation> loc) {
@@ -69,6 +89,11 @@ public class Arm extends SubsystemBase {
     }
 
     public Command stop() {
-        return new InstantCommand(() -> io.setArmVolts(0), this);
+        return new InstantCommand(
+                () -> {
+                    io.setArmVolts(0);
+                    target = null;
+                },
+                this);
     }
 }

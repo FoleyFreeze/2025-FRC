@@ -1,7 +1,10 @@
 package frc.robot.subsystems.wrist;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -46,6 +49,8 @@ public class Wrist extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Wrist", inputs);
+
+        Logger.recordOutput("Wrist/Setpoint", target == null ? 0 : target.wristAngle.in(Radians));
     }
 
     public double getVoltage() {
@@ -53,8 +58,40 @@ public class Wrist extends SubsystemBase {
     }
 
     public Command goTo(Supplier<SuperstructureLocation> loc) {
-        return new RunCommand(() -> io.setWristPosition(loc.get().armAngle.in(Radians)), this)
-                .until(() -> atTarget(loc));
+        return new RunCommand(
+                        () -> {
+                            target = loc.get();
+                            io.setWristPosition(target.wristAngle.in(Radians));
+                        },
+                        this)
+                .until(() -> atTarget(loc))
+                .finallyDo(
+                        b -> {
+                            if (!b)
+                                System.out.format(
+                                        "Wrist completed at %.1f with err %.1f\n",
+                                        loc.get().wristAngle.in(Degrees),
+                                        Units.radiansToDegrees(inputs.wristPositionRad)
+                                                - loc.get().wristAngle.in(Degrees));
+                        });
+    }
+
+    public Command goToLimit(Supplier<SuperstructureLocation> loc) {
+        return new InstantCommand(
+                () -> {
+                    target = loc.get();
+                    // limit wrist angle to -20 - 100
+                    double value =
+                            MathUtil.clamp(
+                                    target.wristAngle.in(Radians),
+                                    Units.degreesToRadians(-15),
+                                    Units.degreesToRadians(100));
+                    io.setWristPosition(value);
+                    System.out.format(
+                            "Wrist targeting at %.1f instead of %.1f\n",
+                            Units.radiansToDegrees(value), loc.get().wristAngle.in(Degrees));
+                },
+                this);
     }
 
     public void setAngle(Angle angle) {
@@ -66,13 +103,18 @@ public class Wrist extends SubsystemBase {
     }
 
     public boolean atTarget(Supplier<SuperstructureLocation> loc) {
-        double target = loc.get().armAngle.in(Radians);
+        double target = loc.get().wristAngle.in(Radians);
         double curr = inputs.wristPositionRad;
 
         return Math.abs(target - curr) < k.closeEnough;
     }
 
     public Command stop() {
-        return new InstantCommand(() -> io.setWristVolts(0), this);
+        return new InstantCommand(
+                () -> {
+                    io.setWristVolts(0);
+                    target = null;
+                },
+                this);
     }
 }

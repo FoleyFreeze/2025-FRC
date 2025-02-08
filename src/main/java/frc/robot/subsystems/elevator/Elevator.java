@@ -19,6 +19,8 @@ public class Elevator extends SubsystemBase {
 
     public ElevatorCals k;
 
+    SuperstructureLocation target = null;
+
     public static Elevator create() {
         Elevator elevator;
         ElevatorCals cals = new ElevatorCals();
@@ -47,6 +49,8 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
+
+        Logger.recordOutput("Elevator/Setpoint", target == null ? 0 : target.eleHeight.in(Inches));
     }
 
     public Distance getHeight() {
@@ -60,12 +64,31 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command goTo(Supplier<SuperstructureLocation> loc) {
-        return new RunCommand(() -> io.setElevatorPosition(loc.get().eleHeight.in(Inches)), this)
-                .until(() -> atTarget(loc));
+        return new RunCommand(
+                        () -> {
+                            target = loc.get();
+                            io.setElevatorPosition(loc.get().eleHeight.in(Inches));
+                        },
+                        this)
+                .until(() -> atTarget(loc))
+                .finallyDo(
+                        b -> {
+                            if (!b)
+                                System.out.format(
+                                        "Elevator completed at %.1f with err %.1f\n",
+                                        loc.get().eleHeight.in(Inches),
+                                        inputs.elevatorPositionInches
+                                                - loc.get().eleHeight.in(Inches));
+                        });
     }
 
     public Command stop() {
-        return new InstantCommand(() -> io.setElevatorVolts(0), this);
+        return new InstantCommand(
+                () -> {
+                    io.setElevatorVolts(0);
+                    target = null;
+                },
+                this);
     }
 
     public boolean atTarget(Supplier<SuperstructureLocation> loc) {

@@ -14,6 +14,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -21,6 +22,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -65,14 +67,13 @@ public class RobotContainer {
     private static RobotContainer r = null;
 
     public static RobotContainer getInstance() {
-        if (r == null) {
-            r = new RobotContainer();
-        }
         return r;
     }
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+        r = this;
+        ComplexCommands.r = this;
 
         drive = Drive.create();
         wrist = Wrist.create();
@@ -164,7 +165,7 @@ public class RobotContainer {
                 .axisGreaterThan(2, 0)
                 .and(controller.axisGreaterThan(3, 0).negate())
                 .whileTrue(ComplexCommands.noDriveGather());
-        controller.button(4).onTrue(ComplexCommands.stopSuperstructure());
+        controller.button(4).onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
 
         // controller.button(2).onTrue(new InstantCommand(() ->
         // goTo(SuperstructureLocation.LEVEL4)));
@@ -172,13 +173,15 @@ public class RobotContainer {
         // goTo(SuperstructureLocation.INTAKE)));
     }
 
-    /*
-    public void goTo(SuperstructureLocation loc) {
-        elevator.goTo(loc);
-        arm.goTo(loc);
-        wrist.goTo(loc);
+    public void robotPeriodic() {
+        String s =
+                String.format(
+                        "%.1f,%.0f,%.0f",
+                        r.elevator.getHeight().in(Inches),
+                        r.arm.getAngleRads().in(Degrees),
+                        r.wrist.getAngleRads().in(Degrees));
+        SmartDashboard.putString("SuperPosition", s);
     }
-    */
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.

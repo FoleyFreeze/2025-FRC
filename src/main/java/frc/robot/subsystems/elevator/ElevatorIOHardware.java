@@ -21,6 +21,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -60,7 +61,7 @@ public class ElevatorIOHardware implements ElevatorIO {
         elevatorTalon = new TalonFX(2, "*");
 
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -76,15 +77,15 @@ public class ElevatorIOHardware implements ElevatorIO {
 
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-        config.Slot0.kG = 55;
+        config.Slot0.kG = 5;
         config.Slot0.kS = 0;
         config.Slot0.kV = 0;
         config.Slot0.kA = 0;
-        config.Slot0.kP = 120;
+        config.Slot0.kP = 130;
         config.Slot0.kI = 0;
         config.Slot0.kD = 9;
 
-        config.TorqueCurrent.PeakForwardTorqueCurrent = 150;
+        config.TorqueCurrent.PeakForwardTorqueCurrent = 50;
         config.TorqueCurrent.PeakReverseTorqueCurrent = -30;
 
         config.Voltage.PeakForwardVoltage = 6;
@@ -118,7 +119,7 @@ public class ElevatorIOHardware implements ElevatorIO {
 
     @Override
     public void setElevatorVelocity(double velocityInchesPerSec) {
-        double velocity = velocityInchesPerSec / k.drumRadiusInches;
+        double velocity = Units.radiansToRotations(velocityInchesPerSec / k.drumRadiusInches);
         if (useTorqueControl) {
             elevatorTalon.setControl(
                     velocityTorqueCurrentRequest.withVelocity(velocity).withAcceleration(null));
@@ -134,7 +135,7 @@ public class ElevatorIOHardware implements ElevatorIO {
 
     @Override
     public void setElevatorPosition(double motorPositionInches) {
-        double motorPosition = motorPositionInches / k.drumRadiusInches;
+        double motorPosition = Units.radiansToRotations(motorPositionInches / k.drumRadiusInches);
         if (useTorqueControl) {
             elevatorTalon.setControl(positionTorqueCurrentRequest.withPosition(motorPosition));
         } else {

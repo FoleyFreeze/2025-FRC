@@ -18,7 +18,7 @@ public class HandIOHardware implements HandIO {
         encoder = motor.getEncoder();
 
         SparkMaxConfig config = new SparkMaxConfig();
-
+        config.inverted(true);
         config.smartCurrentLimit(30);
         config.secondaryCurrentLimit(60);
 
@@ -29,7 +29,7 @@ public class HandIOHardware implements HandIO {
     public void updateInputs(HandIOInputs inputs) {
         inputs.handAppliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();
         inputs.handCurrent = motor.getOutputCurrent();
-        inputs.handTempF = motor.getMotorTemperature();
+        inputs.handTempF = motor.getMotorTemperature() * 9 / 5.0 + 32;
     }
 
     @Override
