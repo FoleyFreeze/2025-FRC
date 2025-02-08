@@ -37,7 +37,7 @@ public class ElevatorIOHardware implements ElevatorIO {
 
     private final TalonFX elevatorTalon;
 
-    private final boolean useTorqueControl = false;
+    private final boolean useTorqueControl = true;
 
     ElevatorCals k;
 
@@ -57,14 +57,14 @@ public class ElevatorIOHardware implements ElevatorIO {
 
     public ElevatorIOHardware(ElevatorCals k) {
         this.k = k;
-        elevatorTalon = new TalonFX(0, "*");
+        elevatorTalon = new TalonFX(2, "*");
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 80;
+        config.CurrentLimits.StatorCurrentLimit = 120;
         config.CurrentLimits.SupplyCurrentLimitEnable = false;
         config.CurrentLimits.SupplyCurrentLimit = 80;
         config.CurrentLimits.SupplyCurrentLowerLimit = 40;
@@ -76,15 +76,16 @@ public class ElevatorIOHardware implements ElevatorIO {
 
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-        config.Slot0.kG = 0;
+        config.Slot0.kG = 55;
         config.Slot0.kS = 0;
         config.Slot0.kV = 0;
         config.Slot0.kA = 0;
-        config.Slot0.kP = 0;
+        config.Slot0.kP = 120;
         config.Slot0.kI = 0;
-        config.Slot0.kD = 0;
+        config.Slot0.kD = 9;
 
-        // config.TorqueCurrent
+        config.TorqueCurrent.PeakForwardTorqueCurrent = 150;
+        config.TorqueCurrent.PeakReverseTorqueCurrent = -30;
 
         config.Voltage.PeakForwardVoltage = 6;
         config.Voltage.PeakReverseVoltage = -3;

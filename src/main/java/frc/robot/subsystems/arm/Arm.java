@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -65,5 +66,9 @@ public class Arm extends SubsystemBase {
         double curr = inputs.armPositionRad;
 
         return Math.abs(target - curr) < k.closeEnough;
+    }
+
+    public Command stop() {
+        return new InstantCommand(() -> io.setArmVolts(0), this);
     }
 }

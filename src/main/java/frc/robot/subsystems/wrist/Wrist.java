@@ -71,4 +71,8 @@ public class Wrist extends SubsystemBase {
 
         return Math.abs(target - curr) < k.closeEnough;
     }
+
+    public Command stop() {
+        return new InstantCommand(() -> io.setWristVolts(0), this);
+    }
 }

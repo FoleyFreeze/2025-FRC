@@ -18,17 +18,17 @@ public class ArmIOHardware implements ArmIO {
     private SparkClosedLoopController closedLoopController;
 
     public ArmIOHardware(ArmCals cals) {
-        motor = new SparkMax(0, MotorType.kBrushless);
+        motor = new SparkMax(16, MotorType.kBrushless);
         absEncoder = motor.getAbsoluteEncoder();
         encoder = motor.getEncoder();
         closedLoopController = motor.getClosedLoopController();
 
         SparkMaxConfig config = new SparkMaxConfig();
-        config.closedLoop.pid(0, 0, 0).outputRange(-3, 3);
+        config.closedLoop.pid(2.5, 0, 0).outputRange(-0.3, 0.3);
         config.closedLoopRampRate(0);
 
-        config.smartCurrentLimit(40);
-        config.secondaryCurrentLimit(80);
+        config.smartCurrentLimit(30);
+        config.secondaryCurrentLimit(60);
 
         config.encoder.positionConversionFactor(1.0 / cals.gearRatio);
         config.absoluteEncoder.positionConversionFactor(1.0 / cals.gearRatioToAbsEncoder);

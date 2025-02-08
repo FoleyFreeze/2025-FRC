@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.controls.ControlBoard;
@@ -157,6 +158,13 @@ public class RobotContainer {
                                                         SimulatedArena.getInstance()
                                                                 .resetFieldForAuto()))
                                 .ignoringDisable(true));
+
+        controller.axisGreaterThan(3, 0).whileTrue(ComplexCommands.noDriveScore());
+        controller
+                .axisGreaterThan(2, 0)
+                .and(controller.axisGreaterThan(3, 0).negate())
+                .whileTrue(ComplexCommands.noDriveGather());
+        controller.button(4).onTrue(ComplexCommands.stopSuperstructure());
 
         // controller.button(2).onTrue(new InstantCommand(() ->
         // goTo(SuperstructureLocation.LEVEL4)));
