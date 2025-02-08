@@ -14,7 +14,7 @@ public class HandIOHardware implements HandIO {
 
     public HandIOHardware(HandCals k) {
         this.k = k;
-        motor = new SparkMax(0, MotorType.kBrushless);
+        motor = new SparkMax(17, MotorType.kBrushless);
         encoder = motor.getEncoder();
 
         SparkMaxConfig config = new SparkMaxConfig();
