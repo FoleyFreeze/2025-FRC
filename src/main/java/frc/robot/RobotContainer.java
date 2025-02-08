@@ -53,10 +53,10 @@ public class RobotContainer {
     public final Arm arm;
     public final Wrist wrist;
     public final Hand hand;
-    public final ControlBoard controlBoard;
 
     // Controller
     public final CommandXboxController controller = new CommandXboxController(0);
+    public final ControlBoard controlBoard = new ControlBoard();
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;

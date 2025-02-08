@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Radians;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.SuperstructureLocation;
@@ -16,22 +17,25 @@ public class Wrist extends SubsystemBase {
     private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
     SuperstructureLocation target = null;
+    WristCals k;
 
     public static Wrist create() {
         Wrist wrist;
+        WristCals cals = new WristCals();
         switch (Constants.currentMode) {
             case REAL:
-                wrist = new Wrist(new WristIOHardware(new WristCals()));
+                wrist = new Wrist(new WristIOHardware(cals));
                 break;
 
             case SIM:
-                wrist = new Wrist(new WristIOSim(new WristCals()));
+                wrist = new Wrist(new WristIOSim(cals));
                 break;
 
             default:
                 wrist = new Wrist(new WristIO() {});
                 break;
         }
+        wrist.k = cals;
         return wrist;
     }
 
@@ -49,11 +53,8 @@ public class Wrist extends SubsystemBase {
     }
 
     public Command goTo(Supplier<SuperstructureLocation> loc) {
-        return new InstantCommand(
-                () -> {
-                    io.setWristPosition(0);
-                },
-                this);
+        return new RunCommand(() -> io.setWristPosition(loc.get().armAngle.in(Radians)), this)
+                .until(() -> atTarget(loc));
     }
 
     public void setAngle(Angle angle) {
@@ -62,5 +63,12 @@ public class Wrist extends SubsystemBase {
 
     public Angle getAngleRads() {
         return Radians.of(inputs.wristPositionRad);
+    }
+
+    public boolean atTarget(Supplier<SuperstructureLocation> loc) {
+        double target = loc.get().armAngle.in(Radians);
+        double curr = inputs.wristPositionRad;
+
+        return Math.abs(target - curr) < k.closeEnough;
     }
 }

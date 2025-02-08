@@ -4,15 +4,25 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class ControlBoard {
 
-
-    public enum ReefSticks{
-        A, B, C, D, E, F, G, H, I, J, K, L;
+    public enum ReefSticks {
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H,
+        I,
+        J,
+        K,
+        L;
     }
 
     public ReefSticks lastPressed;
 
-    public Rotation2d getAlignAngle(){
-        switch(lastPressed){
+    public Rotation2d getAlignAngle() {
+        switch (lastPressed) {
             case A:
             case B:
                 return Rotation2d.fromDegrees(0);
@@ -33,8 +43,6 @@ public class ControlBoard {
                 return Rotation2d.fromDegrees(300);
             default:
                 return Rotation2d.fromDegrees(0);
-
-            
         }
     }
 }
