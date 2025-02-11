@@ -10,6 +10,7 @@ import static frc.robot.util.PhoenixUtil.tryUntilOk;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -49,8 +50,8 @@ public class ElevatorIOHardware implements ElevatorIO {
 
     // torque control requests
     // private final TorqueCurrentFOC torqueCurrentRequest = new TorqueCurrentFOC(0);
-    private final PositionTorqueCurrentFOC positionTorqueCurrentRequest =
-            new PositionTorqueCurrentFOC(0);
+    private final MotionMagicTorqueCurrentFOC positionTorqueCurrentRequest =
+            new MotionMagicTorqueCurrentFOC(0);
     private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest =
             new VelocityTorqueCurrentFOC(0.0);
 
@@ -77,16 +78,20 @@ public class ElevatorIOHardware implements ElevatorIO {
 
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-        config.Slot0.kG = 5;
-        config.Slot0.kS = 0;
-        config.Slot0.kV = 0;
-        config.Slot0.kA = 0;
-        config.Slot0.kP = 130;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 9;
+        config.Slot0.kG = 1;
+        config.Slot0.kS = 7;
+        config.Slot0.kV = 2;
+        config.Slot0.kA = 1;
+        config.Slot0.kP = 170;
+        config.Slot0.kI = 15;
+        config.Slot0.kD = 15;
 
-        config.TorqueCurrent.PeakForwardTorqueCurrent = 50;
-        config.TorqueCurrent.PeakReverseTorqueCurrent = -30;
+        config.TorqueCurrent.PeakForwardTorqueCurrent = 120;
+        config.TorqueCurrent.PeakReverseTorqueCurrent = -60;
+
+
+        config.MotionMagic.MotionMagicCruiseVelocity = 9;
+        config.MotionMagic.MotionMagicAcceleration = 30;
 
         config.Voltage.PeakForwardVoltage = 6;
         config.Voltage.PeakReverseVoltage = -3;
