@@ -23,6 +23,8 @@ public class HandIOHardware implements HandIO {
         config.secondaryCurrentLimit(60);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        zero();
     }
 
     @Override

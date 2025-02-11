@@ -16,4 +16,6 @@ public interface HandIO {
     public default void updateInputs(HandIOInputs inputs) {}
 
     public default void setHandVolts(double volts) {}
+
+    public default void zero() {}
 }

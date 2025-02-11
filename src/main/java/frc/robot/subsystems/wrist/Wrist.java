@@ -117,4 +117,8 @@ public class Wrist extends SubsystemBase {
                 },
                 this);
     }
+
+    public void zero() {
+        io.zero();
+    }
 }

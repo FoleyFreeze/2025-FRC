@@ -160,6 +160,9 @@ public class RobotContainer {
                                                                 .resetFieldForAuto()))
                                 .ignoringDisable(true));
 
+        // rezero superstructure
+        controller.button(14).onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
+
         controller.axisGreaterThan(3, 0).whileTrue(ComplexCommands.noDriveScore());
         controller
                 .axisGreaterThan(2, 0)

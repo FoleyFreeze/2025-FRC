@@ -21,4 +21,6 @@ public interface WristIO {
     public default void setWristVolts(double volts) {}
 
     public default void setWristPosition(double rads) {}
+
+    public default void zero() {}
 }

@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import java.util.function.Supplier;
@@ -104,5 +105,14 @@ public class ComplexCommands {
                 .alongWith(r.arm.stop())
                 .alongWith(r.wrist.stop())
                 .alongWith(r.hand.stop());
+    }
+
+    public static Command zeroSuperstructure() {
+        return new InstantCommand(
+                () -> {
+                    r.elevator.zero();
+                    r.arm.zero();
+                    r.wrist.zero();
+                });
     }
 }

@@ -97,4 +97,8 @@ public class Elevator extends SubsystemBase {
 
         return Math.abs(target - curr) < k.closeEnough;
     }
+
+    public void zero() {
+        io.zero();
+    }
 }

@@ -35,9 +35,7 @@ public class WristIOHardware implements WristIO {
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        // read the absolute encoder and reset the relative one
-        double absEncVal = absEncoder.getPosition();
-        encoder.setPosition(absEncVal - 0.25); // add 0.25 revolutions to start at 90deg
+        zero();
     }
 
     @Override
@@ -55,5 +53,12 @@ public class WristIOHardware implements WristIO {
     public void setWristPosition(double motorPosition) {
         closedLoopController.setReference(
                 Units.radiansToRotations(motorPosition), ControlType.kPosition);
+    }
+
+    @Override
+    public void zero() {
+        // read the absolute encoder and reset the relative one
+        double absEncVal = absEncoder.getPosition();
+        encoder.setPosition(absEncVal - 0.25); // add 0.25 revolutions to start at 90deg
     }
 }

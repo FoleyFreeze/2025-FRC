@@ -22,4 +22,6 @@ public interface ElevatorIO {
     public default void setElevatorVolts(double volts) {}
 
     public default void setElevatorPosition(double motorPositionInches) {}
+
+    public default void zero() {}
 }

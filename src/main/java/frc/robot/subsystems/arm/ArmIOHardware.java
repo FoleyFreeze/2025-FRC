@@ -34,11 +34,7 @@ public class ArmIOHardware implements ArmIO {
         config.absoluteEncoder.positionConversionFactor(1.0 / cals.gearRatioToAbsEncoder);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        // read the absolute encoder and reset the relative one
-        double absEncVal = absEncoder.getPosition();
-        // encoder.setPosition(absEncVal);
-        encoder.setPosition(Units.degreesToRotations(-83)); // TODO: use abs encoder once wired up
+        zero();
     }
 
     @Override
@@ -61,5 +57,13 @@ public class ArmIOHardware implements ArmIO {
     @Override
     public void setArmVolts(double volts) {
         motor.setVoltage(volts);
+    }
+
+    @Override
+    public void zero() {
+        // read the absolute encoder and reset the relative one
+        double absEncVal = absEncoder.getPosition();
+        // encoder.setPosition(absEncVal);
+        encoder.setPosition(Units.degreesToRotations(-83)); // TODO: use abs encoder once wired up
     }
 }

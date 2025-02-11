@@ -92,7 +92,7 @@ public class ElevatorIOHardware implements ElevatorIO {
         config.Voltage.PeakReverseVoltage = -3;
 
         tryUntilOk(5, () -> elevatorTalon.getConfigurator().apply(config, 0.25));
-        tryUntilOk(5, () -> elevatorTalon.setPosition(0.0, 0.25));
+        zero();
 
         elevatorPosition = elevatorTalon.getPosition();
         elevatorVelocity = elevatorTalon.getVelocity();
@@ -141,5 +141,10 @@ public class ElevatorIOHardware implements ElevatorIO {
         } else {
             elevatorTalon.setControl(positionVoltageRequest.withPosition(motorPosition));
         }
+    }
+
+    @Override
+    public void zero() {
+        tryUntilOk(5, () -> elevatorTalon.setPosition(0.0, 0.25));
     }
 }

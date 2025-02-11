@@ -23,4 +23,6 @@ public interface ArmIO {
     public default void setArmVelocity(double velocityRadPerSec) {}
 
     public default void setArmPosition(double motorPositionRad) {}
+
+    public default void zero() {}
 }
