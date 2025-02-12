@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.ControlBoard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -56,6 +57,7 @@ public class RobotContainer {
     public final Arm arm;
     public final Wrist wrist;
     public final Hand hand;
+    public final Climb climb;
 
     // Controller
     public final CommandXboxController controller = new CommandXboxController(0);
@@ -80,6 +82,7 @@ public class RobotContainer {
         arm = Arm.create();
         elevator = Elevator.create();
         hand = Hand.create();
+        climb = Climb.create();
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
