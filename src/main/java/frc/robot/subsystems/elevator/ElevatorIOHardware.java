@@ -11,7 +11,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -88,7 +87,6 @@ public class ElevatorIOHardware implements ElevatorIO {
 
         config.TorqueCurrent.PeakForwardTorqueCurrent = 120;
         config.TorqueCurrent.PeakReverseTorqueCurrent = -60;
-
 
         config.MotionMagic.MotionMagicCruiseVelocity = 9;
         config.MotionMagic.MotionMagicAcceleration = 30;

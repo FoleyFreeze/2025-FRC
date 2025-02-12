@@ -2,15 +2,12 @@ package frc.robot.subsystems.climb;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
-import edu.wpi.first.math.util.Units;
 
 public class ClimbIOHardware implements ClimbIO {
     ClimbCals k;
@@ -25,7 +22,7 @@ public class ClimbIOHardware implements ClimbIO {
         absEncoder = motor.getAbsoluteEncoder();
         encoder = motor.getEncoder();
         closedLoopController = motor.getClosedLoopController();
-//TODO: fill out the nums, yo
+        // TODO: fill out the nums, yo
         SparkMaxConfig config = new SparkMaxConfig();
         config.closedLoop.pid(0, 0, 0).outputRange(0, 0);
         config.closedLoopRampRate(0);

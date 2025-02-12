@@ -109,8 +109,6 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
-
-        configureAutoBuilder();
     }
 
     /**
@@ -237,9 +235,5 @@ public class RobotContainer {
         mechWrist.setAngle(wrist.getAngleRads().in(Degrees));
 
         Logger.recordOutput("Mechanism", mechBase);
-    }
-
-    public void configureAutoBuilder(){
-        AutoBuilder.
     }
 }
