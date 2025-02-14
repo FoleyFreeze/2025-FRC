@@ -17,7 +17,10 @@ public class ArmIOHardware implements ArmIO {
     private final AbsoluteEncoder absEncoder;
     private SparkClosedLoopController closedLoopController;
 
+    ArmCals k;
+
     public ArmIOHardware(ArmCals cals) {
+        k = cals;
         motor = new SparkMax(16, MotorType.kBrushless);
         absEncoder = motor.getAbsoluteEncoder();
         encoder = motor.getEncoder();
@@ -45,7 +48,10 @@ public class ArmIOHardware implements ArmIO {
         inputs.armAppliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();
         inputs.armCurrent = motor.getOutputCurrent();
         inputs.armTempF = motor.getMotorTemperature() * 9 / 5.0 + 32;
-        inputs.absEncAngleRad = Units.rotationsToRadians(absEncoder.getPosition());
+
+        double absEncVal = absEncoder.getPosition();
+        // absEncVal = (1 - (absEncVal * k.gearRatioToAbsEncoder)) / k.gearRatioToAbsEncoder;
+        inputs.absEncAngleRad = Units.rotationsToRadians(absEncVal);
     }
 
     @Override
@@ -63,7 +69,8 @@ public class ArmIOHardware implements ArmIO {
     public void zero() {
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
-        // encoder.setPosition(absEncVal);
-        encoder.setPosition(Units.degreesToRotations(-83)); // TODO: use abs encoder once wired up
+        encoder.setPosition(absEncVal);
+        absEncVal = (1 - (absEncVal * k.gearRatioToAbsEncoder)) / k.gearRatioToAbsEncoder;
+        encoder.setPosition(0 - Units.degreesToRotations(83));
     }
 }

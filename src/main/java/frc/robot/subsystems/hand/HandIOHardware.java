@@ -19,8 +19,8 @@ public class HandIOHardware implements HandIO {
 
         SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(true);
-        config.smartCurrentLimit(30);
-        config.secondaryCurrentLimit(60);
+        config.smartCurrentLimit(80);
+        config.secondaryCurrentLimit(100);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 

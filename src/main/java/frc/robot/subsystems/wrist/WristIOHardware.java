@@ -59,6 +59,6 @@ public class WristIOHardware implements WristIO {
     public void zero() {
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
-        encoder.setPosition(absEncVal - 0.25); // add 0.25 revolutions to start at 90deg
+        encoder.setPosition(0 - 0.25); // add 0.25 revolutions to start at 90deg
     }
 }

@@ -100,11 +100,8 @@ public class ComplexCommands {
     }
 
     public static Command stopSuperstructure() {
-        return r.elevator
-                .stop()
-                .alongWith(r.arm.stop())
-                .alongWith(r.wrist.stop())
-                .alongWith(r.hand.stop());
+        return r.elevator.stop().alongWith(r.arm.stop()).alongWith(r.wrist.stop());
+        // .alongWith(r.hand.stop());
     }
 
     public static Command zeroSuperstructure() {

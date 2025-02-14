@@ -9,9 +9,9 @@ import edu.wpi.first.units.measure.Distance;
 public enum SuperstructureLocation {
     HOLD(4, 0, 0),
     LEVEL1(12, 30, 0),
-    LEVEL2(6.1, 34, 99),
-    LEVEL3(17.3, 24.3, 68),
-    LEVEL4(41.7, 37, 85),
+    LEVEL2(4.2, 12, 75),
+    LEVEL3(17.5, 14, 88),
+    LEVEL4(40.7, 20, 86),
 
     PRENET(0, 0, 0),
     NET(0, 0, 0),

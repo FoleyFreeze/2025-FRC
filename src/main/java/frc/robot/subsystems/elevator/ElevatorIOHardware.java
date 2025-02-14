@@ -77,19 +77,19 @@ public class ElevatorIOHardware implements ElevatorIO {
 
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-        config.Slot0.kG = 1;
-        config.Slot0.kS = 7;
+        config.Slot0.kG = 0;
+        config.Slot0.kS = 30;
         config.Slot0.kV = 2;
-        config.Slot0.kA = 1;
-        config.Slot0.kP = 170;
-        config.Slot0.kI = 15;
+        config.Slot0.kA = 2;
+        config.Slot0.kP = 200;
+        config.Slot0.kI = 400; // 15;
         config.Slot0.kD = 15;
 
-        config.TorqueCurrent.PeakForwardTorqueCurrent = 120;
+        config.TorqueCurrent.PeakForwardTorqueCurrent = 140;
         config.TorqueCurrent.PeakReverseTorqueCurrent = -60;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = 9;
-        config.MotionMagic.MotionMagicAcceleration = 30;
+        config.MotionMagic.MotionMagicCruiseVelocity = 15;
+        config.MotionMagic.MotionMagicAcceleration = 35;
 
         config.Voltage.PeakForwardVoltage = 6;
         config.Voltage.PeakReverseVoltage = -3;
@@ -125,7 +125,7 @@ public class ElevatorIOHardware implements ElevatorIO {
         double velocity = Units.radiansToRotations(velocityInchesPerSec / k.drumRadiusInches);
         if (useTorqueControl) {
             elevatorTalon.setControl(
-                    velocityTorqueCurrentRequest.withVelocity(velocity).withAcceleration(null));
+                    velocityTorqueCurrentRequest.withVelocity(velocity).withAcceleration(0));
         } else {
             elevatorTalon.setControl(velocityVoltageRequest.withVelocity(velocity));
         }
