@@ -20,7 +20,7 @@ public class Climb extends SubsystemBase {
                 break;
 
             case SIM:
-                climb = new Climb(ClimbIOSim(cals));
+                climb = new Climb(new ClimbIOSim(cals));
                 break;
 
             default:
@@ -30,11 +30,6 @@ public class Climb extends SubsystemBase {
 
         climb.k = cals;
         return climb;
-    }
-
-    private static ClimbIO ClimbIOSim(ClimbCals cals) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'ClimbIOSim'");
     }
 
     public Climb(ClimbIO io) {
