@@ -55,9 +55,16 @@ public class Wrist extends SubsystemBase {
 
         Logger.recordOutput("Wrist/Setpoint", target == null ? 0 : target.in(Radians));
 
-        Logger.recordOutput("Wrist/LocalAngle", cvrtEncToLocal(inputs.wristPositionRad, r.arm.getAngle().in(Radians)));
-        Logger.recordOutput("Wrist/MinBound", cvrtLocalToEnc(k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians)));
-        Logger.recordOutput("Wrist/MaxBound", cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians)));
+        Logger.recordOutput(
+                "Wrist/LocalAngle",
+                cvrtEncToLocal(inputs.wristPositionRad, r.arm.getAngle().in(Radians)));
+        Logger.recordOutput(
+                "Wrist/MinBound",
+                cvrtLocalToEnc(
+                        k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians)));
+        Logger.recordOutput(
+                "Wrist/MaxBound",
+                cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians)));
     }
 
     public double getVoltage() {
@@ -65,11 +72,7 @@ public class Wrist extends SubsystemBase {
     }
 
     public Command goTo(Supplier<SuperstructureLocation> loc) {
-        return new RunCommand(
-                        () -> 
-                            setAngle(loc.get().wristAngle)
-                        ,
-                        this)
+        return new RunCommand(() -> setAngle(loc.get().wristAngle), this)
                 .until(() -> atTarget())
                 .finallyDo(
                         b -> {
@@ -84,8 +87,10 @@ public class Wrist extends SubsystemBase {
 
     public void setAngle(Angle angle) {
         target = angle;
-        double minAngle = cvrtLocalToEnc(k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));
-        double maxAngle = cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians));
+        double minAngle =
+                cvrtLocalToEnc(k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));
+        double maxAngle =
+                cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians));
 
         double newAngleTarget = MathUtil.clamp(angle.in(Radians), minAngle, maxAngle);
         io.setWristPosition(newAngleTarget);
@@ -109,18 +114,18 @@ public class Wrist extends SubsystemBase {
     }
 
     public void zero() {
-        io.zero();
+        io.superZero();
     }
 
-    public double cvrtLocalToEnc(double localWristAngle, double armAngle){
-        double extraArm = (armAngle + 83) / k.g3;
-        double wristEncAngle = localWristAngle - extraArm;
+    public double cvrtLocalToEnc(double localWristAngle, double armAngle) {
+        double extraArm = (armAngle + Units.degreesToRadians(83)) / k.g3;
+        double wristEncAngle = localWristAngle + extraArm;
         return wristEncAngle;
     }
 
-    public double cvrtEncToLocal(double wristAngle, double armAngle){
-        double extraArm = (armAngle + 83) / k.g3;
-        double wristLocalAngle = wristAngle + extraArm;
+    public double cvrtEncToLocal(double wristAngle, double armAngle) {
+        double extraArm = (armAngle + Units.degreesToRadians(83)) / k.g3;
+        double wristLocalAngle = wristAngle - extraArm;
         return wristLocalAngle;
     }
 }

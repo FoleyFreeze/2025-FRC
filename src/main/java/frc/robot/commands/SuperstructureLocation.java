@@ -7,7 +7,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
 public enum SuperstructureLocation {
-    //elevator, arm, wrist
+    // elevator, arm, wrist
     HOLD(4, 0, 0),
     LEVEL1(12, 30, 0),
     LEVEL2(4.2, 12, 75),

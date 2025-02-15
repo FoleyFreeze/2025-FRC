@@ -98,6 +98,6 @@ public class Arm extends SubsystemBase {
     }
 
     public void zero() {
-        io.zero();
+        io.superZero();
     }
 }

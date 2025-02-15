@@ -34,7 +34,7 @@ public class ArmIOHardware implements ArmIO {
         config.secondaryCurrentLimit(60);
 
         config.encoder.positionConversionFactor(1.0 / cals.gearRatio);
-        config.absoluteEncoder.positionConversionFactor(1.0 / cals.gearRatioToAbsEncoder);
+        config.absoluteEncoder.positionConversionFactor(1.0);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         zero();
@@ -52,7 +52,8 @@ public class ArmIOHardware implements ArmIO {
         inputs.armTempF = motor.getMotorTemperature() * 9 / 5.0 + 32;
 
         inputs.absEncAngleRaw = absEncoder.getPosition();
-        inputs.absEncAngleRel = Units.rotationsToRadians(convertAbsToRel(inputs.absEncAngleRaw, relEnc));
+        inputs.absEncAngleRel =
+                Units.rotationsToRadians(convertAbsToRel(inputs.absEncAngleRaw, relEnc));
     }
 
     @Override
@@ -72,29 +73,29 @@ public class ArmIOHardware implements ArmIO {
         double absEncVal = absEncoder.getPosition();
         encoder.setPosition(absEncVal);
         absEncVal = (1 - (absEncVal * k.gearRatioToAbsEncoder)) / k.gearRatioToAbsEncoder;
-        encoder.setPosition(0 - Units.degreesToRotations(83));
+        encoder.setPosition(0 + Units.degreesToRotations(k.startEncVal));
     }
 
-    //if the relative and abs encoders are way apart, this resets the rel to "true" zero
+    // if the relative and abs encoders are way apart, this resets the rel to "true" zero
     @Override
-    public void superZero(){
+    public void superZero() {
         encoder.setPosition(0);
         zero();
     }
 
     public double convertAbsToRel(double absEnc, double relEnc) {
-        absEnc = absEnc - k.armEncOffsetDegres;
+        absEnc = (-absEnc + k.armEncOffset + (k.startEncVal / 60.0)) % 1;
         if (absEnc > 0.5) {
             absEnc = absEnc - 1;
-        } else if (absEnc < 0.5) {
-            absEnc = absEnc - 1;
+        } else if (absEnc < -0.5) {
+            absEnc = absEnc + 1;
         }
 
-        absEnc = absEnc / k.gearRatio;
-        double maxZeroArea = absEnc + 1 / k.gearRatioToAbsEncoder / 2;
+        absEnc = absEnc / k.gearRatioToAbsEncoder;
+        double maxZeroArea = absEnc + 1.0 / k.gearRatioToAbsEncoder / 2.0;
         double extraRevOfAbsEnc = Math.ceil((relEnc - maxZeroArea) * k.gearRatioToAbsEncoder);
 
-        if (extraRevOfAbsEnc < 0) {
+        if (extraRevOfAbsEnc < Math.ceil(k.startEncVal / 60.0)) {
             return absEnc;
         } else {
             double result = extraRevOfAbsEnc / k.gearRatioToAbsEncoder + absEnc;

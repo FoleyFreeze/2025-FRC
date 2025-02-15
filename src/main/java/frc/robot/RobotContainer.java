@@ -77,7 +77,7 @@ public class RobotContainer {
         ComplexCommands.r = this;
 
         drive = Drive.create();
-        wrist = Wrist.create();
+        wrist = Wrist.create(this);
         arm = Arm.create();
         elevator = Elevator.create();
         hand = Hand.create();

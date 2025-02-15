@@ -52,7 +52,8 @@ public class WristIOHardware implements WristIO {
         inputs.wristTempF = motor.getMotorTemperature() * 9 / 5.0 + 32;
 
         inputs.absEncAngleRaw = absEncoder.getPosition();
-        inputs.absEncAngleRel = Units.rotationsToRadians(convertAbsToRel(inputs.absEncAngleRaw, relEncPos));
+        inputs.absEncAngleRel =
+                Units.rotationsToRadians(convertAbsToRel(inputs.absEncAngleRaw, relEncPos));
     }
 
     @Override
@@ -66,12 +67,12 @@ public class WristIOHardware implements WristIO {
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
         encoder.setPosition(0 - 0.25); // add 0.25 revolutions to start at 90deg
-        //encoder.setPosition(convertAbsToRel(absEncVal, encoder.getPosition()));
+        // encoder.setPosition(convertAbsToRel(absEncVal, encoder.getPosition()));
     }
 
-    //if the relative and abs encoders are way apart, this resets the rel to "true" zero
+    // if the relative and abs encoders are way apart, this resets the rel to "true" zero
     @Override
-    public void superZero(){
+    public void superZero() {
         encoder.setPosition(0);
         zero();
     }
