@@ -38,35 +38,36 @@ public class Vision extends SubsystemBase {
     private final VisionIOInputsAutoLogged[] inputs;
     private final Alert[] disconnectedAlerts;
 
-    public static Vision create(RobotContainer r){
+    public static Vision create(RobotContainer r) {
         Vision v;
         switch (Constants.currentMode) {
             case REAL:
-              // Real robot, instantiate hardware IO implementations
-              v =
-                  new Vision(
-                      r.drive::addVisionMeasurement,
-                      new VisionIOLimelight(camera0Name, r.drive::getRotation));
-              // vision =
-              //     new Vision(
-              //         demoDrive::addVisionMeasurement,
-              //         new VisionIOPhotonVision(camera0Name, robotToCamera0),
-              //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
-              break;
-      
+                // Real robot, instantiate hardware IO implementations
+                v =
+                        new Vision(
+                                r.drive::addVisionMeasurement,
+                                new VisionIOLimelight(camera0Name, r.drive::getRotation));
+                // vision =
+                //     new Vision(
+                //         demoDrive::addVisionMeasurement,
+                //         new VisionIOPhotonVision(camera0Name, robotToCamera0),
+                //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                break;
+
             case SIM:
-              // Sim robot, instantiate physics sim IO implementations
-              v =
-                  new Vision(
-                      r.drive::addVisionMeasurement,
-                      new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, r.drive::getPose));
-              break;
-      
+                // Sim robot, instantiate physics sim IO implementations
+                v =
+                        new Vision(
+                                r.drive::addVisionMeasurement,
+                                new VisionIOPhotonVisionSim(
+                                        camera0Name, robotToCamera0, r.drive::getPose));
+                break;
+
             default:
-              // Replayed robot, disable IO implementations
-              // (Use same number of dummy implementations as the real robot)
-              v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {});
-              break;
+                // Replayed robot, disable IO implementations
+                // (Use same number of dummy implementations as the real robot)
+                v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {});
+                break;
         }
 
         return v;

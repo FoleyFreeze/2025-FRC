@@ -25,13 +25,13 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.ControlBoard;
+import frc.robot.subsystems.controls.Flysky;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hand.Hand;
@@ -61,7 +61,7 @@ public class RobotContainer {
     public final Vision vision;
 
     // Controller
-    public final CommandXboxController controller = new CommandXboxController(0);
+    public final Flysky flysky = new Flysky();
     public final ControlBoard controlBoard = new ControlBoard();
 
     // Dashboard inputs
@@ -124,9 +124,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getLeftX(),
-                        () -> -controller.getRightX()));
+                        () -> -flysky.getLeftY(),
+                        () -> -flysky.getLeftX(),
+                        () -> -flysky.getRightX()));
 
         // Lock to 0° when A button is held
         /*controller
@@ -142,33 +142,29 @@ public class RobotContainer {
         // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
         // Reset gyro to 0° when B button is pressed
-        controller
-                .button(10)
-                .onTrue(
-                        Commands.runOnce(
-                                        Constants.currentMode == Constants.Mode.SIM
-                                                ? () ->
-                                                        drive.setPose(
-                                                                drive.driveSimulation
-                                                                        .getSimulatedDriveTrainPose())
-                                                : () ->
-                                                        drive.setPose(
-                                                                new Pose2d(
-                                                                        drive.getPose()
-                                                                                .getTranslation(),
-                                                                        new Rotation2d())),
-                                        drive)
-                                .ignoringDisable(true));
+        flysky.upLTRIM.onTrue(
+                Commands.runOnce(
+                                Constants.currentMode == Constants.Mode.SIM
+                                        ? () ->
+                                                drive.setPose(
+                                                        drive.driveSimulation
+                                                                .getSimulatedDriveTrainPose())
+                                        : () ->
+                                                drive.setPose(
+                                                        new Pose2d(
+                                                                drive.getPose().getTranslation(),
+                                                                new Rotation2d())),
+                                drive)
+                        .ignoringDisable(true));
 
         // rezero superstructure
-        controller.button(14).onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
+        flysky.upRTRIM.onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
 
-        controller.axisGreaterThan(3, 0).whileTrue(ComplexCommands.noDriveScore());
-        controller
-                .axisGreaterThan(2, 0)
-                .and(controller.axisGreaterThan(3, 0).negate())
+        flysky.rightTriggerSWG.whileTrue(ComplexCommands.noDriveScore());
+        flysky.leftTriggerSWE
+                .and(flysky.rightTriggerSWG.negate())
                 .whileTrue(ComplexCommands.noDriveGather());
-        controller.button(4).onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
+        flysky.topRightMomentSWC.onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
 
         // controller.button(2).onTrue(new InstantCommand(() ->
         // goTo(SuperstructureLocation.LEVEL4)));

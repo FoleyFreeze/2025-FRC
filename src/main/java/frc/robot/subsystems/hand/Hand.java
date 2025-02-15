@@ -39,8 +39,8 @@ public class Hand extends SubsystemBase {
         Logger.processInputs("Hand", inputs);
     }
 
-    public double getVoltage() {
-        return (inputs.handAppliedVolts);
+    public double getCurrent() {
+        return inputs.handCurrent;
     }
 
     public Command setVoltage(double volts) {

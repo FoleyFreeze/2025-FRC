@@ -1,7 +1,6 @@
 package frc.robot.subsystems.controls;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.SuperstructureLocation;
 
 public class ControlBoard {
@@ -48,11 +47,11 @@ public class ControlBoard {
         }
     }
 
-    public SuperstructureLocation getLevelFromController(CommandXboxController controller) {
+    public SuperstructureLocation getCoralLevelFromController(Flysky controller) {
         int level = 0;
-        if (controller.button(8).getAsBoolean()) {
+        if (controller.botRightSWHLo.getAsBoolean()) {
             level = 2;
-        } else if (controller.button(9).getAsBoolean()) {
+        } else if (controller.botRightSWHHi.getAsBoolean()) {
             level = 4;
         } else {
             level = 3;
@@ -60,6 +59,18 @@ public class ControlBoard {
 
         return getLevelLocation(level);
     }
+
+    public SuperstructureLocation getAlgaeLevelFromController(Flysky controller) {
+        if (controller.botRightSWHLo.getAsBoolean()){
+            return SuperstructureLocation.ALGAE_LEVEL_2_3;
+        }else if (controller.botRightSWHHi.getAsBoolean()){
+            return SuperstructureLocation.ALGAE_LEVEL_3_4;
+        }else{
+            return SuperstructureLocation.ALGAE_LEVEL_2_3;
+        }
+    }
+
+
 
     public SuperstructureLocation getLevelLocation(int reefLevel) {
         switch (reefLevel) {

@@ -17,8 +17,8 @@ public enum SuperstructureLocation {
     PRENET(0, 0, 0),
     NET(0, 0, 0),
 
-    ALGAE_LEVEL12(0, 0, 0),
-    ALGAE_LEVEL23(0, 0, 0),
+    ALGAE_LEVEL_2_3(0, 0, 0),
+    ALGAE_LEVEL_3_4(0, 0, 0),
 
     PRE_LEVEL1(0, 0, 0),
     PRE_LEVEL2(0, 0, 0),
