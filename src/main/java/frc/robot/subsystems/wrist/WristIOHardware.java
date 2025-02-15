@@ -16,8 +16,10 @@ public class WristIOHardware implements WristIO {
     private final RelativeEncoder encoder;
     private final AbsoluteEncoder absEncoder;
     private SparkClosedLoopController closedLoopController;
+    WristCals k;
 
-    public WristIOHardware(WristCals cals) {
+    public WristIOHardware(WristCals k) {
+        this.k = k;
         motor = new SparkMax(15, MotorType.kBrushless);
         absEncoder = motor.getAbsoluteEncoder();
         encoder = motor.getEncoder();
@@ -30,8 +32,8 @@ public class WristIOHardware implements WristIO {
         config.smartCurrentLimit(30);
         config.secondaryCurrentLimit(60);
 
-        config.encoder.positionConversionFactor(1.0 / cals.gearRatio);
-        config.absoluteEncoder.positionConversionFactor(1.0 / cals.gearRatioToAbsEncoder);
+        config.encoder.positionConversionFactor(1.0 / k.gearRatio);
+        config.absoluteEncoder.positionConversionFactor(1);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -60,5 +62,27 @@ public class WristIOHardware implements WristIO {
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
         encoder.setPosition(0 - 0.25); // add 0.25 revolutions to start at 90deg
+    }
+
+    // convert absenc value to relenc value
+    public double convertAbsToRel(double absEnc, double relEnc) {
+        absEnc = absEnc - k.absEncOffsetDeg;
+
+        if (absEnc > 0.5) {
+            absEnc = absEnc - 1;
+        } else if (absEnc < 0.5) {
+            absEnc = absEnc + 1;
+        }
+
+        absEnc = absEnc / k.gearRatioToAbsEncoder;
+        double maxZeroArea = absEnc + 1 / k.gearRatioToAbsEncoder / 2;
+        double extraRevOfAbsEnc = Math.ceil((relEnc - maxZeroArea) * k.gearRatioToAbsEncoder);
+
+        if (extraRevOfAbsEnc < 0) {
+            return absEnc;
+        } else {
+            double result = extraRevOfAbsEnc / k.gearRatioToAbsEncoder + absEnc;
+            return result;
+        }
     }
 }
