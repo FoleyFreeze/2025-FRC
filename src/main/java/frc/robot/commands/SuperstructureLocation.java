@@ -8,7 +8,9 @@ import edu.wpi.first.units.measure.Distance;
 
 public enum SuperstructureLocation {
     // elevator, arm, wrist
-    HOLD(4, 0, 0),
+    HOLD(0, 0, -110),
+    // HOLD_GATHER(0, 0, -110),
+
     LEVEL1(12, 30, 0),
     LEVEL2(4.2, 12, 75),
     LEVEL3(17.5, 14, 88),
@@ -27,7 +29,7 @@ public enum SuperstructureLocation {
 
     FLOOR_GATHER_ALGAE(0, 0, 0),
     SCORE_PROCESSOR(0, 0, 0),
-    INTAKE(3, -32, -59),
+    INTAKE(0, -43, -62),
     SAFE(0, 0, 0);
 
     public final Distance eleHeight;

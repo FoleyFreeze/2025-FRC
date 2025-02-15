@@ -131,8 +131,8 @@ public class Drive extends SubsystemBase {
             case REAL:
                 drive =
                         new Drive(
-                                // new GyroIOPigeon2(),
-                                new GyroIO() {},
+                                new GyroIOPigeon2(),
+                                // new GyroIO() {},
                                 new ModuleIOTalonFX(TunerConstants.FrontLeft),
                                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                                 new ModuleIOTalonFX(TunerConstants.BackLeft),

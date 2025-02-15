@@ -61,16 +61,14 @@ public class ControlBoard {
     }
 
     public SuperstructureLocation getAlgaeLevelFromController(Flysky controller) {
-        if (controller.botRightSWHLo.getAsBoolean()){
+        if (controller.botRightSWHLo.getAsBoolean()) {
             return SuperstructureLocation.ALGAE_LEVEL_2_3;
-        }else if (controller.botRightSWHHi.getAsBoolean()){
+        } else if (controller.botRightSWHHi.getAsBoolean()) {
             return SuperstructureLocation.ALGAE_LEVEL_3_4;
-        }else{
+        } else {
             return SuperstructureLocation.ALGAE_LEVEL_2_3;
         }
     }
-
-
 
     public SuperstructureLocation getLevelLocation(int reefLevel) {
         switch (reefLevel) {

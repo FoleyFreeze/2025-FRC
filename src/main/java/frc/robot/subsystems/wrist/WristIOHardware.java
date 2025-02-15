@@ -26,7 +26,7 @@ public class WristIOHardware implements WristIO {
         closedLoopController = motor.getClosedLoopController();
 
         SparkMaxConfig config = new SparkMaxConfig();
-        config.closedLoop.pid(2.5, 0, 0).outputRange(-0.3, 0.3);
+        config.closedLoop.pid(4, 0, 0).outputRange(-0.4, 0.4);
         config.closedLoopRampRate(0);
 
         config.smartCurrentLimit(30);
@@ -95,7 +95,7 @@ public class WristIOHardware implements WristIO {
         }
 
         absEnc = absEnc / k.gearRatioToAbsEncoder;
-        double maxZeroArea = absEnc + 1 / k.gearRatioToAbsEncoder / 2;
+        double maxZeroArea = absEnc + 1.0 / k.gearRatioToAbsEncoder / 2.0;
         double extraRevOfAbsEnc = Math.ceil((relEnc - maxZeroArea) * k.gearRatioToAbsEncoder);
 
         if (extraRevOfAbsEnc < Math.ceil(k.startEncVal / (360.0 / k.gearRatioToAbsEncoder))) {

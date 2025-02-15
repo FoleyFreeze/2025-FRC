@@ -90,13 +90,15 @@ public class Wrist extends SubsystemBase {
         double angleTarget = target.wristAngle.in(Radians);
 
         // if the funnel is in the way, go to -90 degrees local
-        if (target.armAngle.in(Degrees) < -35) {
+        if (target.armAngle.in(Degrees) < -30) {
             // we are going toward the funnel
-            angleTarget = cvrtLocalToEnc(Units.degreesToRadians(-90), target.armAngle.in(Radians));
+            angleTarget =
+                    cvrtLocalToEnc(Units.degreesToRadians(-110), r.arm.getAngle().in(Radians));
         } else if (r.arm.getAngle().in(Degrees) < -35) {
             // we are going away from the funnel, but we are not there yet
-            angleTarget = cvrtLocalToEnc(Units.degreesToRadians(-90), target.armAngle.in(Radians));
+            angleTarget = cvrtLocalToEnc(Units.degreesToRadians(-90), r.arm.getAngle().in(Radians));
         }
+        Logger.recordOutput("Wrist/ArmAngle", r.arm.getAngle().in(Degrees));
 
         double minAngle =
                 cvrtLocalToEnc(k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));
