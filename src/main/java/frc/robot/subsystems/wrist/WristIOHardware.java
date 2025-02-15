@@ -90,7 +90,7 @@ public class WristIOHardware implements WristIO {
 
         if (absEnc > 0.5) {
             absEnc = absEnc - 1;
-        } else if (absEnc < 0.5) {
+        } else if (absEnc < -0.5) {
             absEnc = absEnc + 1;
         }
 
