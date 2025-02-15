@@ -54,6 +54,10 @@ public class Wrist extends SubsystemBase {
         Logger.processInputs("Wrist", inputs);
 
         Logger.recordOutput("Wrist/Setpoint", target == null ? 0 : target.in(Radians));
+
+        Logger.recordOutput("Wrist/LocalAngle", cvrtEncToLocal(inputs.wristPositionRad, r.arm.getAngle().in(Radians)));
+        Logger.recordOutput("Wrist/MinBound", cvrtLocalToEnc(k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians)));
+        Logger.recordOutput("Wrist/MaxBound", cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians)));
     }
 
     public double getVoltage() {
@@ -112,5 +116,11 @@ public class Wrist extends SubsystemBase {
         double extraArm = (armAngle + 83) / k.g3;
         double wristEncAngle = localWristAngle - extraArm;
         return wristEncAngle;
+    }
+
+    public double cvrtEncToLocal(double wristAngle, double armAngle){
+        double extraArm = (armAngle + 83) / k.g3;
+        double wristLocalAngle = wristAngle + extraArm;
+        return wristLocalAngle;
     }
 }

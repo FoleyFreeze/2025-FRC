@@ -70,6 +70,7 @@ public class WristIOHardware implements WristIO {
     }
 
     //if the relative and abs encoders are way apart, this resets the rel to "true" zero
+    @Override
     public void superZero(){
         encoder.setPosition(0);
         zero();

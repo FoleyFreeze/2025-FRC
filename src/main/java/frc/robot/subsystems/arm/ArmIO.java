@@ -26,4 +26,6 @@ public interface ArmIO {
     public default void setArmPosition(double motorPositionRad) {}
 
     public default void zero() {}
+
+    public default void superZero() {}
 }

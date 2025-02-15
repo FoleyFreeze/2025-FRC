@@ -52,7 +52,7 @@ public class ArmIOHardware implements ArmIO {
         inputs.armTempF = motor.getMotorTemperature() * 9 / 5.0 + 32;
 
         inputs.absEncAngleRaw = absEncoder.getPosition();
-        
+        inputs.absEncAngleRel = Units.rotationsToRadians(convertAbsToRel(inputs.absEncAngleRaw, relEnc));
     }
 
     @Override
@@ -73,6 +73,13 @@ public class ArmIOHardware implements ArmIO {
         encoder.setPosition(absEncVal);
         absEncVal = (1 - (absEncVal * k.gearRatioToAbsEncoder)) / k.gearRatioToAbsEncoder;
         encoder.setPosition(0 - Units.degreesToRotations(83));
+    }
+
+    //if the relative and abs encoders are way apart, this resets the rel to "true" zero
+    @Override
+    public void superZero(){
+        encoder.setPosition(0);
+        zero();
     }
 
     public double convertAbsToRel(double absEnc, double relEnc) {

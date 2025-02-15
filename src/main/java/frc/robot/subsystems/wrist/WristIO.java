@@ -25,4 +25,6 @@ public interface WristIO {
     public default void setWristPosition(double rads) {}
 
     public default void zero() {}
+
+    public default void superZero() {}
 }
