@@ -16,8 +16,7 @@ public class Climb extends SubsystemBase {
         ClimbCals cals = new ClimbCals();
         switch (Constants.currentMode) {
             case REAL:
-                // climb = new Climb(new ClimbIOHardware(cals));
-                climb = new Climb(new ClimbIO() {});
+                climb = new Climb(new ClimbIOHardware(cals));
                 break;
 
             case SIM:

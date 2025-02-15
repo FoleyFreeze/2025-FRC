@@ -6,7 +6,9 @@ public interface ClimbIO {
 
     @AutoLog
     public static class ClimbIOInputs {
-        public double climbPositionInches = 0;
+        public boolean climbConnected = false;
+        public double climbPositionRads = 0;
+        public double climbVelocityRadPerSec = 0;
         public double climbAppliedVolts = 0;
         public double climbCurrentAmps = 0;
         public double climbTempFahrenheit = 0;

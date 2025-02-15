@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.util.Units;
 
 public class ClimbIOHardware implements ClimbIO {
     ClimbCals k;
@@ -18,7 +19,7 @@ public class ClimbIOHardware implements ClimbIO {
 
     public ClimbIOHardware(ClimbCals cals) {
         this.k = k;
-        motor = new SparkMax(0, MotorType.kBrushless);
+        motor = new SparkMax(14, MotorType.kBrushless);
         absEncoder = motor.getAbsoluteEncoder();
         encoder = motor.getEncoder();
         closedLoopController = motor.getClosedLoopController();
@@ -27,17 +28,28 @@ public class ClimbIOHardware implements ClimbIO {
         config.closedLoop.pid(0, 0, 0).outputRange(0, 0);
         config.closedLoopRampRate(0);
 
-        config.smartCurrentLimit(0);
-        config.secondaryCurrentLimit(0);
-        config.encoder.positionConversionFactor(0 / cals.gearRatio);
-        config.absoluteEncoder.positionConversionFactor(0 / cals.gearRatioToAbsEncoder);
+        config.smartCurrentLimit(60);
+        config.secondaryCurrentLimit(60);
+        config.encoder.positionConversionFactor(1.0 / cals.gearRatio);
+        config.absoluteEncoder.positionConversionFactor(1.0);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         zero();
     }
 
     @Override
-    public void updateInputs(ClimbIOInputs inputs) {}
+    public void updateInputs(ClimbIOInputs inputs) {
+        double rawVoltage = motor.getBusVoltage();
+
+        inputs.climbPositionRads = Units.rotationsToRadians(encoder.getPosition());
+        inputs.climbVelocityRadPerSec =
+                Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
+        inputs.climbAppliedVolts = rawVoltage * motor.getAppliedOutput();
+        inputs.climbCurrentAmps = motor.getOutputCurrent();
+        inputs.climbTempFahrenheit = motor.getMotorTemperature() * 9 / 5.0 + 32;
+
+        inputs.climbConnected = rawVoltage > 6;
+    }
 
     @Override
     public void zero() {

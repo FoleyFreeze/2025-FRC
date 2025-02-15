@@ -43,17 +43,20 @@ public class WristIOHardware implements WristIO {
     @Override
     public void updateInputs(WristIOInputs inputs) {
         double relEncPos = encoder.getPosition();
+        double rawVolts = motor.getBusVoltage();
 
         inputs.wristPositionRad = Units.rotationsToRadians(relEncPos);
         inputs.wristVelocityRadPerSec =
-                Units.radiansPerSecondToRotationsPerMinute(encoder.getVelocity());
-        inputs.wristAppliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();
+                Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
+        inputs.wristAppliedVolts = rawVolts * motor.getAppliedOutput();
         inputs.wristCurrent = motor.getOutputCurrent();
         inputs.wristTempF = motor.getMotorTemperature() * 9 / 5.0 + 32;
 
         inputs.absEncAngleRaw = absEncoder.getPosition();
         inputs.absEncAngleRel =
                 Units.rotationsToRadians(convertAbsToRel(inputs.absEncAngleRaw, relEncPos));
+
+        inputs.wristConnected = rawVolts > 6;
     }
 
     @Override

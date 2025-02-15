@@ -43,17 +43,20 @@ public class ArmIOHardware implements ArmIO {
     @Override
     public void updateInputs(ArmIOInputs inputs) {
         double relEnc = encoder.getPosition();
+        double rawVoltage = motor.getBusVoltage();
 
         inputs.armPositionRad = Units.rotationsToRadians(relEnc);
         inputs.armVelocityRadPerSec =
                 Units.radiansPerSecondToRotationsPerMinute(encoder.getVelocity());
-        inputs.armAppliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();
+        inputs.armAppliedVolts = rawVoltage * motor.getAppliedOutput();
         inputs.armCurrent = motor.getOutputCurrent();
         inputs.armTempF = motor.getMotorTemperature() * 9 / 5.0 + 32;
 
         inputs.absEncAngleRaw = absEncoder.getPosition();
         inputs.absEncAngleRel =
                 Units.rotationsToRadians(convertAbsToRel(inputs.absEncAngleRaw, relEnc));
+
+        inputs.armConnected = rawVoltage > 6;
     }
 
     @Override
