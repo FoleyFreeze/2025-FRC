@@ -73,4 +73,24 @@ public class ArmIOHardware implements ArmIO {
         absEncVal = (1 - (absEncVal * k.gearRatioToAbsEncoder)) / k.gearRatioToAbsEncoder;
         encoder.setPosition(0 - Units.degreesToRotations(83));
     }
+
+    public double convertAbsToRel(double absEnc, double relEnc) {
+        absEnc = absEnc - k.armEncOffsetDegres;
+        if (absEnc > 0.5) {
+            absEnc = absEnc - 1;
+        } else if (absEnc < 0.5) {
+            absEnc = absEnc - 1;
+        }
+
+        absEnc = absEnc / k.gearRatio;
+        double maxZeroArea = absEnc + 1 / k.gearRatioToAbsEncoder / 2;
+        double extraRevOfAbsEnc = Math.ceil((relEnc - maxZeroArea) * k.gearRatioToAbsEncoder);
+
+        if (extraRevOfAbsEnc < 0) {
+            return absEnc;
+        } else {
+            double result = extraRevOfAbsEnc / k.gearRatioToAbsEncoder + absEnc;
+            return result;
+        }
+    }
 }
