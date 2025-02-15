@@ -35,6 +35,7 @@ import frc.robot.subsystems.controls.ControlBoard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hand.Hand;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.wrist.Wrist;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
@@ -57,6 +58,7 @@ public class RobotContainer {
     public final Wrist wrist;
     public final Hand hand;
     public final Climb climb;
+    public final Vision vision;
 
     // Controller
     public final CommandXboxController controller = new CommandXboxController(0);
@@ -82,6 +84,7 @@ public class RobotContainer {
         elevator = Elevator.create();
         hand = Hand.create();
         climb = Climb.create();
+        vision = Vision.create(this);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
