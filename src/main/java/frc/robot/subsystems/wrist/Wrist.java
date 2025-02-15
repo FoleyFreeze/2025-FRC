@@ -20,7 +20,7 @@ public class Wrist extends SubsystemBase {
     private final WristIO io;
     private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
-    Angle target = null;
+    SuperstructureLocation target = null;
     WristCals k;
     RobotContainer r;
 
@@ -53,7 +53,7 @@ public class Wrist extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Wrist", inputs);
 
-        Logger.recordOutput("Wrist/Setpoint", target == null ? 0 : target.in(Radians));
+        Logger.recordOutput("Wrist/Setpoint", target == null ? 0 : target.wristAngle.in(Radians));
 
         Logger.recordOutput(
                 "Wrist/LocalAngle",
@@ -72,27 +72,40 @@ public class Wrist extends SubsystemBase {
     }
 
     public Command goTo(Supplier<SuperstructureLocation> loc) {
-        return new RunCommand(() -> setAngle(loc.get().wristAngle), this)
+        return new RunCommand(() -> setAngle(loc.get()), this)
                 .until(() -> atTarget())
                 .finallyDo(
                         b -> {
                             if (!b)
                                 System.out.format(
                                         "Wrist completed at %.1f with err %.1f\n",
-                                        target.in(Degrees),
+                                        target.wristAngle.in(Degrees),
                                         Units.radiansToDegrees(inputs.wristPositionRad)
-                                                - target.in(Degrees));
+                                                - target.wristAngle.in(Degrees));
                         });
     }
 
-    public void setAngle(Angle angle) {
-        target = angle;
+    public void setAngle(SuperstructureLocation target) {
+        this.target = target;
+        double angleTarget = target.wristAngle.in(Radians);
+
+        // if the funnel is in the way, go to -90 degrees local
+        if (target.armAngle.in(Degrees) < -35) {
+            // we are going toward the funnel
+            angleTarget = cvrtLocalToEnc(Units.degreesToRadians(-90), target.armAngle.in(Radians));
+        } else if (r.arm.getAngle().in(Degrees) < -35) {
+            // we are going away from the funnel, but we are not there yet
+            angleTarget = cvrtLocalToEnc(Units.degreesToRadians(-90), target.armAngle.in(Radians));
+        }
+
         double minAngle =
                 cvrtLocalToEnc(k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));
         double maxAngle =
                 cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians));
 
-        double newAngleTarget = MathUtil.clamp(angle.in(Radians), minAngle, maxAngle);
+        double newAngleTarget = MathUtil.clamp(angleTarget, minAngle, maxAngle);
+
+        Logger.recordOutput("Wrist/SetpointBounded", newAngleTarget);
         io.setWristPosition(newAngleTarget);
     }
 
@@ -101,7 +114,7 @@ public class Wrist extends SubsystemBase {
     }
 
     public boolean atTarget() {
-        return Math.abs(target.in(Radians) - inputs.wristPositionRad) < k.closeEnough;
+        return Math.abs(target.wristAngle.in(Radians) - inputs.wristPositionRad) < k.closeEnough;
     }
 
     public Command stop() {

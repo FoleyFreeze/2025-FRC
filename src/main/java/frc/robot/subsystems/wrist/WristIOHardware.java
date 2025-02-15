@@ -66,7 +66,10 @@ public class WristIOHardware implements WristIO {
     public void zero() {
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
-        encoder.setPosition(0 - 0.25); // add 0.25 revolutions to start at 90deg
+        encoder.setPosition(
+                0
+                        + Units.degreesToRotations(
+                                k.startEncVal)); // add 0.25 revolutions to start at 90deg
         // encoder.setPosition(convertAbsToRel(absEncVal, encoder.getPosition()));
     }
 
@@ -79,7 +82,8 @@ public class WristIOHardware implements WristIO {
 
     // convert absenc value to relenc value
     public double convertAbsToRel(double absEnc, double relEnc) {
-        absEnc = absEnc - k.absEncOffset;
+        absEnc =
+                (absEnc - k.absEncOffset + (k.startEncVal / (360.0 / k.gearRatioToAbsEncoder))) % 1;
 
         if (absEnc > 0.5) {
             absEnc = absEnc - 1;
@@ -91,7 +95,7 @@ public class WristIOHardware implements WristIO {
         double maxZeroArea = absEnc + 1 / k.gearRatioToAbsEncoder / 2;
         double extraRevOfAbsEnc = Math.ceil((relEnc - maxZeroArea) * k.gearRatioToAbsEncoder);
 
-        if (extraRevOfAbsEnc < 0) {
+        if (extraRevOfAbsEnc < Math.ceil(k.startEncVal / (360.0 / k.gearRatioToAbsEncoder))) {
             return absEnc;
         } else {
             double result = extraRevOfAbsEnc / k.gearRatioToAbsEncoder + absEnc;
