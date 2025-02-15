@@ -13,7 +13,8 @@ public interface ArmIO {
         public double armAppliedVolts = 0;
         public double armCurrent = 0;
         public double armTempF = 0;
-        public double absEncAngleRad = 0;
+        public double absEncAngleRaw = 0;
+        public double absEncAngleRel = 0;
     }
 
     public default void updateInputs(ArmIOInputs inputs) {}

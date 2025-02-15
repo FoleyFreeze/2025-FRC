@@ -54,7 +54,7 @@ public class Arm extends SubsystemBase {
         Logger.recordOutput("Arm/Setpoint", target == null ? 0 : target.armAngle.in(Radians));
     }
 
-    public Angle getAngleRads() {
+    public Angle getAngle() {
         return Radians.of(inputs.armPositionRad);
     }
 

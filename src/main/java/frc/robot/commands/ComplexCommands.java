@@ -82,7 +82,7 @@ public class ComplexCommands {
     // moves elevator to a height with arm tucked up, then deploys arm
     public static Command goToLoc(Supplier<SuperstructureLocation> p) {
         return r.arm.goTo(() -> SuperstructureLocation.HOLD)
-                .alongWith(r.wrist.goToLimit(p))
+                .deadlineFor(r.wrist.goTo(p)) //this intenionally gets interrupted when the arm reaches its dest
                 .andThen(r.elevator.goTo(p))
                 .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
         // arm to 0, elevator move, arm out

@@ -13,7 +13,9 @@ public interface WristIO {
         public double wristAppliedVolts = 0;
         public double wristCurrent = 0;
         public double wristTempF = 0;
-        public double absEncAngleRad = 0;
+
+        public double absEncAngleRaw = 0;
+        public double absEncAngleRel = 0;
     }
 
     public default void updateInputs(WristIOInputs inputs) {}

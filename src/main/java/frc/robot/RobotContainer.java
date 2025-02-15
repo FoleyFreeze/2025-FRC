@@ -178,7 +178,7 @@ public class RobotContainer {
                 String.format(
                         "%.1f,%.0f,%.0f",
                         r.elevator.getHeight().in(Inches),
-                        r.arm.getAngleRads().in(Degrees),
+                        r.arm.getAngle().in(Degrees),
                         r.wrist.getAngleRads().in(Degrees));
         SmartDashboard.putString("SuperPosition", s);
     }
@@ -225,7 +225,7 @@ public class RobotContainer {
 
     public void updateMechanisms() {
         mechElevator.setLength(elevator.getHeight().in(Meters));
-        mechArm.setAngle(arm.getAngleRads().in(Degrees));
+        mechArm.setAngle(arm.getAngle().in(Degrees));
         mechWrist.setAngle(wrist.getAngleRads().in(Degrees));
 
         Logger.recordOutput("Mechanism", mechBase);

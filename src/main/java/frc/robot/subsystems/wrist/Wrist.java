@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.commands.SuperstructureLocation;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -19,10 +20,11 @@ public class Wrist extends SubsystemBase {
     private final WristIO io;
     private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
-    SuperstructureLocation target = null;
+    Angle target = null;
     WristCals k;
+    RobotContainer r;
 
-    public static Wrist create() {
+    public static Wrist create(RobotContainer r) {
         Wrist wrist;
         WristCals cals = new WristCals();
         switch (Constants.currentMode) {
@@ -39,6 +41,7 @@ public class Wrist extends SubsystemBase {
                 break;
         }
         wrist.k = cals;
+        wrist.r = r;
         return wrist;
     }
 
@@ -50,7 +53,7 @@ public class Wrist extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Wrist", inputs);
 
-        Logger.recordOutput("Wrist/Setpoint", target == null ? 0 : target.wristAngle.in(Radians));
+        Logger.recordOutput("Wrist/Setpoint", target == null ? 0 : target.in(Radians));
     }
 
     public double getVoltage() {
@@ -59,54 +62,37 @@ public class Wrist extends SubsystemBase {
 
     public Command goTo(Supplier<SuperstructureLocation> loc) {
         return new RunCommand(
-                        () -> {
-                            target = loc.get();
-                            io.setWristPosition(target.wristAngle.in(Radians));
-                        },
+                        () -> 
+                            setAngle(loc.get().wristAngle)
+                        ,
                         this)
-                .until(() -> atTarget(loc))
+                .until(() -> atTarget())
                 .finallyDo(
                         b -> {
                             if (!b)
                                 System.out.format(
                                         "Wrist completed at %.1f with err %.1f\n",
-                                        loc.get().wristAngle.in(Degrees),
+                                        target.in(Degrees),
                                         Units.radiansToDegrees(inputs.wristPositionRad)
-                                                - loc.get().wristAngle.in(Degrees));
+                                                - target.in(Degrees));
                         });
     }
 
-    public Command goToLimit(Supplier<SuperstructureLocation> loc) {
-        return new InstantCommand(
-                () -> {
-                    target = loc.get();
-                    // limit wrist angle to -20 - 100
-                    double value =
-                            MathUtil.clamp(
-                                    target.wristAngle.in(Radians),
-                                    Units.degreesToRadians(-15),
-                                    Units.degreesToRadians(100));
-                    io.setWristPosition(value);
-                    System.out.format(
-                            "Wrist targeting at %.1f instead of %.1f\n",
-                            Units.radiansToDegrees(value), loc.get().wristAngle.in(Degrees));
-                },
-                this);
-    }
-
     public void setAngle(Angle angle) {
-        io.setWristPosition(angle.in(Radians));
+        target = angle;
+        double minAngle = cvrtLocalToEnc(k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));
+        double maxAngle = cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians));
+
+        double newAngleTarget = MathUtil.clamp(angle.in(Radians), minAngle, maxAngle);
+        io.setWristPosition(newAngleTarget);
     }
 
     public Angle getAngleRads() {
         return Radians.of(inputs.wristPositionRad);
     }
 
-    public boolean atTarget(Supplier<SuperstructureLocation> loc) {
-        double target = loc.get().wristAngle.in(Radians);
-        double curr = inputs.wristPositionRad;
-
-        return Math.abs(target - curr) < k.closeEnough;
+    public boolean atTarget() {
+        return Math.abs(target.in(Radians) - inputs.wristPositionRad) < k.closeEnough;
     }
 
     public Command stop() {
@@ -120,5 +106,11 @@ public class Wrist extends SubsystemBase {
 
     public void zero() {
         io.zero();
+    }
+
+    public double cvrtLocalToEnc(double localWristAngle, double armAngle){
+        double extraArm = (armAngle + 83) / k.g3;
+        double wristEncAngle = localWristAngle - extraArm;
+        return wristEncAngle;
     }
 }
