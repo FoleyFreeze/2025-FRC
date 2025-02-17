@@ -9,7 +9,7 @@ import edu.wpi.first.units.measure.Distance;
 public enum SuperstructureLocation {
     // elevator, arm, wrist
     HOLD(0, 0, -110),
-    // HOLD_GATHER(0, 0, -110),
+    HOLD_GATHER(0, 0, -110),
 
     LEVEL1(12, 30, 0),
     LEVEL2(4.2, 12, 75),

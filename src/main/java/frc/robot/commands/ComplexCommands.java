@@ -52,7 +52,7 @@ public class ComplexCommands {
     }
 
     public static Command noDriveGather() {
-        return goToLoc(() -> SuperstructureLocation.INTAKE)
+        return goToLoc(() -> SuperstructureLocation.HOLD_GATHER)
                 .andThen(gatherCoral())
                 // as soon as command finishes, come back up
                 .finallyDo(ComplexCommands::goHome);
@@ -121,6 +121,14 @@ public class ComplexCommands {
                 .andThen(r.elevator.goTo(p))
                 .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
         // arm to 0, elevator move, arm out
+    }
+
+    public static Command goToGather(){
+        return r.arm.goTo(() -> SuperstructureLocation.HOLD_GATHER)
+                .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD_GATHER))
+                .andThen(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
+                .andThen(r.arm.goTo(() -> SuperstructureLocation.HOLD));
+
     }
 
     public static void goHome() {
