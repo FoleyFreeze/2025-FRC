@@ -128,19 +128,6 @@ public class RobotContainer {
                         () -> -flysky.getLeftX(),
                         () -> -flysky.getRightX()));
 
-        // Lock to 0° when A button is held
-        /*controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));*/
-
-        // Switch to X pattern when X button is pressed
-        // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(
                 Commands.runOnce(
@@ -166,10 +153,6 @@ public class RobotContainer {
                 .whileTrue(ComplexCommands.noDriveGather());
         flysky.topRightMomentSWC.onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
 
-        // controller.button(2).onTrue(new InstantCommand(() ->
-        // goTo(SuperstructureLocation.LEVEL4)));
-        // controller.button(3).onTrue(new InstantCommand(() ->
-        // goTo(SuperstructureLocation.INTAKE)));
     }
 
     public void robotPeriodic() {
