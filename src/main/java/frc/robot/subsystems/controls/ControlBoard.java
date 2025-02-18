@@ -1,9 +1,26 @@
 package frc.robot.subsystems.controls;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SuperstructureLocation;
 
 public class ControlBoard {
+
+    public Joystick cb;
+    public Joystick cb2;
+
+    public ControlBoard(){
+        cb = new Joystick(1);
+        cb2 = new Joystick(2);
+    }
+
+    /*
+    public Trigger climbSW = new Trigger(() -> cb.getRawButton(3));
+    public Trigger shift = new Trigger(() -> cb.getRawButton(3));
+    public Trigger levelSW = new Trigger(() -> cb.getRawButton(3));
+    public Trigger  = new Trigger(() -> cb.getRawButton(3));
+    */
 
     public enum ReefSticks {
         A,
