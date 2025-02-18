@@ -147,11 +147,23 @@ public class RobotContainer {
         // rezero superstructure
         flysky.upRTRIM.onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
 
-        flysky.rightTriggerSWG.whileTrue(ComplexCommands.noDriveScore());
+        flysky.rightTriggerSWG
+        .and(flysky.topRightSWD.negate())
+                .whileTrue(ComplexCommands.noDriveScore());
+
         flysky.leftTriggerSWE
                 .and(flysky.rightTriggerSWG.negate())
+                .and(flysky.topRightSWD.negate())
                 .whileTrue(ComplexCommands.noDriveGather());
-        flysky.topRightMomentSWC.onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
+
+        flysky.leftTriggerSWE
+                .and(flysky.rightTriggerSWG.negate())
+                .and(flysky.topRightSWD).whileTrue(ComplexCommands.gatherAlgae());
+
+        flysky.rightTriggerSWG
+                .and(flysky.topRightSWD).whileTrue(ComplexCommands.scoreAlgaeProc());
+ 
+                flysky.topRightMomentSWC.onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
 
     }
 
@@ -212,4 +224,6 @@ public class RobotContainer {
 
         Logger.recordOutput("Mechanism", mechBase);
     }
+
+
 }

@@ -20,6 +20,7 @@ public class Flysky {
     public Trigger rightRTRIM = new Trigger(() -> flysky.getRawButton(16));
     public Trigger leftRTRIM = new Trigger(() -> flysky.getRawButton(17));
 
+    // algae switch
     public Trigger topRightSWD = new Trigger(() -> flysky.getRawButton(5));
     public Trigger topLeftSWA = new Trigger(() -> flysky.getRawButton(1));
     public Trigger topLeftSWBHi = new Trigger(() -> flysky.getRawButton(2));
@@ -29,6 +30,7 @@ public class Flysky {
     public Trigger botLeftSWFLo = new Trigger(() -> flysky.getRawButton(6));
     public Trigger botRightSWHHi = new Trigger(() -> flysky.getRawButton(9));
     public Trigger botRightSWHLo = new Trigger(() -> flysky.getRawButton(8));
+    public Trigger fillerButton = new Trigger(() -> flysky.getRawButton(0));
 
     public Flysky() {
         flysky = new Joystick(0);
