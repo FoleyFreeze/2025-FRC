@@ -11,6 +11,7 @@ public class HandIOHardware implements HandIO {
     private final SparkMax motor;
     private RelativeEncoder encoder;
     HandCals k;
+    HandIOInputs inputs;
 
     public HandIOHardware(HandCals k) {
         this.k = k;
@@ -40,5 +41,9 @@ public class HandIOHardware implements HandIO {
     @Override
     public void setHandVolts(double volts) {
         motor.setVoltage(volts);
+    }
+
+    public double getHandCurrent() {
+        return inputs.handCurrent;
     }
 }
