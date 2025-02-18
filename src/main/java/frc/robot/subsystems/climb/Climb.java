@@ -17,6 +17,7 @@ public class Climb extends SubsystemBase {
         switch (Constants.currentMode) {
             case REAL:
                 climb = new Climb(new ClimbIOHardware(cals));
+                // climb = new Climb(new ClimbIO() {});
                 break;
 
             case SIM:
@@ -44,7 +45,7 @@ public class Climb extends SubsystemBase {
         return new RunCommand(() -> io.setClimbVolts(volts), this);
     }
 
-    public void stop(){
+    public void stop() {
         io.setClimbVolts(0);
     }
 

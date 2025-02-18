@@ -2,7 +2,6 @@ package frc.robot.subsystems.controls;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SuperstructureLocation;
 
 public class ControlBoard {
@@ -10,7 +9,7 @@ public class ControlBoard {
     public Joystick cb;
     public Joystick cb2;
 
-    public ControlBoard(){
+    public ControlBoard() {
         cb = new Joystick(1);
         cb2 = new Joystick(2);
     }

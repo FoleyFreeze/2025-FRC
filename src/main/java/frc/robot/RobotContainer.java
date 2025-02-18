@@ -148,7 +148,7 @@ public class RobotContainer {
         flysky.upRTRIM.onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
 
         flysky.rightTriggerSWG
-        .and(flysky.topRightSWD.negate())
+                .and(flysky.topRightSWD.negate())
                 .whileTrue(ComplexCommands.noDriveScore());
 
         flysky.leftTriggerSWE
@@ -158,13 +158,12 @@ public class RobotContainer {
 
         flysky.leftTriggerSWE
                 .and(flysky.rightTriggerSWG.negate())
-                .and(flysky.topRightSWD).whileTrue(ComplexCommands.gatherAlgae());
+                .and(flysky.topRightSWD)
+                .whileTrue(ComplexCommands.gatherAlgae());
 
-        flysky.rightTriggerSWG
-                .and(flysky.topRightSWD).whileTrue(ComplexCommands.scoreAlgaeProc());
- 
-                flysky.topRightMomentSWC.onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
+        flysky.rightTriggerSWG.and(flysky.topRightSWD).whileTrue(ComplexCommands.scoreAlgaeProc());
 
+        flysky.topRightMomentSWC.onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
     }
 
     public void robotPeriodic() {
@@ -224,6 +223,4 @@ public class RobotContainer {
 
         Logger.recordOutput("Mechanism", mechBase);
     }
-
-
 }
