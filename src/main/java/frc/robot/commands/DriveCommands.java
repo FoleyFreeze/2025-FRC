@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.drive.Drive;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -67,7 +68,7 @@ public class DriveCommands {
      * Field relative drive command using two joysticks (controlling linear and angular velocities).
      */
     public static Command joystickDrive(
-            Drive drive,
+            RobotContainer r,
             DoubleSupplier xSupplier,
             DoubleSupplier ySupplier,
             DoubleSupplier omegaSupplier) {
@@ -87,20 +88,26 @@ public class DriveCommands {
                     // Convert to field relative speeds & send command
                     ChassisSpeeds speeds =
                             new ChassisSpeeds(
-                                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                                    omega * drive.getMaxAngularSpeedRadPerSec());
+                                    linearVelocity.getX() * r.drive.getMaxLinearSpeedMetersPerSec(),
+                                    linearVelocity.getY() * r.drive.getMaxLinearSpeedMetersPerSec(),
+                                    omega * r.drive.getMaxAngularSpeedRadPerSec());
+
+                    // "turbo" button
+                    if (r.flysky.rightTriggerSWG.getAsBoolean()) {
+                        speeds = speeds.times(0.5);
+                    }
+
                     boolean isFlipped =
                             DriverStation.getAlliance().isPresent()
                                     && DriverStation.getAlliance().get() == Alliance.Red;
-                    drive.runVelocity(
+                    r.drive.runVelocity(
                             ChassisSpeeds.fromFieldRelativeSpeeds(
                                     speeds,
                                     isFlipped
-                                            ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                                            : drive.getRotation()));
+                                            ? r.drive.getRotation().plus(new Rotation2d(Math.PI))
+                                            : r.drive.getRotation()));
                 },
-                drive);
+                r.drive);
     }
 
     /**

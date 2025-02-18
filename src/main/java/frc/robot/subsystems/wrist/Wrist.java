@@ -85,6 +85,25 @@ public class Wrist extends SubsystemBase {
                         });
     }
 
+    public Command goToReally(Supplier<SuperstructureLocation> loc) {
+        return new RunCommand(
+                        () -> {
+                            io.setWristPosition(loc.get().wristAngle.in(Radians));
+                            this.target = loc.get();
+                        },
+                        this)
+                .until(() -> atTarget())
+                .finallyDo(
+                        b -> {
+                            if (!b)
+                                System.out.format(
+                                        "Wrist completed at %.1f with err %.1f\n",
+                                        target.wristAngle.in(Degrees),
+                                        Units.radiansToDegrees(inputs.wristPositionRad)
+                                                - target.wristAngle.in(Degrees));
+                        });
+    }
+
     public void setAngle(SuperstructureLocation target) {
         this.target = target;
         double angleTarget = target.wristAngle.in(Radians);
@@ -98,7 +117,7 @@ public class Wrist extends SubsystemBase {
             // we are going away from the funnel, but we are not there yet
             angleTarget = cvrtLocalToEnc(Units.degreesToRadians(-90), r.arm.getAngle().in(Radians));
         }
-        Logger.recordOutput("Wrist/ArmAngle", r.arm.getAngle().in(Degrees));
+        Logger.recordOutput("Wrist/ArmAngle", r.arm.getAngle().in(Radians));
 
         double minAngle =
                 cvrtLocalToEnc(k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));

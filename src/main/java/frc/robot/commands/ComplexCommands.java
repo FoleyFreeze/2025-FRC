@@ -10,11 +10,11 @@ import java.util.function.Supplier;
 
 public class ComplexCommands {
 
-    static double holdPowerCoral = 0.5;
+    static double holdPowerCoral = 0.6;
     static double releasePowerCoral = -5;
     static double releaseTimeCoral = 0.5;
 
-    static double intakePowerCoral = 1.0;
+    static double intakePowerCoral = 2.0;
     static double intakeCurrentCoral = 100;
     static double intakeCoralTime = 0.2;
 
@@ -52,7 +52,7 @@ public class ComplexCommands {
     }
 
     public static Command noDriveGather() {
-        return goToLoc(() -> SuperstructureLocation.HOLD_GATHER)
+        return goToGather()
                 .andThen(gatherCoral())
                 // as soon as command finishes, come back up
                 .finallyDo(ComplexCommands::goHome);
@@ -102,7 +102,8 @@ public class ComplexCommands {
         return r.hand.setVoltage(intakePowerCoral)
                 .andThen(new WaitCommand(0.1))
                 .until(() -> r.hand.getCurrent() > intakeCurrentCoral)
-                .andThen(new WaitCommand(intakeCoralTime));
+                .andThen(new WaitCommand(intakeCoralTime))
+                .finallyDo(() -> holdCoral().schedule());
     }
 
     // lines up with target field element
@@ -123,12 +124,12 @@ public class ComplexCommands {
         // arm to 0, elevator move, arm out
     }
 
-    public static Command goToGather(){
-        return r.arm.goTo(() -> SuperstructureLocation.HOLD_GATHER)
-                .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD_GATHER))
-                .andThen(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
-                .andThen(r.arm.goTo(() -> SuperstructureLocation.HOLD));
-
+    public static Command goToGather() {
+        return r.arm.goTo(() -> SuperstructureLocation.HOLD)
+                .alongWith(r.wrist.goToReally(() -> SuperstructureLocation.HOLD))
+                .andThen(r.wrist.goToReally(() -> SuperstructureLocation.HOLD_GATHER))
+                .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
+                .andThen(r.wrist.goToReally(() -> SuperstructureLocation.INTAKE));
     }
 
     public static void goHome() {

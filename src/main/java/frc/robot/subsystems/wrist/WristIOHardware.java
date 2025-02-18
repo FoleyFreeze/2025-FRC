@@ -76,6 +76,11 @@ public class WristIOHardware implements WristIO {
         // encoder.setPosition(convertAbsToRel(absEncVal, encoder.getPosition()));
     }
 
+    @Override
+    public void setWristVolts(double volts) {
+        motor.setVoltage(volts);
+    }
+
     // if the relative and abs encoders are way apart, this resets the rel to "true" zero
     @Override
     public void superZero() {

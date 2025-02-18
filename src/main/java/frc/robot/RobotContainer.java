@@ -123,7 +123,7 @@ public class RobotContainer {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
-                        drive,
+                        this,
                         () -> -flysky.getLeftY(),
                         () -> -flysky.getLeftX(),
                         () -> -flysky.getRightX()));
