@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.RobotContainer;
 import java.util.function.Supplier;
 
@@ -22,7 +23,7 @@ public class ComplexCommands {
     static double intakeCurrentAlgae = 50;
     static double intakeAlgaePower = 12;
     static double releasePowerAlgae = -12;
-    static double releaseTimeAlgae = 0.2;
+    static double releaseTimeAlgae = 0.5;
 
     static double gatherPosition = 0;
 
@@ -68,8 +69,7 @@ public class ComplexCommands {
         return goToLoc(() -> SuperstructureLocation.SCORE_PROCESSOR)
                 .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
                 .andThen(releaseAlgae())
-                .andThen(new RunCommand(() -> {})) // wait forever until command trigger released
-                .finallyDo(ComplexCommands::goHome);
+                .andThen(ComplexCommands::goHome);
     }
 
     public static Command scoreAlgaeNet() {
@@ -83,7 +83,9 @@ public class ComplexCommands {
     public static Command releaseAlgae() {
         return r.hand.setVoltage(releasePowerAlgae)
                 .andThen(new WaitCommand(releaseTimeAlgae))
-                .andThen(r.hand.stop());
+                .andThen(r.hand.stop())
+                //TODO: does this help?
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     // STES LOW POWER ON HAND TO KEEP CORAL IN

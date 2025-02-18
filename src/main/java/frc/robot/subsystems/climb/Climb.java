@@ -40,7 +40,15 @@ public class Climb extends SubsystemBase {
         return (inputs.climbAppliedVolts);
     }
 
-    public Command setVoltage(double volts) {
+    public Command setClimbVoltage(double volts) {
         return new RunCommand(() -> io.setClimbVolts(volts), this);
+    }
+
+    public void stop(){
+        io.setClimbVolts(0);
+    }
+
+    public Command stopCmd() {
+        return new RunCommand(this::stop, this);
     }
 }

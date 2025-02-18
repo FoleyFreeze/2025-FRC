@@ -128,19 +128,6 @@ public class RobotContainer {
                         () -> -flysky.getLeftX(),
                         () -> -flysky.getRightX()));
 
-        // Lock to 0° when A button is held
-        /*controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));*/
-
-        // Switch to X pattern when X button is pressed
-        // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(
                 Commands.runOnce(
@@ -160,16 +147,24 @@ public class RobotContainer {
         // rezero superstructure
         flysky.upRTRIM.onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
 
-        flysky.rightTriggerSWG.whileTrue(ComplexCommands.noDriveScore());
+        flysky.rightTriggerSWG
+        .and(flysky.topRightSWD.negate())
+                .whileTrue(ComplexCommands.noDriveScore());
+
         flysky.leftTriggerSWE
                 .and(flysky.rightTriggerSWG.negate())
+                .and(flysky.topRightSWD.negate())
                 .whileTrue(ComplexCommands.noDriveGather());
-        flysky.topRightMomentSWC.onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
 
-        // controller.button(2).onTrue(new InstantCommand(() ->
-        // goTo(SuperstructureLocation.LEVEL4)));
-        // controller.button(3).onTrue(new InstantCommand(() ->
-        // goTo(SuperstructureLocation.INTAKE)));
+        flysky.leftTriggerSWE
+                .and(flysky.rightTriggerSWG.negate())
+                .and(flysky.topRightSWD).whileTrue(ComplexCommands.gatherAlgae());
+
+        flysky.rightTriggerSWG
+                .and(flysky.topRightSWD).whileTrue(ComplexCommands.scoreAlgaeProc());
+ 
+                flysky.topRightMomentSWC.onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
+
     }
 
     public void robotPeriodic() {
@@ -229,4 +224,6 @@ public class RobotContainer {
 
         Logger.recordOutput("Mechanism", mechBase);
     }
+
+
 }
