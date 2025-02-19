@@ -21,6 +21,7 @@ import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -63,6 +64,12 @@ public class VisionIOLimelight implements VisionIO {
         // Update connection status based on whether an update has been seen in the last 250ms
         inputs.connected =
                 ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
+
+        if (DriverStation.isDisabled()) {
+            LimelightHelpers.setLimelightNTDouble("limelight", "throttle-set", 240);
+        } else {
+            LimelightHelpers.setLimelightNTDouble("limelight", "throttle-set", 1);
+        }
 
         // Update target observation
         inputs.latestTargetObservation =
