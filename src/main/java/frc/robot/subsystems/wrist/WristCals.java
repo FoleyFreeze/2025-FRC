@@ -10,7 +10,7 @@ public class WristCals {
     double g1 = 10.935;
     double g2 = 30.0 / 19.0;
     double g3 = 40.0 / 30.0;
-    double gearRatio = 23.021; // g1 * g2 * g3;
+    double gearRatio = g1 * g2 * g3;
     public double gearRatioToAbsEncoder = g2 * g3;
     double absEncOffset = 0.6643;
     double startEncVal = -59;

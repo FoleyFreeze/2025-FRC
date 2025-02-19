@@ -17,6 +17,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,6 +25,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -33,10 +35,12 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
+    private RobotContainer r;
     private final VisionConsumer consumer;
     private final VisionIO[] io;
     private final VisionIOInputsAutoLogged[] inputs;
     private final Alert[] disconnectedAlerts;
+    private final Debouncer isEnabledDebounce = new Debouncer(5);
 
     public static Vision create(RobotContainer r) {
         Vision v;
@@ -66,6 +70,7 @@ public class Vision extends SubsystemBase {
                 break;
         }
 
+        v.r = r;
         return v;
     }
 
@@ -145,7 +150,11 @@ public class Vision extends SubsystemBase {
                                 || observation.pose().getX() < 0.0
                                 || observation.pose().getX() > aprilTagLayout.getFieldLength()
                                 || observation.pose().getY() < 0.0
-                                || observation.pose().getY() > aprilTagLayout.getFieldWidth();
+                                || observation.pose().getY() > aprilTagLayout.getFieldWidth()
+                                || observation.type() == PoseObservationType.MEGATAG_1
+                                        && isMoving()
+                                        && isEnabled()
+                                        && angleAgrees();
 
                 // Add pose to log
                 robotPoses.add(observation.pose());
@@ -220,5 +229,17 @@ public class Vision extends SubsystemBase {
                 Pose2d visionRobotPoseMeters,
                 double timestampSeconds,
                 Matrix<N3, N1> visionMeasurementStdDevs);
+    }
+
+    private boolean isMoving() {
+        return true;
+    }
+
+    private boolean isEnabled() {
+        return (isEnabledDebounce.calculate(DriverStation.isEnabled()));
+    }
+
+    private boolean angleAgrees() {
+        return true;
     }
 }
