@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 public class ComplexCommands {
 
-    static double holdPowerCoral = 0.6;
+    static double holdPowerCoral = 0.4;
     static double releasePowerCoral = -5;
     static double releaseTimeCoral = 0.5;
 

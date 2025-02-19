@@ -27,7 +27,7 @@ public class ArmIOHardware implements ArmIO {
         closedLoopController = motor.getClosedLoopController();
 
         SparkMaxConfig config = new SparkMaxConfig();
-        config.closedLoop.pid(8, 0.01, 0).outputRange(-0.4, 0.4);
+        config.closedLoop.pid(3, 0.006, 2).outputRange(-0.4, 0.4).iZone(0.05);
         config.closedLoopRampRate(0);
 
         config.smartCurrentLimit(60);
