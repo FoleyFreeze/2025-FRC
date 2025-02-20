@@ -24,6 +24,9 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import frc.robot.generated.TunerConstants;
+
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+
 import java.util.Queue;
 
 /** IO implementation for Pigeon 2. */
@@ -59,9 +62,9 @@ public class GyroIOPigeon2 implements GyroIO {
                         .equals(StatusCode.OK);
         inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
         inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
-        inputs.accelX = accelX.getValueAsDouble();
-        inputs.accelX = accelY.getValueAsDouble();
-        inputs.accelX = accelZ.getValueAsDouble();
+        inputs.accelX = accelX.getValue().in(MetersPerSecondPerSecond);
+        inputs.accelY = accelY.getValue().in(MetersPerSecondPerSecond);
+        inputs.accelZ = accelZ.getValue().in(MetersPerSecondPerSecond);
 
         inputs.odometryYawTimestamps =
                 yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();

@@ -13,14 +13,18 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Newton;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
@@ -34,13 +38,19 @@ import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
+
+
 public class Vision extends SubsystemBase {
     private RobotContainer r;
     private final VisionConsumer consumer;
     private final VisionIO[] io;
     private final VisionIOInputsAutoLogged[] inputs;
     private final Alert[] disconnectedAlerts;
-    private final Debouncer isEnabledDebounce = new Debouncer(5);
+    
+    private final Debouncer isEnabledDebounce = new Debouncer(5, DebounceType.kFalling);
+    private final Debouncer angleAgrees = new Debouncer(1, DebounceType.kFalling);
+    LinearFilter accelFilter = LinearFilter.singlePoleIIR(1.0, 0.02);    
 
     public static Vision create(RobotContainer r) {
         Vision v;
@@ -110,6 +120,12 @@ public class Vision extends SubsystemBase {
             Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
         }
 
+        double accelNorm = r.drive.getAccelerometer().getNorm();
+        accelFilter.calculate(accelNorm);
+        Logger.recordOutput("Vision/Accel", accelNorm);
+        Logger.recordOutput("Vision/FiltAccel", accelFilter.lastValue());
+
+
         // Initialize logging values
         List<Pose3d> allTagPoses = new LinkedList<>();
         List<Pose3d> allRobotPoses = new LinkedList<>();
@@ -151,10 +167,10 @@ public class Vision extends SubsystemBase {
                                 || observation.pose().getX() > aprilTagLayout.getFieldLength()
                                 || observation.pose().getY() < 0.0
                                 || observation.pose().getY() > aprilTagLayout.getFieldWidth()
+                                
+                                //only use mega1 when angle is bad and robot not moving for a while
                                 || observation.type() == PoseObservationType.MEGATAG_1
-                                        && isMoving()
-                                        && isEnabled()
-                                        && angleAgrees();
+                                        && (isMoving() || isEnabled() || angleAgrees(observation.pose().getRotation().toRotation2d()));
 
                 // Add pose to log
                 robotPoses.add(observation.pose());
@@ -231,15 +247,25 @@ public class Vision extends SubsystemBase {
                 Matrix<N3, N1> visionMeasurementStdDevs);
     }
 
+    
+    double movingThreshold = 0.25;// m/s^2
     private boolean isMoving() {
-        return true;
+        boolean isMovingVal = Math.abs(r.drive.getAccelerometer().getNorm() - accelFilter.lastValue()) > movingThreshold;
+        Logger.recordOutput("Vision/IsMoving", isMovingVal);
+        return isMovingVal;
     }
-
+        
+        
     private boolean isEnabled() {
-        return (isEnabledDebounce.calculate(DriverStation.isEnabled()));
+        boolean isEnabledVal =  (isEnabledDebounce.calculate(DriverStation.isEnabled()));
+        Logger.recordOutput("Vision/IsEnabled", isEnabledVal);
+        return isEnabledVal;
     }
 
-    private boolean angleAgrees() {
-        return true;
+    private boolean angleAgrees(Rotation2d tagAngle) {
+        Rotation2d deltaAngle = r.drive.getRotation().minus(tagAngle);
+        boolean angleAgreesVal = (angleAgrees.calculate(Math.abs(deltaAngle.getDegrees()) < 20));
+        Logger.recordOutput("Vision/AngleAgrees", angleAgreesVal);
+        return angleAgreesVal;
     }
 }
