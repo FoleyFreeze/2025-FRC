@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
 import frc.robot.util.Locations;
-
 import java.util.function.Supplier;
 
 public class ComplexCommands {
@@ -27,7 +26,6 @@ public class ComplexCommands {
     static double releaseTimeAlgae = 0.5;
 
     static double gatherPosition = 0;
-    
 
     public static RobotContainer r;
 
@@ -44,11 +42,10 @@ public class ComplexCommands {
     }
 
     public static Command visionCoralGather() {
-        //decides which coral station to use
-        //drive there
-        //gather
-        return new PathCommand(r, r.controlBoard::selectCoralStation)
-        .alongWith(noDriveGather());
+        // decides which coral station to use
+        // drive there
+        // gather
+        return new PathCommand(r, r.controlBoard::selectCoralStation).alongWith(noDriveGather());
     }
 
     public static Command blindCoralScore() {

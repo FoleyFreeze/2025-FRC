@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.util.Locations;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -52,12 +53,12 @@ public class Vision extends SubsystemBase {
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
-                v =
-                        new Vision(
-                                r.drive::addVisionMeasurement,
-                                new VisionIOLimelight(camera0Name, r.drive::getRotation));
+                // v =
+                //         new Vision(
+                //                 r.drive::addVisionMeasurement,
+                //                 new VisionIOLimelight(camera0Name, r.drive::getRotation));
 
-                // v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {});
+                v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {});
                 break;
 
             case SIM:
@@ -183,6 +184,22 @@ public class Vision extends SubsystemBase {
 
                 // Skip if rejected
                 if (rejectPose) {
+                    Logger.recordOutput(
+                            "Vision/RejectTagDist",
+                            observation
+                                    .pose()
+                                    .toPose2d()
+                                    .minus(r.drive.getPose())
+                                    .getTranslation()
+                                    .getNorm());
+                    Logger.recordOutput(
+                            "Vision/RejectTagAngle",
+                            observation
+                                    .pose()
+                                    .getRotation()
+                                    .toRotation2d()
+                                    .minus(r.drive.getRotation())
+                                    .getDegrees());
                     continue;
                 }
 
@@ -205,6 +222,23 @@ public class Vision extends SubsystemBase {
                         observation.pose().toPose2d(),
                         observation.timestamp(),
                         VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+
+                Logger.recordOutput(
+                        "Vision/AcceptTagDist",
+                        observation
+                                .pose()
+                                .toPose2d()
+                                .minus(Locations.tags.getTagPose(8).get().toPose2d())
+                                .getTranslation()
+                                .getNorm());
+                Logger.recordOutput(
+                        "Vision/AcceptTagAngle",
+                        observation
+                                .pose()
+                                .getRotation()
+                                .toRotation2d()
+                                .minus(r.drive.getRotation())
+                                .getDegrees());
             }
 
             // Log camera datadata

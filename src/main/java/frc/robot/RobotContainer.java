@@ -149,8 +149,8 @@ public class RobotContainer {
 
         flysky.rightTriggerSWG
                 .and(flysky.topRightSWD.negate())
-                //.whileTrue(ComplexCommands.noDriveScore());
-                .whileTrue(ComplexCommands.visionCoralScore());
+                .whileTrue(ComplexCommands.noDriveScore());
+        // .whileTrue(ComplexCommands.visionCoralScore());
 
         flysky.leftTriggerSWE
                 .and(flysky.rightTriggerSWG.negate())

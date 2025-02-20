@@ -1,13 +1,12 @@
 package frc.robot.subsystems.controls;
 
-import java.util.List;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.RobotContainer;
 import frc.robot.commands.SuperstructureLocation;
 import frc.robot.util.Locations;
+import java.util.List;
 
 public class ControlBoard {
 
@@ -107,7 +106,12 @@ public class ControlBoard {
         }
     }
 
-    public Pose2d selectCoralStation(){
-        return r.drive.getPose().nearest(List.of(Locations.getLeftGatherStation(), Locations.getRightGatherStation()));
+    public Pose2d selectCoralStation() {
+        return r.drive
+                .getPose()
+                .nearest(
+                        List.of(
+                                Locations.getLeftGatherStation(),
+                                Locations.getRightGatherStation()));
     }
 }
