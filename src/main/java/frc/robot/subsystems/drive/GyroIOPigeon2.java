@@ -13,6 +13,8 @@
 
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -59,9 +61,9 @@ public class GyroIOPigeon2 implements GyroIO {
                         .equals(StatusCode.OK);
         inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
         inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
-        inputs.accelX = accelX.getValueAsDouble();
-        inputs.accelX = accelY.getValueAsDouble();
-        inputs.accelX = accelZ.getValueAsDouble();
+        inputs.accelX = accelX.getValue().in(MetersPerSecondPerSecond);
+        inputs.accelY = accelY.getValue().in(MetersPerSecondPerSecond);
+        inputs.accelZ = accelZ.getValue().in(MetersPerSecondPerSecond);
 
         inputs.odometryYawTimestamps =
                 yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
