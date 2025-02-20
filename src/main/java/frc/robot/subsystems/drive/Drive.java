@@ -169,9 +169,9 @@ public class Drive extends SubsystemBase {
                                                 3)) // L3 Gear ratio
                                 // Configures the track length and track width (spacing between
                                 // swerve modules)
-                                .withTrackLengthTrackWidth(Inches.of(24), Inches.of(24))
+                                .withTrackLengthTrackWidth(Inches.of(26), Inches.of(24))
                                 // Configures the bumper size (dimensions of the robot bumper)
-                                .withBumperSize(Inches.of(30), Inches.of(30));
+                                .withBumperSize(Inches.of(36), Inches.of(34));
                 SwerveDriveSimulation sim =
                         new SwerveDriveSimulation(
                                 driveTrainSimulationConfig,

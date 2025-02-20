@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
+import frc.robot.util.Locations;
+
 import java.util.function.Supplier;
 
 public class ComplexCommands {
@@ -25,11 +27,28 @@ public class ComplexCommands {
     static double releaseTimeAlgae = 0.5;
 
     static double gatherPosition = 0;
+    
 
     public static RobotContainer r;
 
-    public static Command fancyCoralScore() {
-        return null;
+    public static Command visionCoralScore() {
+        return new PathFollowingCommand(r, Locations::getTag8)
+                .andThen(goToLoc(() -> r.controlBoard.getCoralLevelFromController(r.flysky)))
+                .alongWith(holdCoral())
+                // gather trigger
+                .until(r.flysky.leftTriggerSWE)
+                .andThen(releaseCoral())
+                // when complete schedule a new command to return the superstructure to the hold
+                // position
+                .finallyDo(ComplexCommands::goHome);
+    }
+
+    public static Command visionCoralGather() {
+        //decides which coral station to use
+        //drive there
+        //gather
+        return new PathCommand(r, r.controlBoard::selectCoralStation)
+        .alongWith(noDriveGather());
     }
 
     public static Command blindCoralScore() {
