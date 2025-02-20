@@ -504,6 +504,4 @@ public class Drive extends SubsystemBase {
 
         return new Translation3d(gyroInputs.accelX, gyroInputs.accelY, gyroInputs.accelZ);
     }
-
-    
 }
