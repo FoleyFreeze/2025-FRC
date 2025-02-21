@@ -3,7 +3,6 @@ package frc.robot.subsystems.hand;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
@@ -43,8 +42,12 @@ public class Hand extends SubsystemBase {
         return inputs.handCurrent;
     }
 
-    public Command setVoltage(double volts) {
-        return new RunCommand(() -> io.setHandVolts(volts), this);
+    public Command setVoltageCmd(double volts) {
+        return new InstantCommand(() -> io.setHandVolts(volts), this);
+    }
+
+    public void setVoltage(double volts) {
+        io.setHandVolts(volts);
     }
 
     public Command stop() {

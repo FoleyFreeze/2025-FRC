@@ -20,6 +20,8 @@ import static edu.wpi.first.units.Units.Meters;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -139,11 +141,20 @@ public class RobotContainer {
                                                 drive.setPose(
                                                         drive.driveSimulation
                                                                 .getSimulatedDriveTrainPose())
-                                        : () ->
-                                                drive.setPose(
-                                                        new Pose2d(
-                                                                drive.getPose().getTranslation(),
-                                                                new Rotation2d())),
+                                        : DriverStation.getAlliance().orElse(Alliance.Blue)
+                                                        == Alliance.Blue
+                                                ? () ->
+                                                        drive.setPose(
+                                                                new Pose2d(
+                                                                        drive.getPose()
+                                                                                .getTranslation(),
+                                                                        new Rotation2d()))
+                                                : () ->
+                                                        drive.setPose(
+                                                                new Pose2d(
+                                                                        drive.getPose()
+                                                                                .getTranslation(),
+                                                                        Rotation2d.k180deg)),
                                 drive)
                         .ignoringDisable(true));
 

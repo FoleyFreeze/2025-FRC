@@ -17,7 +17,7 @@ public class Locations {
     static Transform2d halfRobotCoral =
             new Transform2d(
                     robotLength / 2 + Units.inchesToMeters(4),
-                    Units.inchesToMeters(6.5),
+                    Units.inchesToMeters(5),
                     new Rotation2d());
 
     public static AprilTagFieldLayout tags =
