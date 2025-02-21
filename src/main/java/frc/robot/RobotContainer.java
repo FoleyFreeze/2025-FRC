@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SuperstructureLocation;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.ControlBoard;
@@ -127,6 +128,8 @@ public class RobotContainer {
                         () -> -flysky.getLeftY(),
                         () -> -flysky.getLeftX(),
                         () -> -flysky.getRightX()));
+
+        elevator.setDefaultCommand(ComplexCommands.goToLoc(() -> SuperstructureLocation.HOLD));
 
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(

@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -35,10 +34,7 @@ public class ComplexCommands {
                 .alongWith(holdCoral())
                 // gather trigger
                 .until(r.flysky.leftTriggerSWE)
-                .andThen(releaseCoral())
-                // when complete schedule a new command to return the superstructure to the hold
-                // position
-                .finallyDo(ComplexCommands::goHome);
+                .andThen(releaseCoral());
     }
 
     public static Command visionCoralGather() {
@@ -61,17 +57,11 @@ public class ComplexCommands {
                 .alongWith(holdCoral())
                 // gather trigger
                 .until(r.flysky.leftTriggerSWE)
-                .andThen(releaseCoral())
-                // when complete schedule a new command to return the superstructure to the hold
-                // position
-                .finallyDo(ComplexCommands::goHome);
+                .andThen(releaseCoral());
     }
 
     public static Command noDriveGather() {
-        return goToGather()
-                .andThen(gatherCoral())
-                // as soon as command finishes, come back up
-                .finallyDo(ComplexCommands::goHome);
+        return goToGather().andThen(gatherCoral());
     }
 
     public static Command gatherAlgae() {
@@ -83,8 +73,7 @@ public class ComplexCommands {
     public static Command scoreAlgaeProc() {
         return goToLoc(() -> SuperstructureLocation.SCORE_PROCESSOR)
                 .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
-                .andThen(releaseAlgae())
-                .andThen(ComplexCommands::goHome);
+                .andThen(releaseAlgae());
     }
 
     public static Command scoreAlgaeNet() {
@@ -98,9 +87,7 @@ public class ComplexCommands {
     public static Command releaseAlgae() {
         return r.hand.setVoltage(releasePowerAlgae)
                 .andThen(new WaitCommand(releaseTimeAlgae))
-                .andThen(r.hand.stop())
-                // TODO: does this help?
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+                .andThen(r.hand.stop());
     }
 
     // STES LOW POWER ON HAND TO KEEP CORAL IN
@@ -147,10 +134,6 @@ public class ComplexCommands {
                 .andThen(r.wrist.goToReally(() -> SuperstructureLocation.HOLD_GATHER))
                 .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
                 .andThen(r.wrist.goToReally(() -> SuperstructureLocation.INTAKE));
-    }
-
-    public static void goHome() {
-        goToLoc(() -> SuperstructureLocation.HOLD).schedule();
     }
 
     public static Command stopSuperstructure() {
