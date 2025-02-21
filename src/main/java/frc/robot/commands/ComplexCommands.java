@@ -30,7 +30,7 @@ public class ComplexCommands {
     public static RobotContainer r;
 
     public static Command visionCoralScore() {
-        return new PathFollowingCommand(r, Locations::getTag8)
+        return new PathFollowingCommand(r, Locations::getTag7)
                 .andThen(goToLoc(() -> r.controlBoard.getCoralLevelFromController(r.flysky)))
                 .alongWith(holdCoral())
                 // gather trigger

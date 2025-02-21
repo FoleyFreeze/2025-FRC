@@ -51,8 +51,8 @@ public class Locations {
         return output;
     }
 
-    public static Pose2d getTag8() {
-        Pose2d tag = tags.getTagPose(8).get().toPose2d().plus(halfRobotCoral);
+    public static Pose2d getTag7() {
+        Pose2d tag = tags.getTagPose(7).get().toPose2d().plus(halfRobotCoral);
         Pose2d output =
                 new Pose2d(tag.getTranslation(), tag.getRotation().plus(Rotation2d.k180deg));
         return output;
