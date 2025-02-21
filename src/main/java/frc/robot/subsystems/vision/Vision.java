@@ -53,12 +53,12 @@ public class Vision extends SubsystemBase {
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
-                // v =
-                //         new Vision(
-                //                 r.drive::addVisionMeasurement,
-                //                 new VisionIOLimelight(camera0Name, r.drive::getRotation));
-
-                v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {});
+                v =
+                        new Vision(
+                                r.drive::addVisionMeasurement,
+                                new VisionIOLimelight(camera0Name, r.drive::getRotation));
+                // vision disable
+                // v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {});
                 break;
 
             case SIM:
@@ -300,7 +300,7 @@ public class Vision extends SubsystemBase {
 
     private boolean angleAgrees(Rotation2d tagAngle) {
         Rotation2d deltaAngle = r.drive.getRotation().minus(tagAngle);
-        boolean angleAgreesVal = (angleAgrees.calculate(Math.abs(deltaAngle.getDegrees()) < 20));
+        boolean angleAgreesVal = (angleAgrees.calculate(Math.abs(deltaAngle.getDegrees()) < 4));
         Logger.recordOutput("Vision/AngleAgrees", angleAgreesVal);
         return angleAgreesVal;
     }
