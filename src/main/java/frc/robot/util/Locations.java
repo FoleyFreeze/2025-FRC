@@ -15,7 +15,10 @@ public class Locations {
     static double robotLength = Units.inchesToMeters(30 + 6);
     static Transform2d halfRobot = new Transform2d(robotLength / 2, 0, new Rotation2d());
     static Transform2d halfRobotCoral =
-            new Transform2d(robotLength / 2 + Units.inchesToMeters(4), Units.inchesToMeters(6.5), new Rotation2d());
+            new Transform2d(
+                    robotLength / 2 + Units.inchesToMeters(4),
+                    Units.inchesToMeters(6.5),
+                    new Rotation2d());
 
     public static AprilTagFieldLayout tags =
             AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
