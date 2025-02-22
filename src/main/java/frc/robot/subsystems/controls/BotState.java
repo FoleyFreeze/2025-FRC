@@ -19,4 +19,9 @@ public class BotState {
         hasAlgae = true;
         hasCoral = false;
     }
+
+    public void clear() {
+        hasAlgae = false;
+        hasCoral = false;
+    }
 }

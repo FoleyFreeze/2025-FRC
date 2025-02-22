@@ -131,11 +131,12 @@ public class DriveCommands {
                         new TrapezoidProfile.Constraints(
                                 ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
         angleController.enableContinuousInput(-Math.PI, Math.PI);
+        angleController.setTolerance(Units.degreesToRadians(2));
 
         // evil hack to be effectively final
         final double[] lastManualTime = new double[1];
         lastManualTime[0] = 0;
-        double manualTimeThresh = 0.75;
+        double manualTimeThresh = 0.35;
         double manualThresh = 0.1;
 
         // Construct command
@@ -159,9 +160,15 @@ public class DriveCommands {
                                         angleController.calculate(
                                                 drive.getRotation().getRadians(),
                                                 rotationSupplier.get().getRadians());
+                                if (angleController.atGoal()) {
+                                    omega = 0;
+                                }
+
                             } else {
                                 // in manual mode
-                                omega = omegaSupplier.getAsDouble();
+                                omega =
+                                        omegaSupplier.getAsDouble()
+                                                * drive.getMaxAngularSpeedRadPerSec();
                             }
 
                             // Convert to field relative speeds & send command

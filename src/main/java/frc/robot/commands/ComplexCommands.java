@@ -1,8 +1,10 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
@@ -11,12 +13,12 @@ import java.util.function.Supplier;
 public class ComplexCommands {
 
     static double holdPowerCoral = 0.4;
-    static double releasePowerCoral = -8;
+    static double releasePowerCoral = -6;
     static double releaseTimeCoral = 0.5;
 
     static double intakePowerCoral = 3.5;
-    static double intakeCurrentCoral = 100;
-    static double intakeCoralTime = 0.2;
+    static double intakeCurrentCoral = 15;
+    static double intakeCoralTime = 0.8;
 
     static double intakeAlgaeTime = 0.2;
     static double intakeCurrentAlgae = 50;
@@ -46,11 +48,11 @@ public class ComplexCommands {
     }
 
     public static Command blindCoralScore() {
-        return snapToAngle().alongWith(noDriveScore());
+        return snapToAngle(r.controlBoard::getAlignAngle).alongWith(noDriveScore());
     }
 
     public static Command blindGatherCoral() {
-        return snapToAngle().alongWith(noDriveGather());
+        return snapToAngle(r.controlBoard::selectGatherAngle).alongWith(noDriveGather());
     }
 
     public static Command visionAlgaeGather() {
@@ -63,7 +65,7 @@ public class ComplexCommands {
 
     public static Command noDriveScore() {
         Command c =
-                goToLoc(() -> r.controlBoard.getCoralLevelFromController(r.flysky))
+                goToLoc(() -> r.controlBoard.getCoralLevel())
                         .alongWith(holdCoral())
                         // gather trigger
                         .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
@@ -80,7 +82,8 @@ public class ComplexCommands {
 
     public static Command gatherAlgae() {
         return goToLoc(() -> r.controlBoard.getAlgaeLevelFromController(r.flysky))
-                .andThen(holdAlgae());
+                .andThen(holdAlgae())
+                .andThen(new InstantCommand(() -> r.state.setAlgae()));
         // .until(() -> r.hand.getCurrent() > 50);
     }
 
@@ -101,6 +104,7 @@ public class ComplexCommands {
     public static Command releaseAlgae() {
         return r.hand.setVoltageCmd(releasePowerAlgae)
                 .andThen(new WaitCommand(releaseTimeAlgae))
+                .andThen(new InstantCommand(() -> r.state.clear()))
                 .andThen(r.hand.stop());
     }
 
@@ -113,6 +117,7 @@ public class ComplexCommands {
     public static Command releaseCoral() {
         return r.hand.setVoltageCmd(releasePowerCoral)
                 .andThen(new WaitCommand(releaseTimeCoral))
+                .andThen(new InstantCommand(() -> r.state.clear()))
                 .andThen(r.hand.stop());
     }
 
@@ -124,19 +129,20 @@ public class ComplexCommands {
                                 new WaitUntilCommand(
                                         () -> r.hand.getCurrent() > intakeCurrentCoral))
                         .andThen(new WaitCommand(intakeCoralTime))
+                        .andThen(new InstantCommand(() -> r.state.setCoral()))
                         .finallyDo(() -> r.hand.setVoltage(holdPowerCoral));
         c.setName("GatherCoral");
         return c;
     }
 
     // lines up with target field element
-    public static Command snapToAngle() {
+    public static Command snapToAngle(Supplier<Rotation2d> angle) {
         return DriveCommands.joystickDriveAtAngle(
                 r.drive,
                 () -> -r.flysky.getLeftY(),
                 () -> -r.flysky.getLeftX(),
                 () -> -r.flysky.getRightX(),
-                r.controlBoard::getAlignAngle);
+                angle);
     }
 
     // moves elevator to a height with arm tucked up, then deploys arm
@@ -151,21 +157,34 @@ public class ComplexCommands {
     // go to hold, algae hold, or gather depending on what game pieces we have
     public static Command homeLogic() {
         return new ConditionalCommand(
-                goToLoc(() -> SuperstructureLocation.HOLD),
-                new ConditionalCommand(
-                        goToLoc(() -> SuperstructureLocation.ALGAE_LEVEL_2_3),
-                        goToGather(),
-                        r.state.hasAlgaeT),
-                r.state.hasCoralT);
+                        new ConditionalCommand(
+                                new RunCommand(() -> {}),
+                                goToLoc(() -> SuperstructureLocation.HOLD),
+                                () -> atLocation(SuperstructureLocation.INTAKE)),
+                        new ConditionalCommand(
+                                goToLoc(() -> SuperstructureLocation.ALGAE_LEVEL_2_3),
+                                goToGather()
+                                        .andThen(
+                                                new RunCommand(
+                                                        () -> {})), // prevent command from ending
+                                r.state.hasAlgaeT),
+                        r.state.hasCoralT)
+                .andThen(new WaitUntilCommand(() -> false));
     }
 
     public static Command goToGather() {
-        return r.arm.goTo(() -> SuperstructureLocation.HOLD)
-                .alongWith(r.wrist.goToReally(() -> SuperstructureLocation.HOLD))
-                .andThen(r.wrist.goToReally(() -> SuperstructureLocation.HOLD_GATHER))
-                .alongWith(r.elevator.goTo(() -> SuperstructureLocation.INTAKE))
-                .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
-                .andThen(r.wrist.goToReally(() -> SuperstructureLocation.INTAKE));
+        Command toGather =
+                r.arm.goTo(() -> SuperstructureLocation.HOLD)
+                        .alongWith(r.wrist.goToReally(() -> SuperstructureLocation.HOLD))
+                        .andThen(r.wrist.goToReally(() -> SuperstructureLocation.HOLD_GATHER))
+                        .alongWith(r.elevator.goTo(() -> SuperstructureLocation.INTAKE))
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
+                        .andThen(r.wrist.goToReally(() -> SuperstructureLocation.INTAKE));
+
+        return new ConditionalCommand(
+                new InstantCommand(), // do nothing
+                toGather, // go to gather position
+                () -> atLocation(SuperstructureLocation.INTAKE));
     }
 
     public static Command stopSuperstructure() {
@@ -180,5 +199,11 @@ public class ComplexCommands {
                     r.arm.zero();
                     r.wrist.zero();
                 });
+    }
+
+    public static boolean atLocation(SuperstructureLocation loc) {
+        return r.arm.atTarget(() -> loc)
+                && r.elevator.atTarget(() -> loc)
+                && r.wrist.atTarget(() -> loc);
     }
 }

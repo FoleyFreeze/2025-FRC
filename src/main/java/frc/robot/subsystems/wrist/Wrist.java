@@ -73,7 +73,7 @@ public class Wrist extends SubsystemBase {
 
     public Command goTo(Supplier<SuperstructureLocation> loc) {
         return new RunCommand(() -> setAngle(loc.get()), this)
-                .until(() -> atTarget())
+                .until(() -> atTarget(loc))
                 .finallyDo(
                         b -> {
                             if (!b)
@@ -92,7 +92,7 @@ public class Wrist extends SubsystemBase {
                             this.target = loc.get();
                         },
                         this)
-                .until(() -> atTarget())
+                .until(() -> atTarget(loc))
                 .finallyDo(
                         b -> {
                             if (!b)
@@ -134,8 +134,8 @@ public class Wrist extends SubsystemBase {
         return Radians.of(inputs.wristPositionRad);
     }
 
-    public boolean atTarget() {
-        return Math.abs(target.wristAngle.in(Radians) - inputs.wristPositionRad) < k.closeEnough;
+    public boolean atTarget(Supplier<SuperstructureLocation> loc) {
+        return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad) < k.closeEnough;
     }
 
     public Command stop() {

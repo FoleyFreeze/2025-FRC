@@ -101,6 +101,14 @@ public class ControlBoard {
         }
     }
 
+    public Rotation2d selectGatherAngle() {
+        if (selectedStation) {
+            return Locations.getLeftGatherStation().getRotation().plus(Rotation2d.k180deg);
+        } else {
+            return Locations.getRightGatherStation().getRotation().plus(Rotation2d.k180deg);
+        }
+    }
+
     public Pose2d getPathPose() {
         return Locations.getReefLocation(selectedReefPos);
     }
@@ -138,8 +146,7 @@ public class ControlBoard {
         if (Locations.isBlue()) {
             return scoringPosition;
         } else {
-            scoringPosition.plus(Rotation2d.fromDegrees(180));
-            return scoringPosition;
+            return scoringPosition.plus(Rotation2d.fromDegrees(180));
         }
     }
 
