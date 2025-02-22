@@ -132,6 +132,7 @@ public class RobotContainer {
                         () -> -flysky.getRightX()));
 
         elevator.setDefaultCommand(ComplexCommands.goToLoc(() -> SuperstructureLocation.HOLD));
+        climb.setDefaultCommand(climb.setClimbVoltage(0));
 
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(
@@ -161,23 +162,81 @@ public class RobotContainer {
         // rezero superstructure
         flysky.upRTRIM.onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
 
-        flysky.rightTriggerSWG
-                .and(flysky.topRightSWD.negate())
-                //        .whileTrue(ComplexCommands.noDriveScore());
-                .whileTrue(ComplexCommands.visionCoralScore());
+        //left trigger commands
+        //gather coral camera 
+        //gather coral nocam 
+        //gather algae camera 
+        //gather algae nocam
+        //climb down
+        flysky.leftTriggerSWE //gather sw
+                .and(flysky.topLeftSWA.negate()) //algae sw
+                .and(flysky.topRightSWD) //cam sw
+                .and(controlBoard.climbModeT.negate()) //climb sw
+                .whileTrue(ComplexCommands.visionCoralGather());
 
-        flysky.leftTriggerSWE
-                .and(flysky.rightTriggerSWG.negate())
-                .and(flysky.topRightSWD.negate())
-                .whileTrue(ComplexCommands.noDriveGather());
+        flysky.leftTriggerSWE //gather sw
+                .and(flysky.topLeftSWA.negate()) //algae sw
+                .and(flysky.topRightSWD.negate()) //cam sw
+                .and(controlBoard.climbModeT.negate()) //climb sw
+                .whileTrue(ComplexCommands.blindGatherCoral());
 
-        flysky.leftTriggerSWE
-                .and(flysky.rightTriggerSWG.negate())
-                .and(flysky.topRightSWD)
+        flysky.leftTriggerSWE //gather sw
+                .and(flysky.topLeftSWA) //algae sw
+                .and(flysky.topRightSWD) //cam sw
+                .and(controlBoard.climbModeT.negate()) //climb sw
+                .whileTrue(ComplexCommands.visionAlgaeGather());
+
+        flysky.leftTriggerSWE //gather sw
+                .and(flysky.topLeftSWA) //algae sw
+                .and(flysky.topRightSWD.negate()) //cam sw
+                .and(controlBoard.climbModeT.negate()) //climb sw
                 .whileTrue(ComplexCommands.gatherAlgae());
 
-        flysky.rightTriggerSWG.and(flysky.topRightSWD).whileTrue(ComplexCommands.scoreAlgaeProc());
 
+        flysky.leftTriggerSWE //gather sw
+                .and(controlBoard.climbModeT) //climb sw
+                .whileTrue(r.climb.setClimbVoltage(-2));
+        
+
+
+        //right trigger commands
+        //score coral camera 
+        //score coral nocam 
+        //score algae camera 
+        //score algae nocam 
+        //climb up
+
+
+        flysky.rightTriggerSWG //gather sw
+                .and(flysky.topLeftSWA.negate()) //algae sw
+                .and(flysky.topRightSWD) //cam sw
+                .and(controlBoard.climbModeT.negate()) //climb sw
+                .whileTrue(ComplexCommands.visionCoralScore());
+
+        flysky.rightTriggerSWG //gather sw
+                .and(flysky.topLeftSWA.negate()) //algae sw
+                .and(flysky.topRightSWD.negate()) //cam sw
+                .and(controlBoard.climbModeT.negate()) //climb sw
+                .whileTrue(ComplexCommands.blindCoralScore());
+
+        flysky.rightTriggerSWG //gather sw
+                .and(flysky.topLeftSWA) //algae sw
+                .and(flysky.topRightSWD) //cam sw
+                .and(controlBoard.climbModeT.negate()) //climb sw
+                .whileTrue(ComplexCommands.visionAlgaeScore());
+
+        flysky.rightTriggerSWG //gather sw
+                .and(flysky.topLeftSWA) //algae sw
+                .and(flysky.topRightSWD.negate()) //cam sw
+                .and(controlBoard.climbModeT.negate()) //climb sw
+                .whileTrue(ComplexCommands.scoreAlgaeProc());
+
+        flysky.rightTriggerSWG //gather sw
+                .and(controlBoard.climbModeT) //climb sw
+                .whileTrue(r.climb.setClimbVoltage(6));
+
+
+        //stop button
         flysky.topRightMomentSWC.onTrue(ComplexCommands.stopSuperstructure().ignoringDisable(true));
     }
 

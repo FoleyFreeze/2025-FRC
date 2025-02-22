@@ -52,6 +52,15 @@ public class ComplexCommands {
         return snapToAngle().alongWith(noDriveGather());
     }
 
+    public static Command visionAlgaeGather() {
+        return gatherAlgae();
+    }
+
+    public static Command visionAlgaeScore(){
+        return scoreAlgaeProc();
+    }
+
+
     public static Command noDriveScore() {
         Command c =
                 goToLoc(() -> r.controlBoard.getCoralLevelFromController(r.flysky))
@@ -126,6 +135,7 @@ public class ComplexCommands {
                 r.drive,
                 () -> -r.flysky.getLeftY(),
                 () -> -r.flysky.getLeftX(),
+                () -> -r.flysky.getRightX(),
                 r.controlBoard::getAlignAngle);
     }
 
