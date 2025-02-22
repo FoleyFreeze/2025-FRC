@@ -2,9 +2,14 @@ package frc.robot.subsystems.controls;
 
 import java.util.List;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
 import frc.robot.commands.SuperstructureLocation;
 import frc.robot.util.Locations;
@@ -13,11 +18,44 @@ public class ControlBoard {
 
     public Joystick cb;
     public Joystick cb2;
+    public LoggedDashboardChooser<Integer> level;
+    public LoggedDashboardChooser<ReefSticks> letter;
+    public LoggedDashboardChooser<Boolean> station;
+    public LoggedDashboardChooser<Boolean> climbMode;
+
     RobotContainer r;
 
     public ControlBoard() {
         cb = new Joystick(1);
         cb2 = new Joystick(2);
+        level = new LoggedDashboardChooser<>("Level");
+        letter = new LoggedDashboardChooser<>("Letter");
+        station = new LoggedDashboardChooser<>("Station");
+        climbMode = new LoggedDashboardChooser<>("climbMode");
+
+        level.addDefaultOption("1", 1);
+        level.addOption("2", 2);
+        level.addOption("3", 3);
+        level.addOption("4", 4);
+
+        letter.addDefaultOption("A", ReefSticks.A);
+        letter.addOption("B", ReefSticks.B);
+        letter.addOption("C", ReefSticks.C);
+        letter.addOption("D", ReefSticks.D);
+        letter.addOption("E", ReefSticks.E);
+        letter.addOption("F", ReefSticks.F);
+        letter.addOption("G", ReefSticks.G);
+        letter.addOption("H", ReefSticks.H);
+        letter.addOption("I", ReefSticks.I);
+        letter.addOption("J", ReefSticks.J);
+        letter.addOption("K", ReefSticks.K);
+        letter.addOption("L", ReefSticks.L);
+
+        station.addDefaultOption("Left", true);
+        station.addOption("Right", false);
+
+        station.addDefaultOption("Off", false);
+        station.addOption("On", true);
     }
 
     /*
@@ -27,7 +65,7 @@ public class ControlBoard {
     public Trigger  = new Trigger(() -> cb.getRawButton(3));
     */
 
-    public enum ReefSticks {
+    public static enum ReefSticks {
         A,
         B,
         C,
@@ -42,31 +80,114 @@ public class ControlBoard {
         L;
     }
 
-    public ReefSticks lastPressed;
+    public ReefSticks selectedReefPos;
+    public Integer selectedLevel;
+    public Boolean selectedStation;
+    public Boolean selectedClimbMode;
+
+    public void periodic(){
+        selectedReefPos = letter.get();
+        selectedLevel = level.get();
+        selectedStation = station.get();
+        selectedClimbMode = climbMode.get();
+    }
+
+    public Trigger climbModeT = new Trigger(() -> selectedClimbMode);
+    
+    //left means true
+    public Pose2d selectStation() {
+        if(selectedStation){
+            return Locations.getLeftGatherStation();
+        } else {
+            return Locations.getRightGatherStation();
+        }
+    } 
+
+    public Pose2d getAlignPose() {
+        return null;
+        // switch (selectedReefPos) {
+        //     case A:
+        //         return 
+        //     break;
+        //     case B:
+                
+        //     break;
+        //     case C:
+
+        //     break;
+        //     case D:
+                
+        //     break;
+        //     case E:
+
+        //     break;
+        //     case F:
+                
+        //     break;
+        //     case G:
+
+        //     break;
+        //     case H:
+                
+        //     break;
+        //     case I:
+
+        //     case J:
+                
+        //     break;
+        //     case K:
+
+        //     break;
+        //     case L:
+                
+        //     break;
+        //     default:
+                
+        // }
+
+        
+    }
 
     public Rotation2d getAlignAngle() {
-        switch (lastPressed) {
+        Rotation2d scoringPosition;
+        switch (selectedReefPos) {
             case A:
             case B:
-                return Rotation2d.fromDegrees(0);
+                scoringPosition = Rotation2d.fromDegrees(0);
+            break;
             case C:
             case D:
-                return Rotation2d.fromDegrees(60);
+                scoringPosition = Rotation2d.fromDegrees(60);
+            break;
             case E:
             case F:
-                return Rotation2d.fromDegrees(120);
+                scoringPosition = Rotation2d.fromDegrees(120);
+            break;
             case G:
             case H:
-                return Rotation2d.fromDegrees(180);
+                scoringPosition = Rotation2d.fromDegrees(180);
+            break;
             case I:
             case J:
-                return Rotation2d.fromDegrees(240);
+                scoringPosition = Rotation2d.fromDegrees(240);
+            break;
             case K:
             case L:
-                return Rotation2d.fromDegrees(300);
+                scoringPosition = Rotation2d.fromDegrees(300);
+            break;
             default:
-                return Rotation2d.fromDegrees(0);
+                scoringPosition =  Rotation2d.fromDegrees(0);
         }
+        if(Locations.isBlue()){
+            return scoringPosition;
+        } else {
+            scoringPosition.plus(Rotation2d.fromDegrees(180));
+            return scoringPosition;
+        }
+    }
+
+    public SuperstructureLocation getCoralLevel(){
+        return getLevelLocation(selectedLevel);
     }
 
     public SuperstructureLocation getCoralLevelFromController(Flysky controller) {

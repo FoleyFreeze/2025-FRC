@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
+import frc.robot.subsystems.controls.ControlBoard;
+
 public class Locations {
 
     static double robotWidth = 28+6;
@@ -18,8 +20,22 @@ public class Locations {
     
     public static AprilTagFieldLayout tags = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
+
+    public static Pose2d getReefLocation(ControlBoard.ReefSticks position){
+        switch (position) {
+            case A:
+            if(isBlue()){
+                return tags.getTagPose(18).get().toPose2d();
+            } else {
+                return tags.getTagPose(18).get().toPose2d();
+            }
+            default:
+            return null;    
+        }
+    }
+
     public static Pose2d getLeftGatherStation(){
-        if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Red)){
+        if(!isBlue()){
             return tags.getTagPose(1).get().toPose2d().plus(halfRobot);
         } else {
             return tags.getTagPose(13).get().toPose2d().plus(halfRobot);
@@ -27,7 +43,7 @@ public class Locations {
     }
 
     public static Pose2d getRightGatherStation(){
-        if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Red)){
+        if(!isBlue()){
             return tags.getTagPose(2).get().toPose2d().plus(halfRobot);
         } else {
             return tags.getTagPose(12).get().toPose2d().plus(halfRobot);
@@ -38,6 +54,8 @@ public class Locations {
         return tags.getTagPose(8).get().toPose2d().plus(halfRobotCoral);
     }
 
-    
+    public static boolean isBlue(){
+        return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Blue);
+    }    
 
 }
