@@ -1,18 +1,14 @@
 package frc.robot.subsystems.controls;
 
-import java.util.List;
-
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
 import frc.robot.commands.SuperstructureLocation;
 import frc.robot.util.Locations;
+import java.util.List;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class ControlBoard {
 
@@ -85,7 +81,7 @@ public class ControlBoard {
     public Boolean selectedStation;
     public Boolean selectedClimbMode;
 
-    public void periodic(){
+    public void periodic() {
         selectedReefPos = letter.get();
         selectedLevel = level.get();
         selectedStation = station.get();
@@ -93,18 +89,18 @@ public class ControlBoard {
     }
 
     public Trigger climbModeT = new Trigger(() -> selectedClimbMode);
-    
-    //left means true
+
+    // left means true
     public Pose2d selectStation() {
-        if(selectedStation){
+        if (selectedStation) {
             return Locations.getLeftGatherStation();
         } else {
             return Locations.getRightGatherStation();
         }
-    } 
+    }
 
     public Pose2d getAlignPose() {
-        return Locations.getReefLocation(selectedReefPos);                
+        return Locations.getReefLocation(selectedReefPos);
     }
 
     public Rotation2d getAlignAngle() {
@@ -113,31 +109,31 @@ public class ControlBoard {
             case A:
             case B:
                 scoringPosition = Rotation2d.fromDegrees(0);
-            break;
+                break;
             case C:
             case D:
                 scoringPosition = Rotation2d.fromDegrees(60);
-            break;
+                break;
             case E:
             case F:
                 scoringPosition = Rotation2d.fromDegrees(120);
-            break;
+                break;
             case G:
             case H:
                 scoringPosition = Rotation2d.fromDegrees(180);
-            break;
+                break;
             case I:
             case J:
                 scoringPosition = Rotation2d.fromDegrees(240);
-            break;
+                break;
             case K:
             case L:
                 scoringPosition = Rotation2d.fromDegrees(300);
-            break;
+                break;
             default:
-                scoringPosition =  Rotation2d.fromDegrees(0);
+                scoringPosition = Rotation2d.fromDegrees(0);
         }
-        if(Locations.isBlue()){
+        if (Locations.isBlue()) {
             return scoringPosition;
         } else {
             scoringPosition.plus(Rotation2d.fromDegrees(180));
@@ -145,7 +141,7 @@ public class ControlBoard {
         }
     }
 
-    public SuperstructureLocation getCoralLevel(){
+    public SuperstructureLocation getCoralLevel() {
         return getLevelLocation(selectedLevel);
     }
 
@@ -187,7 +183,12 @@ public class ControlBoard {
         }
     }
 
-    public Pose2d selectCoralStation(){
-        return r.drive.getPose().nearest(List.of(Locations.getLeftGatherStation(), Locations.getRightGatherStation()));
+    public Pose2d selectCoralStation() {
+        return r.drive
+                .getPose()
+                .nearest(
+                        List.of(
+                                Locations.getLeftGatherStation(),
+                                Locations.getRightGatherStation()));
     }
 }

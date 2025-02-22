@@ -56,10 +56,9 @@ public class ComplexCommands {
         return gatherAlgae();
     }
 
-    public static Command visionAlgaeScore(){
+    public static Command visionAlgaeScore() {
         return scoreAlgaeProc();
     }
-
 
     public static Command noDriveScore() {
         Command c =

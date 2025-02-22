@@ -132,7 +132,7 @@ public class DriveCommands {
                                 ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
         angleController.enableContinuousInput(-Math.PI, Math.PI);
 
-        //evil hack to be effectively final
+        // evil hack to be effectively final
         final double[] lastManualTime = new double[1];
         lastManualTime[0] = 0;
         double manualTimeThresh = 0.75;
@@ -146,21 +146,21 @@ public class DriveCommands {
                                     getLinearVelocityFromJoysticks(
                                             xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-                                //determine mode
-                                if(Math.abs(omegaSupplier.getAsDouble()) > manualThresh){
-                                        lastManualTime[0] = Timer.getTimestamp();
-                                }
+                            // determine mode
+                            if (Math.abs(omegaSupplier.getAsDouble()) > manualThresh) {
+                                lastManualTime[0] = Timer.getTimestamp();
+                            }
 
                             // Calculate angular speed
                             double omega;
-                            if(Timer.getTimestamp() - lastManualTime[0] > manualTimeThresh){
-                                //in pid mode
+                            if (Timer.getTimestamp() - lastManualTime[0] > manualTimeThresh) {
+                                // in pid mode
                                 omega =
                                         angleController.calculate(
                                                 drive.getRotation().getRadians(),
                                                 rotationSupplier.get().getRadians());
                             } else {
-                                //in manual mode
+                                // in manual mode
                                 omega = omegaSupplier.getAsDouble();
                             }
 
