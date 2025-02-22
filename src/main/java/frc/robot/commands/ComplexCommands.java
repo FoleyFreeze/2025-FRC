@@ -1,11 +1,11 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
-import frc.robot.util.Locations;
 import java.util.function.Supplier;
 
 public class ComplexCommands {
@@ -29,8 +29,8 @@ public class ComplexCommands {
     public static RobotContainer r;
 
     public static Command visionCoralScore() {
-        return new PathFollowingCommand(r, Locations::getTag7)
-                .andThen(goToLoc(() -> r.controlBoard.getCoralLevelFromController(r.flysky)))
+        return new PathFollowingCommand(r, r.controlBoard::getPathPose, false)
+                .andThen(goToLoc(r.controlBoard::getCoralLevel))
                 .alongWith(holdCoral())
                 // gather trigger
                 .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
@@ -41,7 +41,8 @@ public class ComplexCommands {
         // decides which coral station to use
         // drive there
         // gather
-        return new PathCommand(r, r.controlBoard::selectCoralStation).alongWith(noDriveGather());
+        return new PathCommand(r, r.controlBoard::selectCoralStation, true)
+                .alongWith(noDriveGather());
     }
 
     public static Command blindCoralScore() {
@@ -147,8 +148,15 @@ public class ComplexCommands {
         // arm to 0, elevator move, arm out
     }
 
-    public static Command goHome() {
-        return null;
+    // go to hold, algae hold, or gather depending on what game pieces we have
+    public static Command homeLogic() {
+        return new ConditionalCommand(
+                goToLoc(() -> SuperstructureLocation.HOLD),
+                new ConditionalCommand(
+                        goToLoc(() -> SuperstructureLocation.ALGAE_LEVEL_2_3),
+                        goToGather(),
+                        r.state.hasAlgaeT),
+                r.state.hasCoralT);
     }
 
     public static Command goToGather() {

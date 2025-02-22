@@ -10,20 +10,24 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.util.Locations;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class PathFollowingCommand extends Command {
     RobotContainer r;
+    boolean flipRobot;
 
     private Supplier<Pose2d> poseSupplier;
     private Command c;
     PathConstraints pathConstraints =
             new PathConstraints(1, 1, 1, 1); // vel, accel, rotvel, rotaccel
 
-    public PathFollowingCommand(RobotContainer r, Supplier<Pose2d> poseSupplier) {
+    public PathFollowingCommand(
+            RobotContainer r, Supplier<Pose2d> poseSupplier, boolean flipRobot) {
         this.poseSupplier = poseSupplier;
         this.r = r;
+        this.flipRobot = flipRobot;
     }
 
     @Override
@@ -34,12 +38,19 @@ public class PathFollowingCommand extends Command {
 
         List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(currentLocation, targetPose);
 
+        Pose2d flipPose;
+        if (flipRobot) {
+            flipPose = Locations.invert(targetPose);
+        } else {
+            flipPose = targetPose;
+        }
+
         PathPlannerPath path =
                 new PathPlannerPath(
                         waypoints,
                         pathConstraints,
                         new IdealStartingState(0, r.drive.getRotation()),
-                        new GoalEndState(0, targetPose.getRotation()));
+                        new GoalEndState(0, flipPose.getRotation()));
 
         c = AutoBuilder.followPath(path);
         c.initialize();

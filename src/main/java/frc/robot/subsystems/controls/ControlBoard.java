@@ -21,7 +21,9 @@ public class ControlBoard {
 
     RobotContainer r;
 
-    public ControlBoard() {
+    public ControlBoard(RobotContainer r) {
+        this.r = r;
+
         cb = new Joystick(1);
         cb2 = new Joystick(2);
         level = new LoggedDashboardChooser<>("Level");
@@ -50,8 +52,8 @@ public class ControlBoard {
         station.addDefaultOption("Left", true);
         station.addOption("Right", false);
 
-        station.addDefaultOption("Off", false);
-        station.addOption("On", true);
+        climbMode.addDefaultOption("Off", false);
+        climbMode.addOption("On", true);
     }
 
     /*
@@ -77,9 +79,9 @@ public class ControlBoard {
     }
 
     public ReefSticks selectedReefPos;
-    public Integer selectedLevel;
-    public Boolean selectedStation;
-    public Boolean selectedClimbMode;
+    public int selectedLevel;
+    public boolean selectedStation;
+    public boolean selectedClimbMode;
 
     public void periodic() {
         selectedReefPos = letter.get();
@@ -91,7 +93,7 @@ public class ControlBoard {
     public Trigger climbModeT = new Trigger(() -> selectedClimbMode);
 
     // left means true
-    public Pose2d selectStation() {
+    public Pose2d selectCoralStation() {
         if (selectedStation) {
             return Locations.getLeftGatherStation();
         } else {
@@ -99,7 +101,7 @@ public class ControlBoard {
         }
     }
 
-    public Pose2d getAlignPose() {
+    public Pose2d getPathPose() {
         return Locations.getReefLocation(selectedReefPos);
     }
 
@@ -183,7 +185,7 @@ public class ControlBoard {
         }
     }
 
-    public Pose2d selectCoralStation() {
+    public Pose2d selectClosestCoralStation() {
         return r.drive
                 .getPose()
                 .nearest(

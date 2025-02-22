@@ -111,17 +111,17 @@ public class Locations {
 
     public static Pose2d getLeftGatherStation() {
         if (!isBlue()) {
-            return tags.getTagPose(1).get().toPose2d().plus(halfRobot);
+            return invert(tags.getTagPose(1).get().toPose2d().plus(halfRobot));
         } else {
-            return tags.getTagPose(13).get().toPose2d().plus(halfRobot);
+            return invert(tags.getTagPose(13).get().toPose2d().plus(halfRobot));
         }
     }
 
     public static Pose2d getRightGatherStation() {
         if (!isBlue()) {
-            return tags.getTagPose(2).get().toPose2d().plus(halfRobot);
+            return invert(tags.getTagPose(2).get().toPose2d().plus(halfRobot));
         } else {
-            return tags.getTagPose(12).get().toPose2d().plus(halfRobot);
+            return invert(tags.getTagPose(12).get().toPose2d().plus(halfRobot));
         }
     }
 

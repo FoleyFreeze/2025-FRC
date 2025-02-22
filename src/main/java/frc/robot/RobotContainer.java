@@ -30,9 +30,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.SuperstructureLocation;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.controls.BotState;
 import frc.robot.subsystems.controls.ControlBoard;
 import frc.robot.subsystems.controls.Flysky;
 import frc.robot.subsystems.drive.Drive;
@@ -65,7 +65,8 @@ public class RobotContainer {
 
     // Controller
     public final Flysky flysky = new Flysky();
-    public final ControlBoard controlBoard = new ControlBoard();
+    public final ControlBoard controlBoard = new ControlBoard(this);
+    public final BotState state = new BotState();
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -131,7 +132,8 @@ public class RobotContainer {
                         () -> -flysky.getLeftX(),
                         () -> -flysky.getRightX()));
 
-        elevator.setDefaultCommand(ComplexCommands.goToLoc(() -> SuperstructureLocation.HOLD));
+        elevator.setDefaultCommand(ComplexCommands.homeLogic());
+
         climb.setDefaultCommand(climb.setClimbVoltage(0));
 
         // Reset gyro to 0° when B button is pressed
@@ -169,24 +171,28 @@ public class RobotContainer {
         // gather algae nocam
         // climb down
         flysky.leftTriggerSWE // gather sw
+                .and(flysky.rightTriggerSWG.negate()) // not scoring
                 .and(flysky.topLeftSWA.negate()) // algae sw
                 .and(flysky.topRightSWD) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(ComplexCommands.visionCoralGather());
 
         flysky.leftTriggerSWE // gather sw
+                .and(flysky.rightTriggerSWG.negate()) // not scoring
                 .and(flysky.topLeftSWA.negate()) // algae sw
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(ComplexCommands.blindGatherCoral());
 
         flysky.leftTriggerSWE // gather sw
+                .and(flysky.rightTriggerSWG.negate()) // not scoring
                 .and(flysky.topLeftSWA) // algae sw
                 .and(flysky.topRightSWD) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(ComplexCommands.visionAlgaeGather());
 
         flysky.leftTriggerSWE // gather sw
+                .and(flysky.rightTriggerSWG.negate()) // not scoring
                 .and(flysky.topLeftSWA) // algae sw
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
@@ -236,6 +242,8 @@ public class RobotContainer {
     }
 
     public void robotPeriodic() {
+        controlBoard.periodic();
+
         String s =
                 String.format(
                         "%.1f,%.0f,%.0f",
