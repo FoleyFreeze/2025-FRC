@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.util.Locations;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -56,7 +57,7 @@ public class Vision extends SubsystemBase {
                         new Vision(
                                 r.drive::addVisionMeasurement,
                                 new VisionIOLimelight(camera0Name, r.drive::getRotation));
-
+                // vision disable
                 // v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {});
                 break;
 
@@ -183,6 +184,22 @@ public class Vision extends SubsystemBase {
 
                 // Skip if rejected
                 if (rejectPose) {
+                    Logger.recordOutput(
+                            "Vision/RejectTagDist",
+                            observation
+                                    .pose()
+                                    .toPose2d()
+                                    .minus(r.drive.getPose())
+                                    .getTranslation()
+                                    .getNorm());
+                    Logger.recordOutput(
+                            "Vision/RejectTagAngle",
+                            observation
+                                    .pose()
+                                    .getRotation()
+                                    .toRotation2d()
+                                    .minus(r.drive.getRotation())
+                                    .getDegrees());
                     continue;
                 }
 
@@ -205,6 +222,23 @@ public class Vision extends SubsystemBase {
                         observation.pose().toPose2d(),
                         observation.timestamp(),
                         VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+
+                Logger.recordOutput(
+                        "Vision/AcceptTagDist",
+                        observation
+                                .pose()
+                                .toPose2d()
+                                .minus(Locations.tags.getTagPose(8).get().toPose2d())
+                                .getTranslation()
+                                .getNorm());
+                Logger.recordOutput(
+                        "Vision/AcceptTagAngle",
+                        observation
+                                .pose()
+                                .getRotation()
+                                .toRotation2d()
+                                .minus(r.drive.getRotation())
+                                .getDegrees());
             }
 
             // Log camera datadata
@@ -266,7 +300,7 @@ public class Vision extends SubsystemBase {
 
     private boolean angleAgrees(Rotation2d tagAngle) {
         Rotation2d deltaAngle = r.drive.getRotation().minus(tagAngle);
-        boolean angleAgreesVal = (angleAgrees.calculate(Math.abs(deltaAngle.getDegrees()) < 20));
+        boolean angleAgreesVal = (angleAgrees.calculate(Math.abs(deltaAngle.getDegrees()) < 4));
         Logger.recordOutput("Vision/AngleAgrees", angleAgreesVal);
         return angleAgreesVal;
     }

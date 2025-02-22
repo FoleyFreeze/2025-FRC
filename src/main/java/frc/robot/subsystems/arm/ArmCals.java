@@ -9,7 +9,7 @@ public class ArmCals {
     double gearRatioToAbsEncoder = 6;
     double encoderZero = 0;
     double armEncOffset = 0.5640;
-    double startEncVal = -53;
+    double startEncVal = -25; // -53;
 
     double closeEnough = Units.degreesToRadians(5); // radians
 }

@@ -1,19 +1,17 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
 import frc.robot.util.Locations;
-
 import java.util.function.Supplier;
 
 public class ComplexCommands {
 
     static double holdPowerCoral = 0.4;
-    static double releasePowerCoral = -5;
+    static double releasePowerCoral = -8;
     static double releaseTimeCoral = 0.5;
 
     static double intakePowerCoral = 3.5;
@@ -27,28 +25,23 @@ public class ComplexCommands {
     static double releaseTimeAlgae = 0.5;
 
     static double gatherPosition = 0;
-    
 
     public static RobotContainer r;
 
     public static Command visionCoralScore() {
-        return new PathFollowingCommand(r, Locations::getTag8)
+        return new PathFollowingCommand(r, Locations::getTag7)
                 .andThen(goToLoc(() -> r.controlBoard.getCoralLevelFromController(r.flysky)))
                 .alongWith(holdCoral())
                 // gather trigger
-                .until(r.flysky.leftTriggerSWE)
-                .andThen(releaseCoral())
-                // when complete schedule a new command to return the superstructure to the hold
-                // position
-                .finallyDo(ComplexCommands::goHome);
+                .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
+                .andThen(releaseCoral());
     }
 
     public static Command visionCoralGather() {
-        //decides which coral station to use
-        //drive there
-        //gather
-        return new PathCommand(r, r.controlBoard::selectCoralStation)
-        .alongWith(noDriveGather());
+        // decides which coral station to use
+        // drive there
+        // gather
+        return new PathCommand(r, r.controlBoard::selectCoralStation).alongWith(noDriveGather());
     }
 
     public static Command blindCoralScore() {
@@ -60,21 +53,20 @@ public class ComplexCommands {
     }
 
     public static Command noDriveScore() {
-        return goToLoc(() -> r.controlBoard.getCoralLevelFromController(r.flysky))
-                .alongWith(holdCoral())
-                // gather trigger
-                .until(r.flysky.leftTriggerSWE)
-                .andThen(releaseCoral())
-                // when complete schedule a new command to return the superstructure to the hold
-                // position
-                .finallyDo(ComplexCommands::goHome);
+        Command c =
+                goToLoc(() -> r.controlBoard.getCoralLevelFromController(r.flysky))
+                        .alongWith(holdCoral())
+                        // gather trigger
+                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
+                        .andThen(releaseCoral());
+        c.setName("NoDriveScore");
+        return c;
     }
 
     public static Command noDriveGather() {
-        return goToGather()
-                .andThen(gatherCoral())
-                // as soon as command finishes, come back up
-                .finallyDo(ComplexCommands::goHome);
+        Command c = goToGather().andThen(gatherCoral());
+        c.setName("NoDriveGather");
+        return c;
     }
 
     public static Command gatherAlgae() {
@@ -86,8 +78,7 @@ public class ComplexCommands {
     public static Command scoreAlgaeProc() {
         return goToLoc(() -> SuperstructureLocation.SCORE_PROCESSOR)
                 .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
-                .andThen(releaseAlgae())
-                .andThen(ComplexCommands::goHome);
+                .andThen(releaseAlgae());
     }
 
     public static Command scoreAlgaeNet() {
@@ -95,35 +86,38 @@ public class ComplexCommands {
     }
 
     public static Command holdAlgae() {
-        return r.hand.setVoltage(intakeAlgaePower);
+        return r.hand.setVoltageCmd(intakeAlgaePower);
     }
 
     public static Command releaseAlgae() {
-        return r.hand.setVoltage(releasePowerAlgae)
+        return r.hand.setVoltageCmd(releasePowerAlgae)
                 .andThen(new WaitCommand(releaseTimeAlgae))
-                .andThen(r.hand.stop())
-                // TODO: does this help?
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+                .andThen(r.hand.stop());
     }
 
     // STES LOW POWER ON HAND TO KEEP CORAL IN
     public static Command holdCoral() {
-        return r.hand.setVoltage(holdPowerCoral);
+        return r.hand.setVoltageCmd(holdPowerCoral);
     }
 
     // applies power to get rid of coral
     public static Command releaseCoral() {
-        return r.hand.setVoltage(releasePowerCoral)
-                .raceWith(new WaitCommand(releaseTimeCoral))
+        return r.hand.setVoltageCmd(releasePowerCoral)
+                .andThen(new WaitCommand(releaseTimeCoral))
                 .andThen(r.hand.stop());
     }
 
     public static Command gatherCoral() {
-        return r.hand.setVoltage(intakePowerCoral)
-                .andThen(new WaitCommand(0.1))
-                .until(() -> r.hand.getCurrent() > intakeCurrentCoral)
-                .andThen(new WaitCommand(intakeCoralTime))
-                .finallyDo(() -> holdCoral().schedule());
+        Command c =
+                r.hand.setVoltageCmd(intakePowerCoral)
+                        .andThen(new WaitCommand(0.5))
+                        .andThen(
+                                new WaitUntilCommand(
+                                        () -> r.hand.getCurrent() > intakeCurrentCoral))
+                        .andThen(new WaitCommand(intakeCoralTime))
+                        .finallyDo(() -> r.hand.setVoltage(holdPowerCoral));
+        c.setName("GatherCoral");
+        return c;
     }
 
     // lines up with target field element
@@ -144,16 +138,17 @@ public class ComplexCommands {
         // arm to 0, elevator move, arm out
     }
 
+    public static Command goHome() {
+        return null;
+    }
+
     public static Command goToGather() {
         return r.arm.goTo(() -> SuperstructureLocation.HOLD)
                 .alongWith(r.wrist.goToReally(() -> SuperstructureLocation.HOLD))
                 .andThen(r.wrist.goToReally(() -> SuperstructureLocation.HOLD_GATHER))
+                .alongWith(r.elevator.goTo(() -> SuperstructureLocation.INTAKE))
                 .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
                 .andThen(r.wrist.goToReally(() -> SuperstructureLocation.INTAKE));
-    }
-
-    public static void goHome() {
-        goToLoc(() -> SuperstructureLocation.HOLD).schedule();
     }
 
     public static Command stopSuperstructure() {

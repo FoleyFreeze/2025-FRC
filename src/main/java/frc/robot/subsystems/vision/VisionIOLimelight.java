@@ -66,7 +66,7 @@ public class VisionIOLimelight implements VisionIO {
                 ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
 
         if (DriverStation.isDisabled()) {
-            LimelightHelpers.setLimelightNTDouble("limelight", "throttle-set", 240);
+            LimelightHelpers.setLimelightNTDouble("limelight", "throttle-set", 100);
         } else {
             LimelightHelpers.setLimelightNTDouble("limelight", "throttle-set", 1);
         }

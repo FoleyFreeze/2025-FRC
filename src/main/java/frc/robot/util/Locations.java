@@ -1,11 +1,11 @@
 package frc.robot.util;
 
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -50,12 +50,10 @@ public class Locations {
         }
     }
 
-    public static Pose2d getTag8(){
-        return tags.getTagPose(8).get().toPose2d().plus(halfRobotCoral);
+    public static Pose2d getTag7() {
+        Pose2d tag = tags.getTagPose(7).get().toPose2d().plus(halfRobotCoral);
+        Pose2d output =
+                new Pose2d(tag.getTranslation(), tag.getRotation().plus(Rotation2d.k180deg));
+        return output;
     }
-
-    public static boolean isBlue(){
-        return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Blue);
-    }    
-
 }

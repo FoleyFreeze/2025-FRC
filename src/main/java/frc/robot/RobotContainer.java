@@ -20,6 +20,8 @@ import static edu.wpi.first.units.Units.Meters;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SuperstructureLocation;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.ControlBoard;
@@ -128,6 +131,8 @@ public class RobotContainer {
                         () -> -flysky.getLeftX(),
                         () -> -flysky.getRightX()));
 
+        elevator.setDefaultCommand(ComplexCommands.goToLoc(() -> SuperstructureLocation.HOLD));
+
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(
                 Commands.runOnce(
@@ -136,11 +141,20 @@ public class RobotContainer {
                                                 drive.setPose(
                                                         drive.driveSimulation
                                                                 .getSimulatedDriveTrainPose())
-                                        : () ->
-                                                drive.setPose(
-                                                        new Pose2d(
-                                                                drive.getPose().getTranslation(),
-                                                                new Rotation2d())),
+                                        : DriverStation.getAlliance().orElse(Alliance.Blue)
+                                                        == Alliance.Blue
+                                                ? () ->
+                                                        drive.setPose(
+                                                                new Pose2d(
+                                                                        drive.getPose()
+                                                                                .getTranslation(),
+                                                                        new Rotation2d()))
+                                                : () ->
+                                                        drive.setPose(
+                                                                new Pose2d(
+                                                                        drive.getPose()
+                                                                                .getTranslation(),
+                                                                        Rotation2d.k180deg)),
                                 drive)
                         .ignoringDisable(true));
 
@@ -149,7 +163,7 @@ public class RobotContainer {
 
         flysky.rightTriggerSWG
                 .and(flysky.topRightSWD.negate())
-                //.whileTrue(ComplexCommands.noDriveScore());
+                //        .whileTrue(ComplexCommands.noDriveScore());
                 .whileTrue(ComplexCommands.visionCoralScore());
 
         flysky.leftTriggerSWE
