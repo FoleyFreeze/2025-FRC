@@ -104,48 +104,7 @@ public class ControlBoard {
     } 
 
     public Pose2d getAlignPose() {
-        return null;
-        // switch (selectedReefPos) {
-        //     case A:
-        //         return 
-        //     break;
-        //     case B:
-                
-        //     break;
-        //     case C:
-
-        //     break;
-        //     case D:
-                
-        //     break;
-        //     case E:
-
-        //     break;
-        //     case F:
-                
-        //     break;
-        //     case G:
-
-        //     break;
-        //     case H:
-                
-        //     break;
-        //     case I:
-
-        //     case J:
-                
-        //     break;
-        //     case K:
-
-        //     break;
-        //     case L:
-                
-        //     break;
-        //     default:
-                
-        // }
-
-        
+        return Locations.getReefLocation(selectedReefPos);                
     }
 
     public Rotation2d getAlignAngle() {
@@ -230,8 +189,5 @@ public class ControlBoard {
 
     public Pose2d selectCoralStation(){
         return r.drive.getPose().nearest(List.of(Locations.getLeftGatherStation(), Locations.getRightGatherStation()));
-                        List.of(
-                                Locations.getLeftGatherStation(),
-                                Locations.getRightGatherStation()));
     }
 }
