@@ -6,24 +6,33 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.util.Locations;
 import java.util.function.Supplier;
 
 public class PathfindingCommand extends Command {
 
     private RobotContainer r;
     private Supplier<Pose2d> poseSupplier;
+    private boolean flip;
     private Command c;
     PathConstraints pathConstraints =
             new PathConstraints(1, 1, 1, 1); // vel, accel, rotvel, rotaccel
 
-    public PathfindingCommand(RobotContainer r, Supplier<Pose2d> poseSupplier) {
+    public PathfindingCommand(RobotContainer r, Supplier<Pose2d> poseSupplier, boolean flip) {
         this.r = r;
         this.poseSupplier = poseSupplier;
+        this.flip = flip;
     }
 
     @Override
     public void initialize() {
-        c = AutoBuilder.pathfindToPose(poseSupplier.get(), pathConstraints);
+        Pose2d flipPose;
+        if (flip) {
+            flipPose = Locations.invert(poseSupplier.get());
+        } else {
+            flipPose = poseSupplier.get();
+        }
+        c = AutoBuilder.pathfindToPose(flipPose, pathConstraints);
         c.initialize();
     }
 

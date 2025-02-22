@@ -49,7 +49,7 @@ public class PathFollowingCommand extends Command {
                 new PathPlannerPath(
                         waypoints,
                         pathConstraints,
-                        new IdealStartingState(0, r.drive.getRotation()),
+                        new IdealStartingState(0, flipPose.getRotation()),
                         new GoalEndState(0, flipPose.getRotation()));
 
         c = AutoBuilder.followPath(path);

@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class BotState {
 
-    public boolean hasCoral = false;
+    public boolean hasCoral = true;
     public boolean hasAlgae = false;
 
     public Trigger hasCoralT = new Trigger(() -> hasCoral);

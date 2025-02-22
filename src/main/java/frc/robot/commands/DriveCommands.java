@@ -13,6 +13,8 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -28,6 +30,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.drive.Drive;
 import java.text.DecimalFormat;
@@ -93,7 +96,7 @@ public class DriveCommands {
                                     omega * r.drive.getMaxAngularSpeedRadPerSec());
 
                     // "turbo" button
-                    if (r.flysky.rightTriggerSWG.getAsBoolean()) {
+                    if (r.elevator.getHeight().in(Inches) > 5) {
                         speeds = speeds.times(0.5);
                     }
 
@@ -116,7 +119,7 @@ public class DriveCommands {
      * absolute rotation with a joystick.
      */
     public static Command joystickDriveAtAngle(
-            Drive drive,
+            RobotContainer r,
             DoubleSupplier xSupplier,
             DoubleSupplier ySupplier,
             DoubleSupplier omegaSupplier,
@@ -158,7 +161,7 @@ public class DriveCommands {
                                 // in pid mode
                                 omega =
                                         angleController.calculate(
-                                                drive.getRotation().getRadians(),
+                                                r.drive.getRotation().getRadians(),
                                                 rotationSupplier.get().getRadians());
                                 if (angleController.atGoal()) {
                                     omega = 0;
@@ -168,32 +171,38 @@ public class DriveCommands {
                                 // in manual mode
                                 omega =
                                         omegaSupplier.getAsDouble()
-                                                * drive.getMaxAngularSpeedRadPerSec();
+                                                * r.drive.getMaxAngularSpeedRadPerSec();
                             }
 
                             // Convert to field relative speeds & send command
                             ChassisSpeeds speeds =
                                     new ChassisSpeeds(
                                             linearVelocity.getX()
-                                                    * drive.getMaxLinearSpeedMetersPerSec(),
+                                                    * r.drive.getMaxLinearSpeedMetersPerSec(),
                                             linearVelocity.getY()
-                                                    * drive.getMaxLinearSpeedMetersPerSec(),
+                                                    * r.drive.getMaxLinearSpeedMetersPerSec(),
                                             omega);
+
+                            if (r.elevator.getHeight().in(Inches) > 5) {
+                                speeds = speeds.times(0.5);
+                            }
+
                             boolean isFlipped =
                                     DriverStation.getAlliance().isPresent()
                                             && DriverStation.getAlliance().get() == Alliance.Red;
-                            drive.runVelocity(
+                            r.drive.runVelocity(
                                     ChassisSpeeds.fromFieldRelativeSpeeds(
                                             speeds,
                                             isFlipped
-                                                    ? drive.getRotation()
+                                                    ? r.drive
+                                                            .getRotation()
                                                             .plus(new Rotation2d(Math.PI))
-                                                    : drive.getRotation()));
+                                                    : r.drive.getRotation()));
                         },
-                        drive)
+                        r.drive)
 
                 // Reset PID controller when command starts
-                .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+                .beforeStarting(() -> angleController.reset(r.drive.getRotation().getRadians()));
     }
 
     /**
@@ -351,5 +360,22 @@ public class DriveCommands {
         double[] positions = new double[4];
         Rotation2d lastAngle = new Rotation2d();
         double gyroDelta = 0.0;
+    }
+
+    public static Command driveTo(RobotContainer r, Supplier<Pose2d> destination, boolean flip) {
+        Transform2d finderDelta = new Transform2d(Units.feetToMeters(-1.5), 0, Rotation2d.kZero);
+        Supplier<Pose2d> farDestination =
+                new Supplier<Pose2d>() {
+                    public Pose2d get() {
+                        return destination.get().plus(finderDelta);
+                    }
+                };
+        return new ConditionalCommand(
+                new PathfindingCommand(r, farDestination, flip)
+                        .andThen(new PathFollowingCommand(r, destination, flip)),
+                new PathFollowingCommand(r, destination, flip),
+                () ->
+                        r.drive.getPose().minus(destination.get()).getTranslation().getNorm()
+                                > Units.feetToMeters(3));
     }
 }

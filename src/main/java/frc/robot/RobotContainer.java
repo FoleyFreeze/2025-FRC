@@ -17,7 +17,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -27,6 +26,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
@@ -91,7 +91,14 @@ public class RobotContainer {
         vision = Vision.create(this);
 
         // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices");
+
+        autoChooser.addDefaultOption("DoNothing", new InstantCommand());
+
+        autoChooser.addOption(
+                "DriveToPose",
+                (new InstantCommand(() -> drive.setPose(new Pose2d(2, 2, Rotation2d.kZero)))
+                        .andThen(ComplexCommands.visionCoralScore())));
 
         // Set up SysId routines
         autoChooser.addOption(
@@ -259,8 +266,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // TODO: fix that this crashes if you run auton more than once
-        return autoChooser.get().andThen(drive::stopWithX, drive);
+        return autoChooser.get();
     }
 
     public void resetSimulation() {

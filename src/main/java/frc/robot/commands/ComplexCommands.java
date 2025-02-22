@@ -31,7 +31,7 @@ public class ComplexCommands {
     public static RobotContainer r;
 
     public static Command visionCoralScore() {
-        return new PathFollowingCommand(r, r.controlBoard::getPathPose, false)
+        return DriveCommands.driveTo(r, r.controlBoard::getPathPose, false)
                 .andThen(goToLoc(r.controlBoard::getCoralLevel))
                 .alongWith(holdCoral())
                 // gather trigger
@@ -43,7 +43,7 @@ public class ComplexCommands {
         // decides which coral station to use
         // drive there
         // gather
-        return new PathCommand(r, r.controlBoard::selectCoralStation, true)
+        return DriveCommands.driveTo(r, r.controlBoard::selectCoralStation, true)
                 .alongWith(noDriveGather());
     }
 
@@ -138,7 +138,7 @@ public class ComplexCommands {
     // lines up with target field element
     public static Command snapToAngle(Supplier<Rotation2d> angle) {
         return DriveCommands.joystickDriveAtAngle(
-                r.drive,
+                r,
                 () -> -r.flysky.getLeftY(),
                 () -> -r.flysky.getLeftX(),
                 () -> -r.flysky.getRightX(),
