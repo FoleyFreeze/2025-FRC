@@ -21,7 +21,7 @@ public class PathFollowingCommand extends Command {
     private Supplier<Pose2d> poseSupplier;
     private Command c;
     PathConstraints pathConstraints =
-            new PathConstraints(1, 1, 1, 1); // vel, accel, rotvel, rotaccel
+            new PathConstraints(2, 3, 2, 2); // vel, accel, rotvel, rotaccel
 
     public PathFollowingCommand(
             RobotContainer r, Supplier<Pose2d> poseSupplier, boolean flipRobot) {

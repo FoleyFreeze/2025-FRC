@@ -11,6 +11,7 @@ public enum SuperstructureLocation {
     // inches, degress, degrees
     HOLD(0, 0, -50),
     HOLD_GATHER(0, 0, -75),
+    VERT_ALGAE(19, 0, 193),
 
     LEVEL1(12, 30, 0),
     LEVEL2(4.2 - 0.5, 12, 75),
@@ -20,8 +21,8 @@ public enum SuperstructureLocation {
     PRENET(0, 0, 0),
     NET(0, 0, 0),
 
-    ALGAE_LEVEL_2_3(0, 0, 0),
-    ALGAE_LEVEL_3_4(0, 0, 0),
+    ALGAE_LEVEL_2_3(14.7, 90, 248),
+    ALGAE_LEVEL_3_4(28, 90, 248),
 
     PRE_LEVEL1(0, 0, 0),
     PRE_LEVEL2(0, 0, 0),
@@ -29,8 +30,8 @@ public enum SuperstructureLocation {
     PRE_LEVEL4(50, 60, 0),
 
     FLOOR_GATHER_ALGAE(0, 0, 0),
-    SCORE_PROCESSOR(0, 0, 0),
-    INTAKE(0, -47.5, -67.46),
+    SCORE_PROCESSOR(4, 90, 248),
+    INTAKE(0, -48.5 + .5, -67.46),
     SAFE(0, 0, 0);
 
     public final Distance eleHeight;

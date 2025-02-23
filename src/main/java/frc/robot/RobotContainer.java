@@ -19,14 +19,13 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
@@ -40,6 +39,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hand.Hand;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.wrist.Wrist;
+import frc.robot.util.Locations;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -96,9 +96,22 @@ public class RobotContainer {
         autoChooser.addDefaultOption("DoNothing", new InstantCommand());
 
         autoChooser.addOption(
-                "DriveToPose",
-                (new InstantCommand(() -> drive.setPose(new Pose2d(2, 2, Rotation2d.kZero)))
-                        .andThen(ComplexCommands.visionCoralScore())));
+                "ScoreOneThenGather",
+                (new InstantCommand(
+                                () ->
+                                        drive.setPose(
+                                                new Pose2d(
+                                                        drive.getPose().getTranslation(),
+                                                        Locations.isBlue()
+                                                                ? Rotation2d.k180deg
+                                                                : Rotation2d.kZero)),
+                                drive)) // flipped
+                        .andThen(ComplexCommands.visionCoralScore())
+                        .andThen(ComplexCommands.visionCoralGather()));
+
+        autoChooser.addOption(
+                "JustDrive",
+                new RunCommand(() -> drive.runVelocity(new ChassisSpeeds(0.1, 0, 0)), drive));
 
         // Set up SysId routines
         autoChooser.addOption(
@@ -144,29 +157,7 @@ public class RobotContainer {
         climb.setDefaultCommand(climb.setClimbVoltage(0));
 
         // Reset gyro to 0° when B button is pressed
-        flysky.upLTRIM.onTrue(
-                Commands.runOnce(
-                                Constants.currentMode == Constants.Mode.SIM
-                                        ? () ->
-                                                drive.setPose(
-                                                        drive.driveSimulation
-                                                                .getSimulatedDriveTrainPose())
-                                        : DriverStation.getAlliance().orElse(Alliance.Blue)
-                                                        == Alliance.Blue
-                                                ? () ->
-                                                        drive.setPose(
-                                                                new Pose2d(
-                                                                        drive.getPose()
-                                                                                .getTranslation(),
-                                                                        new Rotation2d()))
-                                                : () ->
-                                                        drive.setPose(
-                                                                new Pose2d(
-                                                                        drive.getPose()
-                                                                                .getTranslation(),
-                                                                        Rotation2d.k180deg)),
-                                drive)
-                        .ignoringDisable(true));
+        flysky.upLTRIM.onTrue(DriveCommands.zeroDrive(this).ignoringDisable(true));
 
         // rezero superstructure
         flysky.upRTRIM.onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
@@ -182,7 +173,8 @@ public class RobotContainer {
                 .and(flysky.topLeftSWA.negate()) // algae sw
                 .and(flysky.topRightSWD) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
-                .whileTrue(ComplexCommands.visionCoralGather());
+                // .whileTrue(ComplexCommands.visionCoralGather());
+                .whileTrue(ComplexCommands.blindGatherCoral());
 
         flysky.leftTriggerSWE // gather sw
                 .and(flysky.rightTriggerSWG.negate()) // not scoring

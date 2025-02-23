@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
 
@@ -22,6 +23,8 @@ public class ClimbIOHardware implements ClimbIO {
         closedLoopController = motor.getClosedLoopController();
         // TODO: fill out the nums, yo
         SparkMaxConfig config = new SparkMaxConfig();
+        config.inverted(true);
+        config.idleMode(IdleMode.kBrake);
         config.closedLoop.pid(0, 0, 0).outputRange(0, 0);
         config.closedLoopRampRate(0);
 
@@ -50,5 +53,10 @@ public class ClimbIOHardware implements ClimbIO {
     @Override
     public void zero() {
         encoder.setPosition(0);
+    }
+
+    @Override
+    public void setClimbVolts(double volts) {
+        motor.setVoltage(volts);
     }
 }

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import org.littletonrobotics.junction.Logger;
 
 public class Climb extends SubsystemBase {
     private final ClimbIO io;
@@ -35,6 +36,12 @@ public class Climb extends SubsystemBase {
 
     public Climb(ClimbIO io) {
         this.io = io;
+    }
+
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("Climb", inputs);
     }
 
     public double getVoltage() {

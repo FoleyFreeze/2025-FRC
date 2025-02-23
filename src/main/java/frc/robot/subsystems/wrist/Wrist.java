@@ -64,7 +64,8 @@ public class Wrist extends SubsystemBase {
                         k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians)));
         Logger.recordOutput(
                 "Wrist/MaxBound",
-                cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians)));
+                cvrtLocalToEnc(
+                        k.maxLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians)));
     }
 
     public double getVoltage() {
@@ -118,11 +119,20 @@ public class Wrist extends SubsystemBase {
             angleTarget = cvrtLocalToEnc(Units.degreesToRadians(-90), r.arm.getAngle().in(Radians));
         }
         Logger.recordOutput("Wrist/ArmAngle", r.arm.getAngle().in(Radians));
-
-        double minAngle =
-                cvrtLocalToEnc(k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));
-        double maxAngle =
-                cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians));
+        double minAngle, maxAngle;
+        if (r.flysky.topLeftSWA.getAsBoolean()) { // Coral Algae sw
+            minAngle =
+                    cvrtLocalToEnc(k.minLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians));
+            maxAngle =
+                    cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians));
+        } else {
+            minAngle =
+                    cvrtLocalToEnc(
+                            k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));
+            maxAngle =
+                    cvrtLocalToEnc(
+                            k.maxLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));
+        }
 
         double newAngleTarget = MathUtil.clamp(angleTarget, minAngle, maxAngle);
 

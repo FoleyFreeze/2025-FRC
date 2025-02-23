@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -14,6 +15,7 @@ public class ComplexCommands {
 
     static double holdPowerCoral = 0.4;
     static double releasePowerCoral = -6;
+    static double releasePowerCoral4 = -4;
     static double releaseTimeCoral = 0.5;
 
     static double intakePowerCoral = 3.5;
@@ -35,7 +37,11 @@ public class ComplexCommands {
                 .andThen(goToLoc(r.controlBoard::getCoralLevel))
                 .alongWith(holdCoral())
                 // gather trigger
-                .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
+                .andThen(
+                        new WaitUntilCommand(
+                                () ->
+                                        r.flysky.leftTriggerSWE.getAsBoolean()
+                                                || RobotState.isAutonomous()))
                 .andThen(releaseCoral());
     }
 
@@ -83,8 +89,8 @@ public class ComplexCommands {
     public static Command gatherAlgae() {
         return goToLoc(() -> r.controlBoard.getAlgaeLevelFromController(r.flysky))
                 .andThen(holdAlgae())
+                .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
                 .andThen(new InstantCommand(() -> r.state.setAlgae()));
-        // .until(() -> r.hand.getCurrent() > 50);
     }
 
     public static Command scoreAlgaeProc() {
@@ -115,7 +121,10 @@ public class ComplexCommands {
 
     // applies power to get rid of coral
     public static Command releaseCoral() {
-        return r.hand.setVoltageCmd(releasePowerCoral)
+        return new ConditionalCommand(
+                        r.hand.setVoltageCmd(releasePowerCoral4),
+                        r.hand.setVoltageCmd(releasePowerCoral),
+                        () -> r.controlBoard.selectedLevel == 4)
                 .andThen(new WaitCommand(releaseTimeCoral))
                 .andThen(new InstantCommand(() -> r.state.clear()))
                 .andThen(r.hand.stop());
@@ -167,7 +176,7 @@ public class ComplexCommands {
                                         .andThen(
                                                 new RunCommand(
                                                         () -> {})), // prevent command from ending
-                                r.state.hasAlgaeT),
+                                r.flysky.topLeftSWA), // coral/algae sw
                         r.state.hasCoralT)
                 .andThen(new WaitUntilCommand(() -> false));
     }

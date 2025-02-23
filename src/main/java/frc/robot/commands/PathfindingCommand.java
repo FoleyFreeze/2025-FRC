@@ -16,7 +16,7 @@ public class PathfindingCommand extends Command {
     private boolean flip;
     private Command c;
     PathConstraints pathConstraints =
-            new PathConstraints(1, 1, 1, 1); // vel, accel, rotvel, rotaccel
+            new PathConstraints(2, 3, 2, 2); // vel, accel, rotvel, rotaccel
 
     public PathfindingCommand(RobotContainer r, Supplier<Pose2d> poseSupplier, boolean flip) {
         this.r = r;

@@ -15,9 +15,10 @@ public class WristCals {
     double absEncOffset = 0.6643;
     double startEncVal = 0; // -59;
 
-    Angle minLocalWristAngle = Degrees.of(-110);
+    Angle minLocalWristAngle = Degrees.of(-124);
     Angle minLocalWristAngleCoral = Degrees.of(-90);
-    Angle maxLocalWristAngle = Degrees.of(80);
+    Angle maxLocalWristAngleCoral = Degrees.of(80);
+    Angle maxLocalWristAngle = Degrees.of(136);
 
     double closeEnough = Units.degreesToRadians(5);
 }

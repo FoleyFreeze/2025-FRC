@@ -166,13 +166,13 @@ public class Vision extends SubsystemBase {
 
                                 // only use mega1 when angle is bad and robot not moving for a while
                                 || observation.type() == PoseObservationType.MEGATAG_1
-                                        && (isMoving()
-                                                || isEnabled()
-                                                || angleAgrees(
-                                                        observation
-                                                                .pose()
-                                                                .getRotation()
-                                                                .toRotation2d()));
+                        /*&& (isMoving()
+                        || isEnabled()
+                        || angleAgrees(
+                                observation
+                                        .pose()
+                                        .getRotation()
+                                        .toRotation2d()))*/ ;
 
                 // Add pose to log
                 robotPoses.add(observation.pose());
