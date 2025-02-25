@@ -75,7 +75,8 @@ public class ControlBoard {
         I,
         J,
         K,
-        L;
+        L,
+        NONE,
     }
 
     public ReefSticks selectedReefPos;
