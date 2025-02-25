@@ -32,17 +32,102 @@ public class ComplexCommands {
 
     public static RobotContainer r;
 
-    public static Command visionCoralScore() {
-        return DriveCommands.driveTo(r, r.controlBoard::getPathPose, false)
-                .andThen(goToLoc(r.controlBoard::getCoralLevel))
-                .alongWith(holdCoral())
-                // gather trigger
-                .andThen(
-                        new WaitUntilCommand(
-                                () ->
-                                        r.flysky.leftTriggerSWE.getAsBoolean()
-                                                || RobotState.isAutonomous()))
-                .andThen(releaseCoral());
+    // ALGAE COMMANDS
+
+    public static Command releaseAlgae() {
+        return r.hand.setVoltageCmd(releasePowerAlgae)
+                .andThen(new WaitCommand(releaseTimeAlgae))
+                .andThen(new InstantCommand(() -> r.state.clear()))
+                .andThen(r.hand.stop());
+    }
+
+    public static Command holdAlgae() {
+        return r.hand.setVoltageCmd(intakeAlgaePower);
+    }
+
+    public static Command scoreAlgaeNet() {
+        return null;
+    }
+
+    public static Command scoreAlgaeProc() {
+        return goToLoc(() -> SuperstructureLocation.SCORE_PROCESSOR)
+                .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
+                .andThen(releaseAlgae());
+    }
+
+    public static Command gatherAlgae() {
+        return goToLoc(() -> r.controlBoard.getAlgaeLevelFromController(r.flysky))
+                .andThen(holdAlgae())
+                .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
+                .andThen(new InstantCommand(() -> r.state.setAlgae()));
+    }
+
+    public static Command visionAlgaeGather() {
+        return gatherAlgae();
+    }
+
+    public static Command visionAlgaeScore() {
+        return scoreAlgaeProc();
+    }
+
+    // CORAL COMMANDS
+
+    public static Command gatherCoral() {
+        Command c =
+                r.hand.setVoltageCmd(intakePowerCoral)
+                        .andThen(new WaitCommand(0.5))
+                        .andThen(
+                                new WaitUntilCommand(
+                                        () -> r.hand.getCurrent() > intakeCurrentCoral))
+                        .andThen(new WaitCommand(intakeCoralTime))
+                        .andThen(new InstantCommand(() -> r.state.setCoral()))
+                        .finallyDo(() -> r.hand.setVoltage(holdPowerCoral));
+        c.setName("GatherCoral");
+        return c;
+    }
+
+    // applies power to get rid of coral
+    public static Command releaseCoral() {
+        return new ConditionalCommand(
+                        r.hand.setVoltageCmd(releasePowerCoral4),
+                        r.hand.setVoltageCmd(releasePowerCoral),
+                        () -> r.controlBoard.selectedLevel == 4)
+                .andThen(new WaitCommand(releaseTimeCoral))
+                .andThen(new InstantCommand(() -> r.state.clear()))
+                .andThen(r.hand.stop());
+    }
+
+    // applies power to get rid of coral in auton
+    public static Command releaseCoralAuton(int level) {
+
+        return (level == 4
+                        ? r.hand.setVoltageCmd(releasePowerCoral4)
+                        : r.hand.setVoltageCmd(releasePowerCoral))
+                .andThen(new WaitCommand(releaseTimeCoral))
+                .andThen(new InstantCommand(() -> r.state.clear()))
+                .andThen(r.hand.stop());
+    }
+
+    // STES LOW POWER ON HAND TO KEEP CORAL IN
+    public static Command holdCoral() {
+        return r.hand.setVoltageCmd(holdPowerCoral);
+    }
+
+    public static Command noDriveGather() {
+        Command c = goToGather().andThen(gatherCoral());
+        c.setName("NoDriveGather");
+        return c;
+    }
+
+    public static Command noDriveScore() {
+        Command c =
+                goToLoc(() -> r.controlBoard.getCoralLevel())
+                        .alongWith(holdCoral())
+                        // gather trigger
+                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
+                        .andThen(releaseCoral());
+        c.setName("NoDriveScore");
+        return c;
     }
 
     public static Command visionCoralGather() {
@@ -61,87 +146,28 @@ public class ComplexCommands {
         return snapToAngle(r.controlBoard::selectGatherAngle).alongWith(noDriveGather());
     }
 
-    public static Command visionAlgaeGather() {
-        return gatherAlgae();
+    public static Command visionCoralScore() {
+        return DriveCommands.driveTo(r, r.controlBoard::getPathPose, false)
+                .andThen(goToLoc(r.controlBoard::getCoralLevel))
+                .alongWith(holdCoral())
+                // gather trigger
+                .andThen(
+                        new WaitUntilCommand(
+                                () ->
+                                        r.flysky.leftTriggerSWE.getAsBoolean()
+                                                || RobotState.isAutonomous()))
+                .andThen(releaseCoral());
     }
 
-    public static Command visionAlgaeScore() {
-        return scoreAlgaeProc();
-    }
+    // IMPORTANT/COMMONLY USED
 
-    public static Command noDriveScore() {
-        Command c =
-                goToLoc(() -> r.controlBoard.getCoralLevel())
-                        .alongWith(holdCoral())
-                        // gather trigger
-                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
-                        .andThen(releaseCoral());
-        c.setName("NoDriveScore");
-        return c;
-    }
-
-    public static Command noDriveGather() {
-        Command c = goToGather().andThen(gatherCoral());
-        c.setName("NoDriveGather");
-        return c;
-    }
-
-    public static Command gatherAlgae() {
-        return goToLoc(() -> r.controlBoard.getAlgaeLevelFromController(r.flysky))
-                .andThen(holdAlgae())
-                .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
-                .andThen(new InstantCommand(() -> r.state.setAlgae()));
-    }
-
-    public static Command scoreAlgaeProc() {
-        return goToLoc(() -> SuperstructureLocation.SCORE_PROCESSOR)
-                .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
-                .andThen(releaseAlgae());
-    }
-
-    public static Command scoreAlgaeNet() {
-        return null;
-    }
-
-    public static Command holdAlgae() {
-        return r.hand.setVoltageCmd(intakeAlgaePower);
-    }
-
-    public static Command releaseAlgae() {
-        return r.hand.setVoltageCmd(releasePowerAlgae)
-                .andThen(new WaitCommand(releaseTimeAlgae))
-                .andThen(new InstantCommand(() -> r.state.clear()))
-                .andThen(r.hand.stop());
-    }
-
-    // STES LOW POWER ON HAND TO KEEP CORAL IN
-    public static Command holdCoral() {
-        return r.hand.setVoltageCmd(holdPowerCoral);
-    }
-
-    // applies power to get rid of coral
-    public static Command releaseCoral() {
-        return new ConditionalCommand(
-                        r.hand.setVoltageCmd(releasePowerCoral4),
-                        r.hand.setVoltageCmd(releasePowerCoral),
-                        () -> r.controlBoard.selectedLevel == 4)
-                .andThen(new WaitCommand(releaseTimeCoral))
-                .andThen(new InstantCommand(() -> r.state.clear()))
-                .andThen(r.hand.stop());
-    }
-
-    public static Command gatherCoral() {
-        Command c =
-                r.hand.setVoltageCmd(intakePowerCoral)
-                        .andThen(new WaitCommand(0.5))
-                        .andThen(
-                                new WaitUntilCommand(
-                                        () -> r.hand.getCurrent() > intakeCurrentCoral))
-                        .andThen(new WaitCommand(intakeCoralTime))
-                        .andThen(new InstantCommand(() -> r.state.setCoral()))
-                        .finallyDo(() -> r.hand.setVoltage(holdPowerCoral));
-        c.setName("GatherCoral");
-        return c;
+    // moves elevator to a height with arm tucked up, then deploys arm
+    public static Command goToLoc(Supplier<SuperstructureLocation> p) {
+        return r.arm.goTo(() -> SuperstructureLocation.HOLD)
+                .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
+                .andThen(r.elevator.goTo(p))
+                .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
+        // arm to 0, elevator move, arm out
     }
 
     // lines up with target field element
@@ -152,15 +178,6 @@ public class ComplexCommands {
                 () -> -r.flysky.getLeftX(),
                 () -> -r.flysky.getRightX(),
                 angle);
-    }
-
-    // moves elevator to a height with arm tucked up, then deploys arm
-    public static Command goToLoc(Supplier<SuperstructureLocation> p) {
-        return r.arm.goTo(() -> SuperstructureLocation.HOLD)
-                .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
-                .andThen(r.elevator.goTo(p))
-                .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
-        // arm to 0, elevator move, arm out
     }
 
     // go to hold, algae hold, or gather depending on what game pieces we have
@@ -180,6 +197,8 @@ public class ComplexCommands {
                         r.state.hasCoralT)
                 .andThen(new WaitUntilCommand(() -> false));
     }
+
+    // MINI COMMANDS
 
     public static Command goToGather() {
         Command toGather =
@@ -201,6 +220,12 @@ public class ComplexCommands {
         // .alongWith(r.hand.stop());
     }
 
+    public static boolean atLocation(SuperstructureLocation loc) {
+        return r.arm.atTarget(() -> loc)
+                && r.elevator.atTarget(() -> loc)
+                && r.wrist.atTarget(() -> loc);
+    }
+
     public static Command zeroSuperstructure() {
         return new InstantCommand(
                 () -> {
@@ -208,11 +233,5 @@ public class ComplexCommands {
                     r.arm.zero();
                     r.wrist.zero();
                 });
-    }
-
-    public static boolean atLocation(SuperstructureLocation loc) {
-        return r.arm.atTarget(() -> loc)
-                && r.elevator.atTarget(() -> loc)
-                && r.wrist.atTarget(() -> loc);
     }
 }
