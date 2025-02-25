@@ -1,7 +1,5 @@
 package frc.robot.util;
 
-import java.lang.reflect.Array;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,24 +35,25 @@ public class Locations {
     public static AprilTagFieldLayout tags =
             AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
+    static Pose2d[] blueStarts = {
+        new Pose2d(0, 0, Rotation2d.k180deg),
+        new Pose2d(0, 0, Rotation2d.k180deg),
+        new Pose2d(0, 0, Rotation2d.k180deg)
+    };
 
-    static Pose2d[] blueStarts = {new Pose2d(0,0,Rotation2d.k180deg),
-                                  new Pose2d(0,0,Rotation2d.k180deg),
-                                  new Pose2d(0,0,Rotation2d.k180deg)};
+    static Pose2d[] redStarts = {
+        new Pose2d(0, 0, Rotation2d.kZero),
+        new Pose2d(0, 0, Rotation2d.k180deg),
+        new Pose2d(0, 0, Rotation2d.k180deg)
+    };
 
-    static Pose2d[] redStarts = {new Pose2d(0,0,Rotation2d.kZero),
-                                new Pose2d(0,0,Rotation2d.k180deg),
-                                new Pose2d(0,0,Rotation2d.k180deg)};
-
-    public static Pose2d getStartLoc(int idx){
-        if(isBlue()) {
+    public static Pose2d getStartLoc(int idx) {
+        if (isBlue()) {
             return blueStarts[idx];
-        }else{
+        } else {
             return redStarts[idx];
         }
     }
-    
-
 
     // everyone hates this
     public static Pose2d getReefLocation(ControlBoard.ReefSticks position) {
