@@ -143,4 +143,12 @@ public class Locations {
     public static Pose2d invert(Pose2d in) {
         return new Pose2d(in.getTranslation(), in.getRotation().plus(Rotation2d.k180deg));
     }
+
+    public static Pose2d getProcLoc() {
+        if (isBlue()) {
+            return invert(tags.getTagPose(16).get().toPose2d().plus(halfRobot));
+        } else {
+            return invert(tags.getTagPose(3).get().toPose2d().plus(halfRobot));
+        }
+    }
 }
