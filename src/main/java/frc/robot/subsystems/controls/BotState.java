@@ -6,9 +6,11 @@ public class BotState {
 
     public boolean hasCoral = true;
     public boolean hasAlgae = false;
+    public boolean hasStop = false;
 
     public Trigger hasCoralT = new Trigger(() -> hasCoral);
     public Trigger hasAlgaeT = new Trigger(() -> hasAlgae);
+    public Trigger hasStopT = new Trigger(() -> hasStop);
 
     public void setCoral() {
         hasCoral = true;

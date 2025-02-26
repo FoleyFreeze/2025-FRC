@@ -7,6 +7,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
@@ -34,9 +35,13 @@ public class PathFollowingCommand extends Command {
     public void initialize() {
         Pose2d targetPose = poseSupplier.get();
 
+        // convert pose angle to desired drive direction insead of the angle the bot is facing
         Pose2d currentLocation = r.drive.getPose();
+        Translation2d travelVector =
+                targetPose.getTranslation().minus(currentLocation.getTranslation());
+        Pose2d startPose = new Pose2d(currentLocation.getTranslation(), travelVector.getAngle());
 
-        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(currentLocation, targetPose);
+        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startPose, targetPose);
 
         Pose2d flipPose;
         if (flipRobot) {

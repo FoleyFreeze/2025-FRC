@@ -16,6 +16,7 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -43,6 +44,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
     private static final double DEADBAND = 0.1;
@@ -54,6 +56,14 @@ public class DriveCommands {
     private static final double FF_RAMP_RATE = 0.2; // Volts/Sec
     private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
     private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+
+    private static final double POS_KP = 5;
+    private static final double POS_KI = 0;
+    private static final double POS_KD = 1;
+    private static final double POS_MAX_VEL = 1; // m/s
+    private static final double POS_TOL = Units.inchesToMeters(0.5);
+    private static final double POS_MAX_DIST =
+            Units.inchesToMeters(10); // dont drive if more than 10in away
 
     private DriveCommands() {}
 
@@ -209,6 +219,54 @@ public class DriveCommands {
 
                 // Reset PID controller when command starts
                 .beforeStarting(() -> angleController.reset(r.drive.getRotation().getRadians()));
+    }
+
+    public static ChassisSpeeds fromFieldRel(ChassisSpeeds speeds, Rotation2d rot) {
+        if (Locations.isBlue()) {
+            return ChassisSpeeds.fromFieldRelativeSpeeds(speeds, rot);
+        } else {
+            // flip if red
+            return ChassisSpeeds.fromFieldRelativeSpeeds(speeds, rot.plus(Rotation2d.k180deg));
+        }
+    }
+
+    public static Command driveToPoint(RobotContainer r, Supplier<Pose2d> supplier) {
+        PIDController pidX = new PIDController(POS_KP, POS_KI, POS_KD);
+        PIDController pidY = new PIDController(POS_KP, POS_KI, POS_KD);
+        pidX.setTolerance(POS_TOL);
+        pidY.setTolerance(POS_TOL);
+
+        double[] error = new double[0];
+
+        return Commands.run(
+                        () -> {
+                            Pose2d target = supplier.get();
+                            Pose2d meas = r.drive.getPose();
+
+                            Translation2d pointErr =
+                                    target.getTranslation().minus(meas.getTranslation());
+                            error[0] = pointErr.getNorm();
+                            Logger.recordOutput("Odometry/PointErr", pointErr);
+
+                            double xVel = pidX.calculate(meas.getX(), target.getX());
+                            double yVel = pidY.calculate(meas.getY(), target.getY());
+
+                            xVel = MathUtil.clamp(xVel, -POS_MAX_VEL, POS_MAX_VEL);
+                            yVel = MathUtil.clamp(yVel, -POS_MAX_VEL, POS_MAX_VEL);
+
+                            // TODO: run angle PID in parallel
+                            r.drive.runVelocity(
+                                    fromFieldRel(
+                                            new ChassisSpeeds(xVel, yVel, 0),
+                                            r.drive.getRotation()));
+                        },
+                        r.drive)
+                .until(() -> error[0] < POS_TOL)
+                .beforeStarting(
+                        () -> {
+                            pidX.reset();
+                            pidY.reset();
+                        });
     }
 
     /**
@@ -378,12 +436,17 @@ public class DriveCommands {
                     }
                 };
         return new ConditionalCommand(
-                new PathfindingCommand(r, farDestination, isGather)
-                        .andThen(new PathFollowingCommand(r, destination, isGather)),
-                new PathFollowingCommand(r, destination, isGather),
-                () ->
-                        r.drive.getPose().minus(destination.get()).getTranslation().getNorm()
-                                > Units.feetToMeters(3));
+                        new PathfindingCommand(r, farDestination, isGather)
+                                .andThen(new PathFollowingCommand(r, destination, isGather)),
+                        new PathFollowingCommand(r, destination, isGather),
+                        () ->
+                                r.drive
+                                                .getPose()
+                                                .minus(destination.get())
+                                                .getTranslation()
+                                                .getNorm()
+                                        > Units.feetToMeters(3))
+                .andThen(driveToPoint(r, destination));
     }
 
     public static Command zeroDrive(RobotContainer r) {
