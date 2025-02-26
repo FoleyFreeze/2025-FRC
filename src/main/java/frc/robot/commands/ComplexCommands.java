@@ -24,7 +24,7 @@ public class ComplexCommands {
 
     static double intakeAlgaeTime = 0.2;
     static double intakeCurrentAlgae = 50;
-    static double intakeAlgaePower = 12;
+    static double intakeAlgaePower = 4;
     static double releasePowerAlgae = -12;
     static double releaseTimeAlgae = 0.5;
 
@@ -35,18 +35,19 @@ public class ComplexCommands {
     // ALGAE COMMANDS
 
     public static Command releaseAlgae() {
-        Command c = r.hand.setVoltageCmd(releasePowerAlgae)
-                .andThen(new WaitCommand(releaseTimeAlgae))
-                .andThen(new InstantCommand(() -> r.state.clear()))
-                .andThen(r.hand.stop());
-            c.setName("ReleaseAlgae");
-            return c;
+        Command c =
+                r.hand.setVoltageCmd(releasePowerAlgae)
+                        .andThen(new WaitCommand(releaseTimeAlgae))
+                        .andThen(new InstantCommand(() -> r.state.clear()))
+                        .andThen(r.hand.stop());
+        c.setName("ReleaseAlgae");
+        return c;
     }
 
     public static Command holdAlgae() {
         Command c = r.hand.setVoltageCmd(intakeAlgaePower);
-            c.setName("HoldAlgae");
-            return c;
+        c.setName("HoldAlgae");
+        return c;
     }
 
     public static Command scoreAlgaeNet() {
@@ -56,32 +57,34 @@ public class ComplexCommands {
     }
 
     public static Command scoreAlgaeProc() {
-        Command c = goToLocAlgae(() -> SuperstructureLocation.SCORE_PROCESSOR)
-                .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
-                .andThen(releaseAlgae());
-            c.setName("ScoreAalgaeProc");
-            return c;
+        Command c =
+                goToLocAlgae(() -> SuperstructureLocation.SCORE_PROCESSOR)
+                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
+                        .andThen(releaseAlgae());
+        c.setName("ScoreAalgaeProc");
+        return c;
     }
 
     public static Command gatherAlgae() {
-        Command c = goToLocAlgae(() -> r.controlBoard.getAlgaeLevelFromController(r.flysky))
-                .andThen(holdAlgae())
-                .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
-                .andThen(new InstantCommand(() -> r.state.setAlgae()));
-            c.setName("GatherAlgae");
-            return c;
+        Command c =
+                goToLocAlgae(() -> r.controlBoard.getAlgaeLevelFromController(r.flysky))
+                        .andThen(holdAlgae())
+                        .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
+                        .andThen(new InstantCommand(() -> r.state.setAlgae()));
+        c.setName("GatherAlgae");
+        return c;
     }
 
     public static Command visionAlgaeGather() {
         Command c = gatherAlgae();
         c.setName("VisionAlgaeAlgae");
-            return c;
+        return c;
     }
 
     public static Command visionAlgaeScore() {
         Command c = scoreAlgaeProc();
         c.setName("VisionAlgaeScore");
-            return c;
+        return c;
     }
 
     // CORAL COMMANDS
@@ -102,35 +105,37 @@ public class ComplexCommands {
 
     // applies power to get rid of coral
     public static Command releaseCoral() {
-        Command c = new ConditionalCommand(
-                        r.hand.setVoltageCmd(releasePowerCoral4),
-                        r.hand.setVoltageCmd(releasePowerCoral),
-                        () -> r.controlBoard.selectedLevel == 4)
-                .andThen(new WaitCommand(releaseTimeCoral))
-                .andThen(new InstantCommand(() -> r.state.clear()))
-                .andThen(r.hand.stop());
-                c.setName("ReleaseCoral");
-                return c;
+        Command c =
+                new ConditionalCommand(
+                                r.hand.setVoltageCmd(releasePowerCoral4),
+                                r.hand.setVoltageCmd(releasePowerCoral),
+                                () -> r.controlBoard.selectedLevel == 4)
+                        .andThen(new WaitCommand(releaseTimeCoral))
+                        .andThen(new InstantCommand(() -> r.state.clear()))
+                        .andThen(r.hand.stop());
+        c.setName("ReleaseCoral");
+        return c;
     }
 
     // applies power to get rid of coral in auton
     public static Command releaseCoralAuton(int level) {
 
-        Command c = (level == 4
-                        ? r.hand.setVoltageCmd(releasePowerCoral4)
-                        : r.hand.setVoltageCmd(releasePowerCoral))
-                .andThen(new WaitCommand(releaseTimeCoral))
-                .andThen(new InstantCommand(() -> r.state.clear()))
-                .andThen(r.hand.stop());
-            c.setName("ReleaseCoralAuton");
-            return c;
+        Command c =
+                (level == 4
+                                ? r.hand.setVoltageCmd(releasePowerCoral4)
+                                : r.hand.setVoltageCmd(releasePowerCoral))
+                        .andThen(new WaitCommand(releaseTimeCoral))
+                        .andThen(new InstantCommand(() -> r.state.clear()))
+                        .andThen(r.hand.stop());
+        c.setName("ReleaseCoralAuton");
+        return c;
     }
 
     // STES LOW POWER ON HAND TO KEEP CORAL IN
     public static Command holdCoral() {
         Command c = r.hand.setVoltageCmd(holdPowerCoral);
         c.setName("HoldCoral");
-            return c;
+        return c;
     }
 
     public static Command noDriveGather() {
@@ -154,93 +159,100 @@ public class ComplexCommands {
         // decides which coral station to use
         // drive there
         // gather
-        Command c = DriveCommands.driveTo(r, r.controlBoard::selectCoralStation, true)
-                .alongWith(noDriveGather());
-            c.setName("VisionCoralGather");
-            return c;
+        Command c =
+                DriveCommands.driveTo(r, r.controlBoard::selectCoralStation, true)
+                        .alongWith(noDriveGather());
+        c.setName("VisionCoralGather");
+        return c;
     }
 
     public static Command blindCoralScore() {
         Command c = snapToAngle(r.controlBoard::getAlignAngle).alongWith(noDriveScore());
         c.setName("BlindCoralScore");
-            return c;
+        return c;
     }
 
     public static Command blindGatherCoral() {
         Command c = snapToAngle(r.controlBoard::selectGatherAngle).alongWith(noDriveGather());
         c.setName("BlindGatherCoral");
-            return c;
+        return c;
     }
 
     public static Command visionCoralScore() {
-        Command c = DriveCommands.driveTo(r, r.controlBoard::getPathPose, false)
-                .andThen(goToLoc(r.controlBoard::getCoralLevel))
-                .alongWith(holdCoral())
-                // gather trigger
-                .andThen(
-                        new WaitUntilCommand(
-                                () ->
-                                        r.flysky.leftTriggerSWE.getAsBoolean()
-                                                || RobotState.isAutonomous()))
-                .andThen(releaseCoral());
-                c.setName("VisionCoralScore");
-                return c;
+        Command c =
+                DriveCommands.driveTo(r, r.controlBoard::getPathPose, false)
+                        .andThen(goToLoc(r.controlBoard::getCoralLevel))
+                        .alongWith(holdCoral())
+                        // gather trigger
+                        .andThen(
+                                new WaitUntilCommand(
+                                        () ->
+                                                r.flysky.leftTriggerSWE.getAsBoolean()
+                                                        || RobotState.isAutonomous()))
+                        .andThen(releaseCoral());
+        c.setName("VisionCoralScore");
+        return c;
     }
 
     // IMPORTANT/COMMONLY USED
 
     // moves elevator to a height with arm tucked up, then deploys arm
     public static Command goToLoc(Supplier<SuperstructureLocation> p) {
-        Command c = r.arm.goTo(() -> SuperstructureLocation.HOLD)
-                .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
-                .andThen(r.elevator.goTo(p))
-                .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
+        Command c =
+                r.arm.goTo(() -> SuperstructureLocation.HOLD)
+                        .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
+                        .andThen(r.elevator.goTo(p))
+                        .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
         // arm to 0, elevator move, arm out
         c.setName("GoToLoc");
-            return c;
+        return c;
     }
 
     public static Command goToLocAlgae(Supplier<SuperstructureLocation> p) {
-        Command c = r.arm.goTo(() -> SuperstructureLocation.HOLD_ALGAE)
-                .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD_ALGAE))
-                .andThen(r.elevator.goTo(p))
-                .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
-                c.setName("goToLocAlgae");
-                return c;
+        Command c =
+                r.arm.goTo(() -> SuperstructureLocation.HOLD_ALGAE)
+                        .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD_ALGAE))
+                        .andThen(r.elevator.goTo(p))
+                        .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
+        c.setName("goToLocAlgae");
+        return c;
     }
 
     // lines up with target field element
     public static Command snapToAngle(Supplier<Rotation2d> angle) {
-        Command c = DriveCommands.joystickDriveAtAngle(
-                r,
-                () -> -r.flysky.getLeftY(),
-                () -> -r.flysky.getLeftX(),
-                () -> -r.flysky.getRightX(),
-                angle);
-                c.setName("SnapToAngle");
-                return c;
+        Command c =
+                DriveCommands.joystickDriveAtAngle(
+                        r,
+                        () -> -r.flysky.getLeftY(),
+                        () -> -r.flysky.getLeftX(),
+                        () -> -r.flysky.getRightX(),
+                        angle);
+        c.setName("SnapToAngle");
+        return c;
     }
 
     // go to hold, algae hold, or gather depending on what game pieces we have
     public static Command homeLogic() {
-        Command c = new ConditionalCommand(
-                        new ConditionalCommand(
-                                new RunCommand(() -> {}),
-                                goToLoc(() -> SuperstructureLocation.HOLD)
-                                        .andThen(new RunCommand(() -> {})),
-                                () -> atLocation(SuperstructureLocation.INTAKE)),
-                        new ConditionalCommand(
-                                goToLoc(() -> SuperstructureLocation.ALGAE_LEVEL_2_3)
-                                        .andThen(new RunCommand(() -> {})),
-                                goToGather()
-                                        .andThen(
-                                                new RunCommand(
-                                                        () -> {})), // prevent command from ending
-                                r.flysky.topLeftSWA), // coral/algae sw
-                        r.state.hasCoralT)
-                .andThen(new WaitUntilCommand(() -> false));
-                c.setName("HomeLogic");
-                return c;
+        Command c =
+                new ConditionalCommand(
+                                new ConditionalCommand(
+                                        new RunCommand(() -> {}),
+                                        goToLoc(() -> SuperstructureLocation.HOLD)
+                                                .andThen(new RunCommand(() -> {})),
+                                        () -> atLocation(SuperstructureLocation.INTAKE)),
+                                new ConditionalCommand(
+                                        goToLocAlgae(() -> SuperstructureLocation.ALGAE_LEVEL_2_3)
+                                                .andThen(new RunCommand(() -> {})),
+                                        goToGather()
+                                                .andThen(
+                                                        new RunCommand(
+                                                                () -> {})), // prevent command from
+                                        // ending
+                                        r.flysky.topLeftSWA), // coral/algae sw
+                                r.state.hasCoralT)
+                        .andThen(new WaitUntilCommand(() -> false));
+        c.setName("HomeLogic");
+        return c;
     }
 
     // MINI COMMANDS
@@ -254,38 +266,37 @@ public class ComplexCommands {
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
                         .andThen(r.wrist.goToReally(() -> SuperstructureLocation.INTAKE));
 
-        Command c = new ConditionalCommand(
-                new InstantCommand(), // do nothing
-                toGather, // go to gather position
-                () -> atLocation(SuperstructureLocation.INTAKE));
-            c.setName("GoToGather");
-            return c;
-            
+        Command c =
+                new ConditionalCommand(
+                        new InstantCommand(), // do nothing
+                        toGather, // go to gather position
+                        () -> atLocation(SuperstructureLocation.INTAKE));
+        c.setName("GoToGather");
+        return c;
     }
 
     public static Command stopSuperstructure() {
         Command c = r.elevator.stop().alongWith(r.arm.stop()).alongWith(r.wrist.stop());
         // .alongWith(r.hand.stop());
         c.setName("StopSuperstructure");
-            return c;
+        return c;
     }
 
     public static boolean atLocation(SuperstructureLocation loc) {
         return r.arm.atTarget(() -> loc)
                 && r.elevator.atTarget(() -> loc)
                 && r.wrist.atTarget(() -> loc);
-            
-                
     }
 
     public static Command zeroSuperstructure() {
-        Command c = new InstantCommand(
-                () -> {
-                    r.elevator.zero();
-                    r.arm.zero();
-                    r.wrist.zero();
-                });
-            c.setName("ZeroSuperstructure");
-            return c;
+        Command c =
+                new InstantCommand(
+                        () -> {
+                            r.elevator.zero();
+                            r.arm.zero();
+                            r.wrist.zero();
+                        });
+        c.setName("ZeroSuperstructure");
+        return c;
     }
 }
