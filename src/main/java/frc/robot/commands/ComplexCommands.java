@@ -50,13 +50,13 @@ public class ComplexCommands {
     }
 
     public static Command scoreAlgaeProc() {
-        return goToLoc(() -> SuperstructureLocation.SCORE_PROCESSOR)
+        return goToLocAlgae(() -> SuperstructureLocation.SCORE_PROCESSOR)
                 .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
                 .andThen(releaseAlgae());
     }
 
     public static Command gatherAlgae() {
-        return goToLoc(() -> r.controlBoard.getAlgaeLevelFromController(r.flysky))
+        return goToLocAlgae(() -> r.controlBoard.getAlgaeLevelFromController(r.flysky))
                 .andThen(holdAlgae())
                 .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
                 .andThen(new InstantCommand(() -> r.state.setAlgae()));
@@ -168,6 +168,13 @@ public class ComplexCommands {
                 .andThen(r.elevator.goTo(p))
                 .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
         // arm to 0, elevator move, arm out
+    }
+
+    public static Command goToLocAlgae(Supplier<SuperstructureLocation> p) {
+        return r.arm.goTo(() -> SuperstructureLocation.HOLD_ALGAE)
+                .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD_ALGAE))
+                .andThen(r.elevator.goTo(p))
+                .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
     }
 
     // lines up with target field element
