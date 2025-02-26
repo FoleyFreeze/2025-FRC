@@ -49,8 +49,10 @@ public class Locations {
 
     public static Pose2d getStartLoc(int idx) {
         if (isBlue()) {
+            if (idx >= blueStarts.length) return null;
             return blueStarts[idx];
         } else {
+            if (idx >= redStarts.length) return null;
             return redStarts[idx];
         }
     }
