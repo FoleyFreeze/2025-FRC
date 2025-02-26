@@ -35,6 +35,28 @@ public class Locations {
     public static AprilTagFieldLayout tags =
             AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
+    static Pose2d[] blueStarts = {
+        new Pose2d(0, 0, Rotation2d.k180deg),
+        new Pose2d(0, 0, Rotation2d.k180deg),
+        new Pose2d(0, 0, Rotation2d.k180deg)
+    };
+
+    static Pose2d[] redStarts = {
+        new Pose2d(0, 0, Rotation2d.kZero),
+        new Pose2d(0, 0, Rotation2d.k180deg),
+        new Pose2d(0, 0, Rotation2d.k180deg)
+    };
+
+    public static Pose2d getStartLoc(int idx) {
+        if (isBlue()) {
+            if (idx >= blueStarts.length) return null;
+            return blueStarts[idx];
+        } else {
+            if (idx >= redStarts.length) return null;
+            return redStarts[idx];
+        }
+    }
+
     // everyone hates this
     public static Pose2d getReefLocation(ControlBoard.ReefSticks position) {
         switch (position) {
@@ -142,5 +164,13 @@ public class Locations {
 
     public static Pose2d invert(Pose2d in) {
         return new Pose2d(in.getTranslation(), in.getRotation().plus(Rotation2d.k180deg));
+    }
+
+    public static Pose2d getProcLoc() {
+        if (isBlue()) {
+            return invert(tags.getTagPose(16).get().toPose2d().plus(halfRobot));
+        } else {
+            return invert(tags.getTagPose(3).get().toPose2d().plus(halfRobot));
+        }
     }
 }

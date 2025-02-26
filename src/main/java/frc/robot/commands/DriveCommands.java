@@ -368,7 +368,8 @@ public class DriveCommands {
         double gyroDelta = 0.0;
     }
 
-    public static Command driveTo(RobotContainer r, Supplier<Pose2d> destination, boolean flip) {
+    public static Command driveTo(
+            RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
         Transform2d finderDelta = new Transform2d(Units.feetToMeters(-1.5), 0, Rotation2d.kZero);
         Supplier<Pose2d> farDestination =
                 new Supplier<Pose2d>() {
@@ -377,9 +378,9 @@ public class DriveCommands {
                     }
                 };
         return new ConditionalCommand(
-                new PathfindingCommand(r, farDestination, flip)
-                        .andThen(new PathFollowingCommand(r, destination, flip)),
-                new PathFollowingCommand(r, destination, flip),
+                new PathfindingCommand(r, farDestination, isGather)
+                        .andThen(new PathFollowingCommand(r, destination, isGather)),
+                new PathFollowingCommand(r, destination, isGather),
                 () ->
                         r.drive.getPose().minus(destination.get()).getTranslation().getNorm()
                                 > Units.feetToMeters(3));
