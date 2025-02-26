@@ -1,13 +1,15 @@
 package frc.robot.auton;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.controls.ControlBoard.ReefSticks;
 import frc.robot.util.Locations;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.util.SettableLoggableChooser;
 
 public class AutonSelection {
 
@@ -15,10 +17,7 @@ public class AutonSelection {
     public Command autonCommand = new InstantCommand();
 
     private String lastAutonString = "";
-
-    public AutonSelection(RobotContainer r) {
-        this.r = r;
-    }
+    private String lastPresetString = "";
 
     public enum GatherType {
         NONE,
@@ -32,57 +31,73 @@ public class AutonSelection {
         ZONE3,
     }
 
-    private LoggedDashboardChooser<Integer> startLocation;
+    private SettableLoggableChooser<Integer> startLocation;
 
-    private LoggedDashboardChooser<ReefSticks> scoreLoc1;
-    private LoggedDashboardChooser<Integer> scoreLevel1;
+    private SettableLoggableChooser<ReefSticks> scoreLoc1;
+    private SettableLoggableChooser<Integer> scoreLevel1;
 
-    private LoggedDashboardChooser<GatherType> gatherChoose1;
-    private LoggedDashboardChooser<ReefSticks> scoreLoc2;
-    private LoggedDashboardChooser<Integer> scoreLevel2;
+    private SettableLoggableChooser<GatherType> gatherChoose1;
+    private SettableLoggableChooser<ReefSticks> scoreLoc2;
+    private SettableLoggableChooser<Integer> scoreLevel2;
 
-    private LoggedDashboardChooser<GatherType> gatherChoose2;
-    private LoggedDashboardChooser<ReefSticks> scoreLoc3;
-    private LoggedDashboardChooser<Integer> scoreLevel3;
+    private SettableLoggableChooser<GatherType> gatherChoose2;
+    private SettableLoggableChooser<ReefSticks> scoreLoc3;
+    private SettableLoggableChooser<Integer> scoreLevel3;
 
-    private LoggedDashboardChooser<GatherType> gatherChoose3;
-    private LoggedDashboardChooser<ReefSticks> scoreLoc4;
-    private LoggedDashboardChooser<Integer> scoreLevel4;
+    private SettableLoggableChooser<GatherType> gatherChoose3;
+    private SettableLoggableChooser<ReefSticks> scoreLoc4;
+    private SettableLoggableChooser<Integer> scoreLevel4;
 
-    public AutonSelection() {
-        startLocation = new LoggedDashboardChooser<>("StartLoc");
-        startLocation.addDefaultOption("One", 0);
-        startLocation.addOption("Two", 1);
-        startLocation.addOption("Three", 2);
+    private SettableLoggableChooser<String> presets;
 
-        scoreLoc1 = new LoggedDashboardChooser<>("Score1Loc");
+    public AutonSelection(RobotContainer r) {
+        this.r = r;
+
+        ShuffleboardTab tab = Shuffleboard.getTab("Auton");
+
+        startLocation = new SettableLoggableChooser<>("StartLoc", tab, 0, 0);
+        startLocation.addDefaultOption("Left", 0);
+        startLocation.addOption("Mid", 1);
+        startLocation.addOption("Right", 2);
+
+        scoreLoc1 = new SettableLoggableChooser<>("Score1Loc", tab, 0, 1);
         fillScoreLoc(scoreLoc1);
-        scoreLevel1 = new LoggedDashboardChooser<>("Score1Level");
+        scoreLevel1 = new SettableLoggableChooser<>("Score1Level", tab, 0, 2);
         fillScoreLevel(scoreLevel1);
 
-        gatherChoose1 = new LoggedDashboardChooser<>("Gather1");
+        gatherChoose1 = new SettableLoggableChooser<>("Gather1", tab, 1, 0);
         FillGatherLoc(gatherChoose1);
-        scoreLoc2 = new LoggedDashboardChooser<>("Score2Loc");
+        scoreLoc2 = new SettableLoggableChooser<>("Score2Loc", tab, 1, 1);
         fillScoreLoc(scoreLoc2);
-        scoreLevel2 = new LoggedDashboardChooser<>("Score2Level");
+        scoreLevel2 = new SettableLoggableChooser<>("Score2Level", tab, 1, 2);
         fillScoreLevel(scoreLevel2);
 
-        gatherChoose2 = new LoggedDashboardChooser<>("Gather2");
+        gatherChoose2 = new SettableLoggableChooser<>("Gather2", tab, 2, 0);
         FillGatherLoc(gatherChoose2);
-        scoreLoc3 = new LoggedDashboardChooser<>("Score3Loc");
+        scoreLoc3 = new SettableLoggableChooser<>("Score3Loc", tab, 2, 1);
         fillScoreLoc(scoreLoc3);
-        scoreLevel3 = new LoggedDashboardChooser<>("Score3Level");
+        scoreLevel3 = new SettableLoggableChooser<>("Score3Level", tab, 2, 2);
         fillScoreLevel(scoreLevel3);
 
-        gatherChoose3 = new LoggedDashboardChooser<>("Gather3");
+        gatherChoose3 = new SettableLoggableChooser<>("Gather3", tab, 3, 0);
         FillGatherLoc(gatherChoose3);
-        scoreLoc4 = new LoggedDashboardChooser<>("Score4Loc");
+        scoreLoc4 = new SettableLoggableChooser<>("Score4Loc", tab, 3, 1);
         fillScoreLoc(scoreLoc4);
-        scoreLevel4 = new LoggedDashboardChooser<>("Score4Level");
+        scoreLevel4 = new SettableLoggableChooser<>("Score4Level", tab, 3, 2);
         fillScoreLevel(scoreLevel4);
+
+        presets = new SettableLoggableChooser<>("Presets", tab, 2, 4);
+        presets.addDefaultOption("Score1Gather1", "Left,H,3,None,None,1,None,None,1,None,None,1");
+        presets.addOption("Score2Gather1", "Mid,K,3,Left_Far,None,1,None,None,1,None,None,1");
     }
 
     public void periodic() {
+        if (!presets.get().equals(lastPresetString)) {
+            lastPresetString = presets.get();
+            updateToPreset(lastPresetString);
+            System.out.println("UpdatePresets");
+        }
+
         // read string
         // compare string
         // if not same, create auton
@@ -90,32 +105,48 @@ public class AutonSelection {
         if (!lastAutonString.equals(s)) {
             autonCommand = buildAuton();
             lastAutonString = s;
+            System.out.println("Generated new auton: " + s);
         }
     }
 
     public Command getAutonCommand() {
-        return autonCommand;
+        // quick hack to run old autos
+        // TODO: make cleaner
+        Command oldAuto = r.getAutonomousCommand();
+        if (oldAuto == null) {
+            return autonCommand;
+        } else {
+            return oldAuto;
+        }
+    }
+
+    public void updateToPreset(String in) {
+        String[] parts = in.split(",");
+        startLocation.setDefault(parts[0]);
+        scoreLoc1.setDefault(parts[1]);
+        scoreLevel1.setDefault(parts[2]);
     }
 
     public String readString() {
         String s = "";
-        s += startLocation.get().toString();
-        s += scoreLoc1.get().toString();
-        s += scoreLevel1.get().toString();
-        s += gatherChoose1.get().toString();
-        s += scoreLoc2.get().toString();
-        s += scoreLevel2.get().toString();
-        s += gatherChoose2.get().toString();
-        s += scoreLoc3.get().toString();
-        s += scoreLevel3.get().toString();
-        s += gatherChoose3.get().toString();
-        s += scoreLoc4.get().toString();
-        s += scoreLevel4.get().toString();
+        s += startLocation.getKey();
+        s += scoreLoc1.getKey();
+        s += scoreLevel1.getKey();
+        s += gatherChoose1.getKey();
+        s += scoreLoc2.getKey();
+        s += scoreLevel2.getKey();
+        s += gatherChoose2.getKey();
+        s += scoreLoc3.getKey();
+        s += scoreLevel3.getKey();
+        s += gatherChoose3.getKey();
+        s += scoreLoc4.getKey();
+        s += scoreLevel4.getKey();
         return s;
     }
 
     public Command buildAuton() {
         SequentialCommandGroup c = new SequentialCommandGroup();
+        c.setName("Auton");
 
         // start location
 
@@ -146,7 +177,7 @@ public class AutonSelection {
         stick = scoreLoc2.get();
         level = scoreLevel2.get();
         if (stick == ReefSticks.NONE || level == null) {
-            return new InstantCommand();
+            return c;
         }
         c.addCommands(AutonCommands.scoreCoral(scoreLoc2.get(), scoreLevel2.get()));
 
@@ -161,7 +192,7 @@ public class AutonSelection {
         stick = scoreLoc3.get();
         level = scoreLevel3.get();
         if (stick == ReefSticks.NONE || level == null) {
-            return new InstantCommand();
+            return c;
         }
         c.addCommands(AutonCommands.scoreCoral(scoreLoc3.get(), scoreLevel3.get()));
 
@@ -176,15 +207,14 @@ public class AutonSelection {
         stick = scoreLoc4.get();
         level = scoreLevel4.get();
         if (stick == ReefSticks.NONE || level == null) {
-            return new InstantCommand();
+            return c;
         }
         c.addCommands(AutonCommands.scoreCoral(scoreLoc4.get(), scoreLevel4.get()));
-        // ...
-        c.setName("Auton");
+
         return c;
     }
 
-    private void fillScoreLoc(LoggedDashboardChooser<ReefSticks> in) {
+    private void fillScoreLoc(SettableLoggableChooser<ReefSticks> in) {
         in.addDefaultOption("None", ReefSticks.NONE);
         in.addOption("A", ReefSticks.A);
         in.addOption("B", ReefSticks.B);
@@ -200,14 +230,14 @@ public class AutonSelection {
         in.addOption("L", ReefSticks.L);
     }
 
-    private void fillScoreLevel(LoggedDashboardChooser<Integer> in) {
-        in.addDefaultOption("None", null);
+    private void fillScoreLevel(SettableLoggableChooser<Integer> in) {
+        in.addDefaultOption("1", 1);
         in.addOption("2", 2);
         in.addOption("3", 3);
         in.addOption("4", 4);
     }
 
-    private void FillGatherLoc(LoggedDashboardChooser<GatherType> in) {
+    private void FillGatherLoc(SettableLoggableChooser<GatherType> in) {
         in.addDefaultOption("None", GatherType.NONE);
         in.addOption("Left_Far", GatherType.LEFT_FAR);
         in.addOption("Left_Close", GatherType.LEFT_CLOSE);

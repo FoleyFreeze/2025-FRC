@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.ComplexCommands;
@@ -39,7 +38,6 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hand.Hand;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.wrist.Wrist;
-import frc.robot.util.Locations;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -93,21 +91,7 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
-        autoChooser.addDefaultOption("DoNothing", new InstantCommand());
-
-        autoChooser.addOption(
-                "ScoreOneThenGather",
-                (new InstantCommand(
-                                () ->
-                                        drive.setPose(
-                                                new Pose2d(
-                                                        drive.getPose().getTranslation(),
-                                                        Locations.isBlue()
-                                                                ? Rotation2d.k180deg
-                                                                : Rotation2d.kZero)),
-                                drive)) // flipped
-                        .andThen(ComplexCommands.visionCoralScore())
-                        .andThen(ComplexCommands.visionCoralGather()));
+        autoChooser.addDefaultOption("Selectable", null);
 
         autoChooser.addOption(
                 "JustDrive",
