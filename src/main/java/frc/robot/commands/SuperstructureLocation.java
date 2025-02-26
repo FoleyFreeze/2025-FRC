@@ -31,7 +31,7 @@ public enum SuperstructureLocation {
 
     FLOOR_GATHER_ALGAE(0, 0, 0),
     SCORE_PROCESSOR(4, 90, 248),
-    INTAKE(0, -48.5 + .5, -67.46),
+    INTAKE(0, -48.5 + .5, -67.46 + 2), // was 0, 48.5 + .5, -67.46
     SAFE(0, 0, 0);
 
     public final Distance eleHeight;

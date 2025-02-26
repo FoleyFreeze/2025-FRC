@@ -18,7 +18,7 @@ public class ComplexCommands {
     static double releasePowerCoral4 = -4;
     static double releaseTimeCoral = 0.5;
 
-    static double intakePowerCoral = 3.5;
+    static double intakePowerCoral = 2.0; // was 3.5;
     static double intakeCurrentCoral = 15;
     static double intakeCoralTime = 0.8;
 
@@ -168,10 +168,12 @@ public class ComplexCommands {
         return new ConditionalCommand(
                         new ConditionalCommand(
                                 new RunCommand(() -> {}),
-                                goToLoc(() -> SuperstructureLocation.HOLD),
+                                goToLoc(() -> SuperstructureLocation.HOLD)
+                                        .andThen(new RunCommand(() -> {})),
                                 () -> atLocation(SuperstructureLocation.INTAKE)),
                         new ConditionalCommand(
-                                goToLoc(() -> SuperstructureLocation.ALGAE_LEVEL_2_3),
+                                goToLoc(() -> SuperstructureLocation.ALGAE_LEVEL_2_3)
+                                        .andThen(new RunCommand(() -> {})),
                                 goToGather()
                                         .andThen(
                                                 new RunCommand(
