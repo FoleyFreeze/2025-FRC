@@ -178,6 +178,18 @@ public class ControlBoard {
         }
     }
 
+    public SuperstructureLocation getAlgaeLevel() {
+        switch (selectedLevel) {
+            case 1:
+            case 2:
+                return SuperstructureLocation.ALGAE_LEVEL_2_3;
+            case 3:
+            case 4:
+            default:
+                return SuperstructureLocation.ALGAE_LEVEL_3_4;
+        }
+    }
+
     public SuperstructureLocation getLevelLocation(int reefLevel) {
         switch (reefLevel) {
             case 1:

@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -13,13 +12,14 @@ import java.util.function.Supplier;
 
 public class ComplexCommands {
 
-    static double holdPowerCoral = 0.4;
-    static double releasePowerCoral = -6;
+    public static double holdPowerCoral = 0.4;
+    static double releasePowerCoral = -4;
     static double releasePowerCoral4 = -4;
+    static double releasePowerCoral1 = -1.5;
     static double releaseTimeCoral = 0.5;
 
-    static double intakePowerCoral = 2.0;
-    static double intakeCurrentCoral = 15;
+    public static double intakePowerCoral = 2.0;
+    public static double intakeCurrentCoral = 15;
     static double intakeCoralTime = 0.8;
 
     static double intakeAlgaeTime = 0.2;
@@ -67,7 +67,7 @@ public class ComplexCommands {
 
     public static Command gatherAlgae() {
         Command c =
-                goToLocAlgae(() -> r.controlBoard.getAlgaeLevelFromController(r.flysky))
+                goToLocAlgae(() -> r.controlBoard.getAlgaeLevel())
                         .andThen(holdAlgae())
                         .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
                         .andThen(new InstantCommand(() -> r.state.setAlgae()));
@@ -106,10 +106,22 @@ public class ComplexCommands {
     // applies power to get rid of coral
     public static Command releaseCoral() {
         Command c =
-                new ConditionalCommand(
-                                r.hand.setVoltageCmd(releasePowerCoral4),
-                                r.hand.setVoltageCmd(releasePowerCoral),
-                                () -> r.controlBoard.selectedLevel == 4)
+                new InstantCommand(
+                                () -> {
+                                    switch (r.controlBoard.selectedLevel) {
+                                        case 1:
+                                            r.hand.setVoltage(releasePowerCoral1);
+                                            break;
+                                        case 2:
+                                        case 3:
+                                        default:
+                                            r.hand.setVoltage(releasePowerCoral);
+                                            break;
+                                        case 4:
+                                            r.hand.setVoltage(releasePowerCoral4);
+                                            break;
+                                    }
+                                })
                         .andThen(new WaitCommand(releaseTimeCoral))
                         .andThen(new InstantCommand(() -> r.state.clear()))
                         .andThen(r.hand.stop());
@@ -185,10 +197,8 @@ public class ComplexCommands {
                         .alongWith(holdCoral())
                         // gather trigger
                         .andThen(
-                                new WaitUntilCommand(
-                                        () ->
-                                                r.flysky.leftTriggerSWE.getAsBoolean()
-                                                        || RobotState.isAutonomous()))
+                                new WaitUntilCommand(() -> r.flysky.leftTriggerSWE.getAsBoolean())
+                                        .raceWith(DriveCommands.joystickDriveFlysky(r)))
                         .andThen(releaseCoral());
         c.setName("VisionCoralScore");
         return c;

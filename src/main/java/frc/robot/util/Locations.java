@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -12,39 +13,46 @@ import frc.robot.subsystems.controls.ControlBoard;
 
 public class Locations {
 
-    static double robotWidth = Units.inchesToMeters(28 + 6);
-    static double robotLength = Units.inchesToMeters(30 + 6);
-    static Transform2d halfRobot = new Transform2d(robotLength / 2, 0, new Rotation2d());
-    static Transform2d halfRobotGather =
+    public static double robotWidth = Units.inchesToMeters(28 + 6);
+    public static double robotLength = Units.inchesToMeters(30 + 6);
+    public static Transform2d halfRobot = new Transform2d(robotLength / 2.0, 0, new Rotation2d());
+    public static Transform2d halfRobotGather =
             new Transform2d(
-                    robotLength / 2 + Units.inchesToMeters(1.5),
+                    robotLength / 2.0 + Units.inchesToMeters(1.5),
                     Units.inchesToMeters(2.5),
                     new Rotation2d());
 
-    static Transform2d halfRobotCoralLeft =
+    public static Transform2d halfRobotCoralRight =
             new Transform2d(
-                    robotLength / 2 + Units.inchesToMeters(4),
-                    Units.inchesToMeters(3.5),
+                    robotLength / 2.0 + Units.inchesToMeters(3.25),
+                    Units.inchesToMeters(5.5),
                     new Rotation2d());
-    static Transform2d halfRobotCoralRight =
+    public static Transform2d halfRobotCoralLeft =
             new Transform2d(
-                    robotLength / 2 + Units.inchesToMeters(4),
+                    robotLength / 2.0 + Units.inchesToMeters(3.5),
                     Units.inchesToMeters(-8),
+                    new Rotation2d());
+
+    //TODO: make code that uses this
+    public static Transform2d halfRobotCoralLevel1 =
+            new Transform2d(
+                    robotLength / 2.0 + Units.inchesToMeters(7.5),
+                    Units.inchesToMeters(0),
                     new Rotation2d());
 
     public static AprilTagFieldLayout tags =
             AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     static Pose2d[] blueStarts = {
-        new Pose2d(0, 0, Rotation2d.k180deg),
-        new Pose2d(0, 0, Rotation2d.k180deg),
-        new Pose2d(0, 0, Rotation2d.k180deg)
+        new Pose2d(6, 3, Rotation2d.k180deg),
+        new Pose2d(6, 3, Rotation2d.k180deg),
+        new Pose2d(6, 3, Rotation2d.k180deg)
     };
 
     static Pose2d[] redStarts = {
-        new Pose2d(0, 0, Rotation2d.kZero),
-        new Pose2d(0, 0, Rotation2d.k180deg),
-        new Pose2d(0, 0, Rotation2d.k180deg)
+        new Pose2d(12, 3, Rotation2d.kZero),
+        new Pose2d(12, 3, Rotation2d.kZero),
+        new Pose2d(12, 3, Rotation2d.kZero)
     };
 
     public static Pose2d getStartLoc(int idx) {
@@ -57,80 +65,93 @@ public class Locations {
         }
     }
 
+    public static Translation2d getReef() {
+        Pose2d front, back;
+        if (isBlue()) {
+            front = tags.getTagPose(18).get().toPose2d();
+            back = tags.getTagPose(21).get().toPose2d();
+        } else {
+            front = tags.getTagPose(7).get().toPose2d();
+            back = tags.getTagPose(10).get().toPose2d();
+        }
+
+        return front.getTranslation().plus(back.getTranslation()).times(0.5);
+    }
+
     // everyone hates this
     public static Pose2d getReefLocation(ControlBoard.ReefSticks position) {
         switch (position) {
             case B:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(18).get().toPose2d().plus(halfRobotCoralLeft));
-                } else {
-                    return invert(tags.getTagPose(7).get().toPose2d().plus(halfRobotCoralLeft));
-                }
-            case A:
-                if (isBlue()) {
                     return invert(tags.getTagPose(18).get().toPose2d().plus(halfRobotCoralRight));
                 } else {
                     return invert(tags.getTagPose(7).get().toPose2d().plus(halfRobotCoralRight));
                 }
-            case D:
+            case A:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(17).get().toPose2d().plus(halfRobotCoralLeft));
+                    return invert(tags.getTagPose(18).get().toPose2d().plus(halfRobotCoralLeft));
                 } else {
-                    return invert(tags.getTagPose(8).get().toPose2d().plus(halfRobotCoralLeft));
+                    return invert(tags.getTagPose(7).get().toPose2d().plus(halfRobotCoralLeft));
                 }
-            case C:
+            case D:
                 if (isBlue()) {
                     return invert(tags.getTagPose(17).get().toPose2d().plus(halfRobotCoralRight));
                 } else {
                     return invert(tags.getTagPose(8).get().toPose2d().plus(halfRobotCoralRight));
                 }
-            case F:
+            case C:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(22).get().toPose2d().plus(halfRobotCoralLeft));
+                    return invert(tags.getTagPose(17).get().toPose2d().plus(halfRobotCoralLeft));
                 } else {
-                    return invert(tags.getTagPose(9).get().toPose2d().plus(halfRobotCoralLeft));
+                    return invert(tags.getTagPose(8).get().toPose2d().plus(halfRobotCoralLeft));
                 }
-            case E:
+            case F:
                 if (isBlue()) {
                     return invert(tags.getTagPose(22).get().toPose2d().plus(halfRobotCoralRight));
                 } else {
                     return invert(tags.getTagPose(9).get().toPose2d().plus(halfRobotCoralRight));
                 }
-            case H:
+            case E:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(21).get().toPose2d().plus(halfRobotCoralLeft));
+                    return invert(tags.getTagPose(22).get().toPose2d().plus(halfRobotCoralLeft));
                 } else {
-                    return invert(tags.getTagPose(10).get().toPose2d().plus(halfRobotCoralLeft));
+                    return invert(tags.getTagPose(9).get().toPose2d().plus(halfRobotCoralLeft));
                 }
-            case G:
+            case H:
                 if (isBlue()) {
                     return invert(tags.getTagPose(21).get().toPose2d().plus(halfRobotCoralRight));
                 } else {
                     return invert(tags.getTagPose(10).get().toPose2d().plus(halfRobotCoralRight));
                 }
-            case J:
+            case G:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(20).get().toPose2d().plus(halfRobotCoralLeft));
+                    return invert(tags.getTagPose(21).get().toPose2d().plus(halfRobotCoralLeft));
                 } else {
-                    return invert(tags.getTagPose(11).get().toPose2d().plus(halfRobotCoralLeft));
+                    return invert(tags.getTagPose(10).get().toPose2d().plus(halfRobotCoralLeft));
                 }
-            case I:
+            case J:
                 if (isBlue()) {
                     return invert(tags.getTagPose(20).get().toPose2d().plus(halfRobotCoralRight));
                 } else {
                     return invert(tags.getTagPose(11).get().toPose2d().plus(halfRobotCoralRight));
                 }
-            case L:
+            case I:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(19).get().toPose2d().plus(halfRobotCoralLeft));
+                    return invert(tags.getTagPose(20).get().toPose2d().plus(halfRobotCoralLeft));
                 } else {
-                    return invert(tags.getTagPose(6).get().toPose2d().plus(halfRobotCoralLeft));
+                    return invert(tags.getTagPose(11).get().toPose2d().plus(halfRobotCoralLeft));
                 }
-            case K:
+            case L:
                 if (isBlue()) {
                     return invert(tags.getTagPose(19).get().toPose2d().plus(halfRobotCoralRight));
                 } else {
                     return invert(tags.getTagPose(6).get().toPose2d().plus(halfRobotCoralRight));
+                }
+            case K:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(19).get().toPose2d().plus(halfRobotCoralLeft));
+                } else {
+                    return invert(tags.getTagPose(6).get().toPose2d().plus(halfRobotCoralLeft));
                 }
             default:
                 return null;
@@ -154,7 +175,7 @@ public class Locations {
     }
 
     public static Pose2d getTag7() {
-        Pose2d tag = tags.getTagPose(7).get().toPose2d().plus(halfRobotCoralRight);
+        Pose2d tag = tags.getTagPose(7).get().toPose2d().plus(halfRobotCoralLeft);
         return invert(tag);
     }
 

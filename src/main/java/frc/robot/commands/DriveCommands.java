@@ -33,6 +33,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.RobotContainer;
@@ -59,11 +61,12 @@ public class DriveCommands {
 
     private static final double POS_KP = 5;
     private static final double POS_KI = 0;
-    private static final double POS_KD = 1;
+    private static final double POS_KD = 0;
     private static final double POS_MAX_VEL = 1; // m/s
     private static final double POS_TOL = Units.inchesToMeters(0.5);
     private static final double POS_MAX_DIST =
             Units.inchesToMeters(10); // dont drive if more than 10in away
+    private static final double POS_MAX_TIME = 0.5;
 
     private DriveCommands() {}
 
@@ -79,6 +82,14 @@ public class DriveCommands {
         return new Pose2d(new Translation2d(), linearDirection)
                 .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
                 .getTranslation();
+    }
+
+    public static Command joystickDriveFlysky(RobotContainer r) {
+        return joystickDrive(
+                r,
+                () -> -r.flysky.getLeftY(),
+                () -> -r.flysky.getLeftX(),
+                () -> -r.flysky.getRightX());
     }
 
     /**
@@ -221,22 +232,14 @@ public class DriveCommands {
                 .beforeStarting(() -> angleController.reset(r.drive.getRotation().getRadians()));
     }
 
-    public static ChassisSpeeds fromFieldRel(ChassisSpeeds speeds, Rotation2d rot) {
-        if (Locations.isBlue()) {
-            return ChassisSpeeds.fromFieldRelativeSpeeds(speeds, rot);
-        } else {
-            // flip if red
-            return ChassisSpeeds.fromFieldRelativeSpeeds(speeds, rot.plus(Rotation2d.k180deg));
-        }
-    }
-
     public static Command driveToPoint(RobotContainer r, Supplier<Pose2d> supplier) {
         PIDController pidX = new PIDController(POS_KP, POS_KI, POS_KD);
         PIDController pidY = new PIDController(POS_KP, POS_KI, POS_KD);
         pidX.setTolerance(POS_TOL);
         pidY.setTolerance(POS_TOL);
 
-        double[] error = new double[0];
+        double[] error = new double[1];
+        Timer timer = new Timer();
 
         return Commands.run(
                         () -> {
@@ -256,17 +259,21 @@ public class DriveCommands {
 
                             // TODO: run angle PID in parallel
                             r.drive.runVelocity(
-                                    fromFieldRel(
+                                    ChassisSpeeds.fromFieldRelativeSpeeds(
                                             new ChassisSpeeds(xVel, yVel, 0),
                                             r.drive.getRotation()));
                         },
                         r.drive)
-                .until(() -> error[0] < POS_TOL)
+                .until(() -> error[0] < POS_TOL || timer.hasElapsed(POS_MAX_TIME))
                 .beforeStarting(
                         () -> {
                             pidX.reset();
                             pidY.reset();
-                        });
+                            timer.restart();
+                        })
+                .andThen(
+                        new InstantCommand(
+                                () -> r.drive.runVelocity(new ChassisSpeeds()), r.drive));
     }
 
     /**
@@ -426,7 +433,7 @@ public class DriveCommands {
         double gyroDelta = 0.0;
     }
 
-    public static Command driveTo(
+    public static Command driveToAuto(
             RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
         Transform2d finderDelta = new Transform2d(Units.feetToMeters(-1.5), 0, Rotation2d.kZero);
         Supplier<Pose2d> farDestination =
@@ -435,7 +442,14 @@ public class DriveCommands {
                         return destination.get().plus(finderDelta);
                     }
                 };
-        return new ConditionalCommand(
+
+        return /*(new ConditionalCommand(
+                       leaveReef(r),
+                       new InstantCommand(),
+                       () ->
+                               r.drive.getPose().getTranslation().getDistance(Locations.getReef())
+                                       < 1.65))
+               .andThen(*/ new ConditionalCommand(
                         new PathfindingCommand(r, farDestination, isGather)
                                 .andThen(new PathFollowingCommand(r, destination, isGather)),
                         new PathFollowingCommand(r, destination, isGather),
@@ -446,7 +460,18 @@ public class DriveCommands {
                                                 .getTranslation()
                                                 .getNorm()
                                         > Units.feetToMeters(3))
-                .andThen(driveToPoint(r, destination));
+                .andThen(driveToPoint(r, destination)) /*)*/;
+    }
+
+    public static Command driveTo(
+            RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
+        return driveToAuto(r, destination, isGather);
+        // TODO: add manual driving after
+    }
+
+    public static Command leaveReef(RobotContainer r) {
+        return new RunCommand(() -> r.drive.runVelocity(new ChassisSpeeds(-2, 0, 0)))
+                .raceWith(new WaitCommand(0.5));
     }
 
     public static Command zeroDrive(RobotContainer r) {

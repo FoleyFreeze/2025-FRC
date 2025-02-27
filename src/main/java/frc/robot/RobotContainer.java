@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auton.AutonCommands;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SuperstructureLocation;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.BotState;
@@ -40,6 +41,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hand.Hand;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.wrist.Wrist;
+import frc.robot.util.Locations;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -145,6 +147,7 @@ public class RobotContainer {
 
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(DriveCommands.zeroDrive(this).ignoringDisable(true));
+        flysky.downLTRIM.onTrue(new InstantCommand(() -> resetSimulation()));
 
         // rezero superstructure
         flysky.upRTRIM.onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
@@ -239,6 +242,10 @@ public class RobotContainer {
                 .and(controlBoard.climbModeT) // climb sw
                 .whileTrue(r.climb.setClimbVoltage(6));
 
+        controlBoard.climbModeT.whileTrue(
+                ComplexCommands.goToLoc(() -> SuperstructureLocation.CLIMB_SAFE)
+                        .andThen(new RunCommand(() -> {})));
+
         // stop button
         flysky.topRightMomentSWC.onTrue(
                 ComplexCommands.stopSuperstructure()
@@ -256,6 +263,18 @@ public class RobotContainer {
                         r.arm.getAngle().in(Degrees),
                         r.wrist.getAngleRads().in(Degrees));
         SmartDashboard.putString("SuperPosition", s);
+
+        double distToTag =
+                r.drive
+                        .getPose()
+                        .getTranslation()
+                        .getDistance(
+                                Locations.tags.getTagPose(7).get().toPose2d().getTranslation());
+        Logger.recordOutput("DistTo7", distToTag);
+
+        Logger.recordOutput("State/hasCoral", state.hasCoral);
+        Logger.recordOutput("State/hasAlgae", state.hasAlgae);
+        Logger.recordOutput("State/hasStop", state.hasStop);
     }
 
     /**
