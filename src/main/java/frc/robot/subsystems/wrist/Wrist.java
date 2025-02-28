@@ -120,7 +120,7 @@ public class Wrist extends SubsystemBase {
         }
         Logger.recordOutput("Wrist/ArmAngle", r.arm.getAngle().in(Radians));
         double minAngle, maxAngle;
-        if (r.flysky.topLeftSWA.getAsBoolean()) { // Coral Algae sw
+        if (r.controlBoard.algaeModeT.getAsBoolean()) { // Coral Algae sw
             minAngle =
                     cvrtLocalToEnc(k.minLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians));
             maxAngle =

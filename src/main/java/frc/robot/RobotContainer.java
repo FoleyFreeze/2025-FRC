@@ -160,7 +160,7 @@ public class RobotContainer {
         // climb down
         flysky.leftTriggerSWE // gather sw
                 .and(flysky.rightTriggerSWG.negate()) // not scoring
-                .and(flysky.topLeftSWA.negate()) // algae sw
+                .and(controlBoard.algaeModeT.negate()) // algae sw
                 .and(flysky.topRightSWD) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 // .whileTrue(ComplexCommands.visionCoralGather());
@@ -170,7 +170,7 @@ public class RobotContainer {
 
         flysky.leftTriggerSWE // gather sw
                 .and(flysky.rightTriggerSWG.negate()) // not scoring
-                .and(flysky.topLeftSWA.negate()) // algae sw
+                .and(controlBoard.algaeModeT.negate()) // algae sw
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
@@ -179,7 +179,7 @@ public class RobotContainer {
 
         flysky.leftTriggerSWE // gather sw
                 .and(flysky.rightTriggerSWG.negate()) // not scoring
-                .and(flysky.topLeftSWA) // algae sw
+                .and(controlBoard.algaeModeT) // algae sw
                 .and(flysky.topRightSWD) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
@@ -188,7 +188,7 @@ public class RobotContainer {
 
         flysky.leftTriggerSWE // gather sw
                 .and(flysky.rightTriggerSWG.negate()) // not scoring
-                .and(flysky.topLeftSWA) // algae sw
+                .and(controlBoard.algaeModeT) // algae sw
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
@@ -207,7 +207,7 @@ public class RobotContainer {
         // climb up
 
         flysky.rightTriggerSWG // gather sw
-                .and(flysky.topLeftSWA.negate()) // algae sw
+                .and(controlBoard.algaeModeT.negate()) // algae sw
                 .and(flysky.topRightSWD) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
@@ -215,7 +215,7 @@ public class RobotContainer {
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
         flysky.rightTriggerSWG // gather sw
-                .and(flysky.topLeftSWA.negate()) // algae sw
+                .and(controlBoard.algaeModeT.negate()) // algae sw
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
@@ -223,7 +223,7 @@ public class RobotContainer {
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
         flysky.rightTriggerSWG // gather sw
-                .and(flysky.topLeftSWA) // algae sw
+                .and(controlBoard.algaeModeT) // algae sw
                 .and(flysky.topRightSWD) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
@@ -231,7 +231,7 @@ public class RobotContainer {
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
         flysky.rightTriggerSWG // gather sw
-                .and(flysky.topLeftSWA) // algae sw
+                .and(controlBoard.algaeModeT) // algae sw
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(

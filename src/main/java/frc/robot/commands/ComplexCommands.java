@@ -310,7 +310,7 @@ public class ComplexCommands {
                                                                         () -> {})), // prevent
                                                 // command from
                                                 // ending
-                                                r.flysky.topLeftSWA), // coral/algae sw
+                                                r.controlBoard.algaeModeT), // coral/algae sw
                                         r.state.hasCoralT),
                                 r.state.hasStopT)
                         .andThen(new WaitUntilCommand(() -> false));
