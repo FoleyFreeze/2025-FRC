@@ -466,7 +466,7 @@ public class DriveCommands {
     public static Command driveTo(
             RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
         return driveToAuto(r, destination, isGather);
-        // TODO: add manual driving after
+        // TODO: add manual driving after?
     }
 
     public static Command leaveReef(RobotContainer r) {

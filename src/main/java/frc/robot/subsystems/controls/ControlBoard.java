@@ -12,12 +12,16 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class ControlBoard {
 
+    public static final boolean useCntrlBoard = false;
+
     public Joystick cb;
     public Joystick cb2;
     public LoggedDashboardChooser<Integer> level;
     public LoggedDashboardChooser<ReefSticks> letter;
     public LoggedDashboardChooser<Boolean> station;
     public LoggedDashboardChooser<Boolean> climbMode;
+    public LoggedDashboardChooser<Boolean> algaeMode;
+    public LoggedDashboardChooser<Boolean> useShuffleboard;
 
     RobotContainer r;
 
@@ -30,6 +34,8 @@ public class ControlBoard {
         letter = new LoggedDashboardChooser<>("Letter");
         station = new LoggedDashboardChooser<>("Station");
         climbMode = new LoggedDashboardChooser<>("climbMode");
+        algaeMode = new LoggedDashboardChooser<>("AlgaeMode");
+        useShuffleboard = new LoggedDashboardChooser<>("UseShuffleboard");
 
         level.addDefaultOption("1", 1);
         level.addOption("2", 2);
@@ -54,14 +60,14 @@ public class ControlBoard {
 
         climbMode.addDefaultOption("Off", false);
         climbMode.addOption("On", true);
+
+        algaeMode.addDefaultOption("Coral", false);
+        algaeMode.addOption("Algae", true);
+
+        useShuffleboard.addDefaultOption("No", false);
+        useShuffleboard.addOption("Yes", true);
     }
 
-    /*
-    public Trigger climbSW = new Trigger(() -> cb.getRawButton(3));
-    public Trigger shift = new Trigger(() -> cb.getRawButton(3));
-    public Trigger levelSW = new Trigger(() -> cb.getRawButton(3));
-    public Trigger  = new Trigger(() -> cb.getRawButton(3));
-    */
 
     public static enum ReefSticks {
         A,
@@ -79,19 +85,74 @@ public class ControlBoard {
         NONE,
     }
 
+
     public ReefSticks selectedReefPos;
     public int selectedLevel;
     public boolean selectedStation;
     public boolean selectedClimbMode;
+    public boolean selectedAlgae;
 
     public void periodic() {
-        selectedReefPos = letter.get();
-        selectedLevel = level.get();
-        selectedStation = station.get();
-        selectedClimbMode = climbMode.get();
+        if(useShuffleboard.get()){
+            selectedClimbMode = cb.getRawButton(1);
+
+            if(cb.getRawAxis(2) > .5){
+                selectedStation = true;
+            } else if( cb.getRawAxis(3) > .5){
+                selectedStation = false;
+            }
+            if(cb.getPOV() == 270){
+                selectedLevel = 1;
+            } else if(cb.getPOV() == 180) {
+                selectedLevel = 2;
+            } else if (cb.getPOV() == 90) {
+                selectedLevel = 3;
+            } else if (cb.getPOV() == 0) {
+                selectedLevel = 4;
+            }
+
+            if(cb2.getRawButton(1)) {
+                selectedReefPos = ReefSticks.A;
+            } else if(cb2.getRawButton(2)) {
+                selectedReefPos = ReefSticks.B;
+            }else if(cb2.getRawButton(3)) {
+                selectedReefPos = ReefSticks.C;
+            }else if(cb2.getRawButton(4)) {
+                selectedReefPos = ReefSticks.D;
+            }else if(cb2.getRawButton(5)) {
+                selectedReefPos = ReefSticks.E;
+            }else if(cb2.getRawButton(6)) {
+                selectedReefPos = ReefSticks.F;
+            }else if(cb2.getRawButton(7)) {
+                selectedReefPos = ReefSticks.G;
+            }else if(cb2.getRawButton(8)) {
+                selectedReefPos = ReefSticks.H;
+            }else if(cb2.getPOV() == 270) {
+                selectedReefPos = ReefSticks.I;
+            }else if(cb2.getPOV() == 0) {
+                selectedReefPos = ReefSticks.J;
+            }else if(cb2.getPOV() == 90) {
+                selectedReefPos = ReefSticks.K;
+            }else if(cb2.getPOV() == 180) {
+                selectedReefPos = ReefSticks.L;
+            }
+
+            if(cb2.getRawButton(9)){
+                selectedAlgae = true; 
+            } else {
+                selectedAlgae = false;
+            }
+        } else {
+            selectedReefPos = letter.get();
+            selectedLevel = level.get();
+            selectedStation = station.get();
+            selectedClimbMode = climbMode.get();
+            selectedAlgae = algaeMode.get();
+        }
     }
 
     public Trigger climbModeT = new Trigger(() -> selectedClimbMode);
+    public Trigger algaeModeT = new Trigger(() -> selectedAlgae);
 
     // left means true
     public Pose2d selectCoralStation() {

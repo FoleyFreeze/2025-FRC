@@ -197,7 +197,7 @@ public class RobotContainer {
 
         flysky.leftTriggerSWE // gather sw
                 .and(controlBoard.climbModeT) // climb sw
-                .whileTrue(r.climb.setClimbVoltage(-4));
+                .whileTrue(r.climb.setClimbVoltage(-6));
 
         // right trigger commands
         // score coral camera

@@ -1,9 +1,7 @@
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -70,15 +68,15 @@ public class Arm extends SubsystemBase {
                         },
                         this)
                 .until(() -> atTarget(loc))
-                .finallyDo(
-                        b -> {
-                            if (!b)
-                                System.out.format(
-                                        "Arm completed at %.1f with err %.1f\n",
-                                        loc.get().armAngle.in(Degrees),
-                                        Units.radiansToDegrees(inputs.armPositionRad)
-                                                - loc.get().armAngle.in(Degrees));
-                        });
+        /*.finallyDo(
+        b -> {
+            if (!b)
+                System.out.format(
+                        "Arm completed at %.1f with err %.1f\n",
+                        loc.get().armAngle.in(Degrees),
+                        Units.radiansToDegrees(inputs.armPositionRad)
+                                - loc.get().armAngle.in(Degrees));
+        })*/ ;
     }
 
     public boolean atTarget(Supplier<SuperstructureLocation> loc) {

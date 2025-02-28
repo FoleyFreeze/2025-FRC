@@ -16,7 +16,7 @@ public class ComplexCommands {
 
     public static double holdPowerCoral = 0.4;
     static double releasePowerCoral = -4;
-    static double releasePowerCoral4 = -4;
+    static double releasePowerCoral4 = -3;
     static double releasePowerCoral1 = -1.5;
     static double releaseTimeCoral = 0.5;
 
@@ -26,7 +26,7 @@ public class ComplexCommands {
 
     static double intakeAlgaeTime = 0.2;
     static double intakeCurrentAlgae = 50;
-    static double intakeAlgaePower = 4;
+    static double intakeAlgaePower = 2;
     static double releasePowerAlgae = -12;
     static double releaseTimeAlgae = 0.5;
 
@@ -75,9 +75,9 @@ public class ComplexCommands {
         Command c =
                 goToLocAlgae(() -> r.controlBoard.getAlgaeLevel())
                         .andThen(holdAlgae())
-                        //.until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
+                        // .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
                         .andThen(new InstantCommand(() -> r.state.setAlgae()))
-                        .andThen(new RunCommand(() ->{}));//never end
+                        .andThen(new RunCommand(() -> {})); // never end
         c.setName("GatherAlgae");
         return c;
     }
@@ -110,19 +110,27 @@ public class ComplexCommands {
         return c;
     }
 
-    public static Command gatherCoral2(){
-        Command c = pulseGather().finallyDo(() -> {
-            r.state.setCoral();
-        });
+    public static Command gatherCoral2() {
+        Command c =
+                pulseGather()
+                        .finallyDo(
+                                () -> {
+                                    r.state.setCoral();
+                                });
 
         c.setName("GatherCoral2");
         return c;
     }
 
-    public static Command pulseGather(){
-        Command c = new WaitCommand(pulseGatherOn).deadlineFor(r.hand.setVoltageCmd(intakePowerCoral))
-        .andThen(new WaitCommand(pulseGatherOff).deadlineFor(r.hand.setVoltageCmd(pulseGatherOffPwr))).repeatedly()
-        .finallyDo(() -> r.hand.setVoltage(holdPowerCoral));
+    public static Command pulseGather() {
+        Command c =
+                new WaitCommand(pulseGatherOn)
+                        .deadlineFor(r.hand.setVoltageCmd(intakePowerCoral))
+                        .andThen(
+                                new WaitCommand(pulseGatherOff)
+                                        .deadlineFor(r.hand.setVoltageCmd(pulseGatherOffPwr)))
+                        .repeatedly()
+                        .finallyDo(() -> r.hand.setVoltage(holdPowerCoral));
 
         c.setName("PulseGather");
         return c;
@@ -157,7 +165,7 @@ public class ComplexCommands {
     // applies power to get rid of coral in auton
     public static Command releaseCoralAuton(int level) {
 
-        Command c = //TODO: this doesnt work, needs to be a supplier
+        Command c = // TODO: this doesnt work, needs to be a supplier
                 (level == 4
                                 ? r.hand.setVoltageCmd(releasePowerCoral4)
                                 : r.hand.setVoltageCmd(releasePowerCoral))
@@ -316,7 +324,10 @@ public class ComplexCommands {
         Command toGather =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                         .alongWith(r.wrist.goToReally(() -> SuperstructureLocation.HOLD))
-                        .andThen(r.wrist.goToReally(() -> SuperstructureLocation.HOLD_GATHER))
+                        .andThen(
+                                r.wrist
+                                        .goToReally(() -> SuperstructureLocation.HOLD_GATHER)
+                                        .raceWith(new WaitCommand(0.75)))
                         .alongWith(r.elevator.goTo(() -> SuperstructureLocation.INTAKE))
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
                         .andThen(r.wrist.goToReally(() -> SuperstructureLocation.INTAKE));

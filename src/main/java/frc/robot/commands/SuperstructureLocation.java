@@ -17,7 +17,7 @@ public enum SuperstructureLocation {
     LEVEL1(0.25, 66, 15),
     LEVEL2(4.25, 14, 73),
     LEVEL3(17, 14, 73),
-    LEVEL4(40.7 + 1, 20, 88),
+    LEVEL4(40.7 + 1.5, 20, 88),
 
     PRENET(0, 0, 0),
     NET(0, 0, 0),

@@ -71,15 +71,15 @@ public class Elevator extends SubsystemBase {
                         },
                         this)
                 .until(() -> atTarget(loc))
-                .finallyDo(
-                        b -> {
-                            if (!b)
-                                System.out.format(
-                                        "Elevator completed at %.1f with err %.1f\n",
-                                        loc.get().eleHeight.in(Inches),
-                                        inputs.elevatorPositionInches
-                                                - loc.get().eleHeight.in(Inches));
-                        });
+        /*.finallyDo(
+        b -> {
+            if (!b)
+                System.out.format(
+                        "Elevator completed at %.1f with err %.1f\n",
+                        loc.get().eleHeight.in(Inches),
+                        inputs.elevatorPositionInches
+                                - loc.get().eleHeight.in(Inches));
+        })*/ ;
     }
 
     public Command stop() {

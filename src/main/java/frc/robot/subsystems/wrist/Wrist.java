@@ -94,15 +94,15 @@ public class Wrist extends SubsystemBase {
                         },
                         this)
                 .until(() -> atTarget(loc))
-                .finallyDo(
-                        b -> {
-                            if (!b)
-                                System.out.format(
-                                        "Wrist completed at %.1f with err %.1f\n",
-                                        target.wristAngle.in(Degrees),
-                                        Units.radiansToDegrees(inputs.wristPositionRad)
-                                                - target.wristAngle.in(Degrees));
-                        });
+        /*.finallyDo(
+        b -> {
+            if (!b)
+                System.out.format(
+                        "Wrist completed at %.1f with err %.1f\n",
+                        target.wristAngle.in(Degrees),
+                        Units.radiansToDegrees(inputs.wristPositionRad)
+                                - target.wristAngle.in(Degrees));
+        })*/ ;
     }
 
     public void setAngle(SuperstructureLocation target) {

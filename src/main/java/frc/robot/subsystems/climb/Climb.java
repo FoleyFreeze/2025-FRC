@@ -49,7 +49,16 @@ public class Climb extends SubsystemBase {
     }
 
     public Command setClimbVoltage(double volts) {
-        return new RunCommand(() -> io.setClimbVolts(volts), this);
+        return new RunCommand(() -> setVolts(volts), this);
+    }
+
+    private void setVolts(double volts) {
+        if (volts > 0 && inputs.climbAbsPosition < 0.215) {
+            volts = 0;
+        } else if (volts < 0 && inputs.climbAbsPosition > 0.55) {
+            volts = 0;
+        }
+        io.setClimbVolts(volts);
     }
 
     public void stop() {

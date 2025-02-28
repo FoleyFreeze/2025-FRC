@@ -19,7 +19,7 @@ public class AutonCommands {
 
     public static Command scoreCoral(ReefSticks reefSticks, int level) {
         return DriveCommands.driveTo(r, () -> Locations.getReefLocation(reefSticks), false)
-                    .deadlineFor(ComplexCommands.pulseGather())
+                .deadlineFor(ComplexCommands.pulseGather())
                 .andThen(ComplexCommands.goToLoc(() -> r.controlBoard.getLevelLocation(level)))
                 .andThen(ComplexCommands.releaseCoralAuton(level));
     }
