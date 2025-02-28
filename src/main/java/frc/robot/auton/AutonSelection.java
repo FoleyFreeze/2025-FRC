@@ -253,16 +253,16 @@ public class AutonSelection {
         Pose2d gatherLoc;
         switch (gathertype) {
             case LEFT_CLOSE:
-                gatherLoc = Locations.getLeftGatherStation();
+                gatherLoc = Locations.getLeftGatherStationClose();
                 break;
             case LEFT_FAR:
-                gatherLoc = Locations.getLeftGatherStation();
+                gatherLoc = Locations.getLeftGatherStationFar();
                 break;
             case RIGHT_CLOSE:
-                gatherLoc = Locations.getRightGatherStation();
+                gatherLoc = Locations.getRightGatherStationClose();
                 break;
             case RIGHT_FAR:
-                gatherLoc = Locations.getRightGatherStation();
+                gatherLoc = Locations.getRightGatherStationFar();
                 break;
             case REEF: // TODO: this
             default:

@@ -75,8 +75,9 @@ public class ComplexCommands {
         Command c =
                 goToLocAlgae(() -> r.controlBoard.getAlgaeLevel())
                         .andThen(holdAlgae())
-                        .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
-                        .andThen(new InstantCommand(() -> r.state.setAlgae()));
+                        //.until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
+                        .andThen(new InstantCommand(() -> r.state.setAlgae()))
+                        .andThen(new RunCommand(() ->{}));//never end
         c.setName("GatherAlgae");
         return c;
     }

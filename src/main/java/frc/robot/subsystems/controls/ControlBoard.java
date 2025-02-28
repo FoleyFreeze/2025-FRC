@@ -96,17 +96,17 @@ public class ControlBoard {
     // left means true
     public Pose2d selectCoralStation() {
         if (selectedStation) {
-            return Locations.getLeftGatherStation();
+            return Locations.getLeftGatherStationFar();
         } else {
-            return Locations.getRightGatherStation();
+            return Locations.getRightGatherStationFar();
         }
     }
 
     public Rotation2d selectGatherAngle() {
         if (selectedStation) {
-            return Locations.getLeftGatherStation().getRotation().plus(Rotation2d.k180deg);
+            return Locations.getLeftGatherStationFar().getRotation().plus(Rotation2d.k180deg);
         } else {
-            return Locations.getRightGatherStation().getRotation().plus(Rotation2d.k180deg);
+            return Locations.getRightGatherStationFar().getRotation().plus(Rotation2d.k180deg);
         }
     }
 
@@ -212,7 +212,7 @@ public class ControlBoard {
                 .getPose()
                 .nearest(
                         List.of(
-                                Locations.getLeftGatherStation(),
-                                Locations.getRightGatherStation()));
+                                Locations.getLeftGatherStationFar(),
+                                Locations.getRightGatherStationFar()));
     }
 }

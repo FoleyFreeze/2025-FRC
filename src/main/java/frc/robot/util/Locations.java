@@ -16,10 +16,26 @@ public class Locations {
     public static double robotWidth = Units.inchesToMeters(28 + 6);
     public static double robotLength = Units.inchesToMeters(30 + 6);
     public static Transform2d halfRobot = new Transform2d(robotLength / 2.0, 0, new Rotation2d());
-    public static Transform2d halfRobotGather =
+
+    public static Transform2d halfRobotGatherLeftFar =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(1.5),
-                    Units.inchesToMeters(2.5),
+                    Units.inchesToMeters(-16),
+                    new Rotation2d());
+    public static Transform2d halfRobotGatherLeftClose =
+            new Transform2d(
+                    robotLength / 2.0 + Units.inchesToMeters(1.5),
+                    Units.inchesToMeters(16),
+                    new Rotation2d());
+    public static Transform2d halfRobotGatherRightFar =
+            new Transform2d(
+                    robotLength / 2.0 + Units.inchesToMeters(1.5),
+                    Units.inchesToMeters(16),
+                    new Rotation2d());
+    public static Transform2d halfRobotGatherRightClose =
+            new Transform2d(
+                    robotLength / 2.0 + Units.inchesToMeters(1.5),
+                    Units.inchesToMeters(-16),
                     new Rotation2d());
 
     public static Transform2d halfRobotCoralRight =
@@ -158,19 +174,35 @@ public class Locations {
         }
     }
 
-    public static Pose2d getLeftGatherStation() {
+    public static Pose2d getLeftGatherStationFar() {
         if (!isBlue()) {
-            return invert(tags.getTagPose(1).get().toPose2d().plus(halfRobotGather));
+            return invert(tags.getTagPose(1).get().toPose2d().plus(halfRobotGatherLeftFar));
         } else {
-            return invert(tags.getTagPose(13).get().toPose2d().plus(halfRobotGather));
+            return invert(tags.getTagPose(13).get().toPose2d().plus(halfRobotGatherLeftFar));
         }
     }
 
-    public static Pose2d getRightGatherStation() {
+    public static Pose2d getRightGatherStationFar() {
         if (!isBlue()) {
-            return invert(tags.getTagPose(2).get().toPose2d().plus(halfRobotGather));
+            return invert(tags.getTagPose(2).get().toPose2d().plus(halfRobotGatherRightFar));
         } else {
-            return invert(tags.getTagPose(12).get().toPose2d().plus(halfRobotGather));
+            return invert(tags.getTagPose(12).get().toPose2d().plus(halfRobotGatherRightFar));
+        }
+    }
+
+    public static Pose2d getLeftGatherStationClose() {
+        if (!isBlue()) {
+            return invert(tags.getTagPose(1).get().toPose2d().plus(halfRobotGatherLeftClose));
+        } else {
+            return invert(tags.getTagPose(13).get().toPose2d().plus(halfRobotGatherLeftClose));
+        }
+    }
+
+    public static Pose2d getRightGatherStationClose() {
+        if (!isBlue()) {
+            return invert(tags.getTagPose(2).get().toPose2d().plus(halfRobotGatherRightClose));
+        } else {
+            return invert(tags.getTagPose(12).get().toPose2d().plus(halfRobotGatherRightClose));
         }
     }
 
