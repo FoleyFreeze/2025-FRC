@@ -85,7 +85,7 @@ public class ControlBoard {
         NONE,
     }
 
-    public static enum Station{
+    public static enum Station {
         LEFT,
         RIGHT,
         CLOSEST
@@ -108,7 +108,6 @@ public class ControlBoard {
             } else {
                 selectedStation = Station.CLOSEST;
             }
-
 
             if (cb.getPOV() == 270) {
                 selectedLevel = 1;
@@ -165,13 +164,14 @@ public class ControlBoard {
 
     // left means true
     public Pose2d selectCoralStation() {
-        switch(selectedStation){
+        switch (selectedStation) {
             case LEFT:
-            return Locations.getLeftGatherStationFar();
+                return Locations.getLeftGatherStationFar();
             case RIGHT:
-            return Locations.getRightGatherStationFar();
+                return Locations.getRightGatherStationFar();
             case CLOSEST:
-            return selectClosestCoralStation();
+            default:
+                return selectClosestCoralStation();
         }
     }
 
