@@ -68,7 +68,6 @@ public class ControlBoard {
         useShuffleboard.addOption("Yes", true);
     }
 
-
     public static enum ReefSticks {
         A,
         B,
@@ -85,7 +84,6 @@ public class ControlBoard {
         NONE,
     }
 
-
     public ReefSticks selectedReefPos;
     public int selectedLevel;
     public boolean selectedStation;
@@ -93,17 +91,17 @@ public class ControlBoard {
     public boolean selectedAlgae;
 
     public void periodic() {
-        if(useShuffleboard.get()){
+        if (!useShuffleboard.get()) {
             selectedClimbMode = cb.getRawButton(1);
 
-            if(cb.getRawAxis(2) > .5){
+            if (cb.getRawAxis(2) > .5) {
                 selectedStation = true;
-            } else if( cb.getRawAxis(3) > .5){
+            } else if (cb.getRawAxis(3) > .5) {
                 selectedStation = false;
             }
-            if(cb.getPOV() == 270){
+            if (cb.getPOV() == 270) {
                 selectedLevel = 1;
-            } else if(cb.getPOV() == 180) {
+            } else if (cb.getPOV() == 180) {
                 selectedLevel = 2;
             } else if (cb.getPOV() == 90) {
                 selectedLevel = 3;
@@ -111,34 +109,34 @@ public class ControlBoard {
                 selectedLevel = 4;
             }
 
-            if(cb2.getRawButton(1)) {
+            if (cb2.getRawButton(1)) {
                 selectedReefPos = ReefSticks.A;
-            } else if(cb2.getRawButton(2)) {
+            } else if (cb2.getRawButton(2)) {
                 selectedReefPos = ReefSticks.B;
-            }else if(cb2.getRawButton(3)) {
+            } else if (cb2.getRawButton(3)) {
                 selectedReefPos = ReefSticks.C;
-            }else if(cb2.getRawButton(4)) {
+            } else if (cb2.getRawButton(4)) {
                 selectedReefPos = ReefSticks.D;
-            }else if(cb2.getRawButton(5)) {
+            } else if (cb2.getRawButton(5)) {
                 selectedReefPos = ReefSticks.E;
-            }else if(cb2.getRawButton(6)) {
+            } else if (cb2.getRawButton(6)) {
                 selectedReefPos = ReefSticks.F;
-            }else if(cb2.getRawButton(7)) {
+            } else if (cb2.getRawButton(7)) {
                 selectedReefPos = ReefSticks.G;
-            }else if(cb2.getRawButton(8)) {
+            } else if (cb2.getRawButton(8)) {
                 selectedReefPos = ReefSticks.H;
-            }else if(cb2.getPOV() == 270) {
+            } else if (cb2.getPOV() == 270) {
                 selectedReefPos = ReefSticks.I;
-            }else if(cb2.getPOV() == 0) {
+            } else if (cb2.getPOV() == 0) {
                 selectedReefPos = ReefSticks.J;
-            }else if(cb2.getPOV() == 90) {
+            } else if (cb2.getPOV() == 90) {
                 selectedReefPos = ReefSticks.K;
-            }else if(cb2.getPOV() == 180) {
+            } else if (cb2.getPOV() == 180) {
                 selectedReefPos = ReefSticks.L;
             }
 
-            if(cb2.getRawButton(9)){
-                selectedAlgae = true; 
+            if (cb2.getRawButton(9)) {
+                selectedAlgae = true;
             } else {
                 selectedAlgae = false;
             }
