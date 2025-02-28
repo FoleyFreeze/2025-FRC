@@ -161,17 +161,16 @@ public class RobotContainer {
         flysky.leftTriggerSWE // gather sw
                 .and(flysky.rightTriggerSWG.negate()) // not scoring
                 .and(controlBoard.algaeModeT.negate()) // algae sw
-                .and(flysky.topRightSWD) // cam sw
+                .and(flysky.topLeftSWA) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
-                // .whileTrue(ComplexCommands.visionCoralGather());
                 .whileTrue(
-                        ComplexCommands.blindGatherCoral()
+                        ComplexCommands.visionCoralGather()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
         flysky.leftTriggerSWE // gather sw
                 .and(flysky.rightTriggerSWG.negate()) // not scoring
                 .and(controlBoard.algaeModeT.negate()) // algae sw
-                .and(flysky.topRightSWD.negate()) // cam sw
+                .and(flysky.topLeftSWA.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
                         ComplexCommands.blindGatherCoral()
@@ -180,7 +179,7 @@ public class RobotContainer {
         flysky.leftTriggerSWE // gather sw
                 .and(flysky.rightTriggerSWG.negate()) // not scoring
                 .and(controlBoard.algaeModeT) // algae sw
-                .and(flysky.topRightSWD) // cam sw
+                .and(flysky.topLeftSWA) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
                         ComplexCommands.visionAlgaeGather()
@@ -189,7 +188,7 @@ public class RobotContainer {
         flysky.leftTriggerSWE // gather sw
                 .and(flysky.rightTriggerSWG.negate()) // not scoring
                 .and(controlBoard.algaeModeT) // algae sw
-                .and(flysky.topRightSWD.negate()) // cam sw
+                .and(flysky.topLeftSWA.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
                         ComplexCommands.gatherAlgae()

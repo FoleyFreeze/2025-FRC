@@ -68,7 +68,7 @@ public class ComplexCommands {
                 goToLocAlgae(() -> SuperstructureLocation.SCORE_PROCESSOR)
                         .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
                         .andThen(releaseAlgae())
-                        .andThen(new RunCommand(() ->{}));
+                        .andThen(new RunCommand(() -> {}));
         c.setName("ScoreAalgaeProc");
         return c;
     }
@@ -209,6 +209,7 @@ public class ComplexCommands {
         // gather
         Command c =
                 DriveCommands.driveTo(r, r.controlBoard::selectCoralStation, true)
+                        .raceWith(new JoystickAbort(r))
                         .alongWith(noDriveGather());
         c.setName("VisionCoralGather");
         return c;
@@ -229,6 +230,7 @@ public class ComplexCommands {
     public static Command visionCoralScore() {
         Command c =
                 DriveCommands.driveTo(r, r.controlBoard::getPathPose, false)
+                    .raceWith(new JoystickAbort(r))
                         .andThen(goToLoc(r.controlBoard::getCoralLevel))
                         .alongWith(holdCoral())
                         // gather trigger
