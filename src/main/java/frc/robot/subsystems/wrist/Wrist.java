@@ -73,17 +73,16 @@ public class Wrist extends SubsystemBase {
     }
 
     public Command goTo(Supplier<SuperstructureLocation> loc) {
-        return new RunCommand(() -> setAngle(loc.get()), this)
-                .until(() -> atTarget(loc))
-                .finallyDo(
-                        b -> {
-                            if (!b)
-                                System.out.format(
-                                        "Wrist completed at %.1f with err %.1f\n",
-                                        target.wristAngle.in(Degrees),
-                                        Units.radiansToDegrees(inputs.wristPositionRad)
-                                                - target.wristAngle.in(Degrees));
-                        });
+        return new RunCommand(() -> setAngle(loc.get()), this).until(() -> atTarget(loc))
+        /*.finallyDo(
+        b -> {
+            if (!b)
+                System.out.format(
+                        "Wrist completed at %.1f with err %.1f\n",
+                        target.wristAngle.in(Degrees),
+                        Units.radiansToDegrees(inputs.wristPositionRad)
+                                - target.wristAngle.in(Degrees));
+        })*/ ;
     }
 
     public Command goToReally(Supplier<SuperstructureLocation> loc) {

@@ -20,12 +20,12 @@ public class Locations {
     public static Transform2d halfRobotGatherLeftFar =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(1.5),
-                    Units.inchesToMeters(-16),
+                    Units.inchesToMeters(16),
                     new Rotation2d());
     public static Transform2d halfRobotGatherLeftClose =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(1.5),
-                    Units.inchesToMeters(16),
+                    Units.inchesToMeters(-16),
                     new Rotation2d());
     public static Transform2d halfRobotGatherRightFar =
             new Transform2d(

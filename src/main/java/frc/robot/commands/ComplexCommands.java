@@ -209,7 +209,7 @@ public class ComplexCommands {
         // gather
         Command c =
                 DriveCommands.driveTo(r, r.controlBoard::selectCoralStation, true)
-                        .raceWith(new JoystickAbort(r))
+                        // .raceWith(new JoystickAbort(r))
                         .alongWith(noDriveGather());
         c.setName("VisionCoralGather");
         return c;
@@ -230,13 +230,19 @@ public class ComplexCommands {
     public static Command visionCoralScore() {
         Command c =
                 DriveCommands.driveTo(r, r.controlBoard::getPathPose, false)
-                        .raceWith(new JoystickAbort(r))
+                        // .raceWith(new JoystickAbort(r))
                         .andThen(goToLoc(r.controlBoard::getCoralLevel))
-                        .alongWith(holdCoral())
-                        // gather trigger
-                        .andThen(
-                                new WaitUntilCommand(() -> r.flysky.leftTriggerSWE.getAsBoolean())
-                                        .raceWith(DriveCommands.joystickDriveFlysky(r)))
+                        .alongWith(
+                                holdCoral()
+                                        // gather trigger
+                                        .andThen(
+                                                new WaitUntilCommand(
+                                                                () ->
+                                                                        r.flysky.leftTriggerSWE
+                                                                                .getAsBoolean())
+                                                        .raceWith(
+                                                                DriveCommands.joystickDriveFlysky(
+                                                                        r))))
                         .andThen(releaseCoral());
         c.setName("VisionCoralScore");
         return c;

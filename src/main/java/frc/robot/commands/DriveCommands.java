@@ -443,13 +443,7 @@ public class DriveCommands {
                     }
                 };
 
-        return /*(new ConditionalCommand(
-                       leaveReef(r),
-                       new InstantCommand(),
-                       () ->
-                               r.drive.getPose().getTranslation().getDistance(Locations.getReef())
-                                       < 1.65))
-               .andThen(*/ new ConditionalCommand(
+        return new ConditionalCommand(
                         new PathfindingCommand(r, farDestination, isGather)
                                 .andThen(new PathFollowingCommand(r, destination, isGather)),
                         new PathFollowingCommand(r, destination, isGather),
@@ -460,7 +454,7 @@ public class DriveCommands {
                                                 .getTranslation()
                                                 .getNorm()
                                         > Units.feetToMeters(3))
-                .andThen(driveToPoint(r, destination)) /*)*/;
+                .andThen(driveToPoint(r, destination));
     }
 
     public static Command driveTo(
