@@ -26,7 +26,8 @@ public class ComplexCommands {
 
     static double intakeAlgaeTime = 0.2;
     static double intakeCurrentAlgae = 50;
-    static double intakeAlgaePower = 2;
+    static double intakeAlgaePower = 3;
+    static double holdAlgaePower = 2;
     static double releasePowerAlgae = -12;
     static double releaseTimeAlgae = 0.5;
 
@@ -51,7 +52,7 @@ public class ComplexCommands {
     }
 
     public static Command holdAlgae() {
-        Command c = r.hand.setVoltageCmd(intakeAlgaePower);
+        Command c = r.hand.setVoltageCmd(holdAlgaePower);
         c.setName("HoldAlgae");
         return c;
     }
@@ -66,7 +67,8 @@ public class ComplexCommands {
         Command c =
                 goToLocAlgae(() -> SuperstructureLocation.SCORE_PROCESSOR)
                         .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
-                        .andThen(releaseAlgae());
+                        .andThen(releaseAlgae())
+                        .andThen(new RunCommand(() ->{}));
         c.setName("ScoreAalgaeProc");
         return c;
     }
@@ -74,10 +76,11 @@ public class ComplexCommands {
     public static Command gatherAlgae() {
         Command c =
                 goToLocAlgae(() -> r.controlBoard.getAlgaeLevel())
-                        .andThen(holdAlgae())
+                        .andThen(r.hand.setVoltageCmd(intakeAlgaePower))
                         // .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
                         .andThen(new InstantCommand(() -> r.state.setAlgae()))
-                        .andThen(new RunCommand(() -> {})); // never end
+                        .andThen(new RunCommand(() -> {})) // never end
+                        .finallyDo(() -> r.hand.setVoltage(holdAlgaePower));
         c.setName("GatherAlgae");
         return c;
     }
