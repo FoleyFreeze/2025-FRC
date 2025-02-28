@@ -14,7 +14,7 @@ public class AutonCommands {
 
     public static RobotContainer r;
 
-    static double gatherStationWait = 1.0;
+    static double gatherStationWait = 0.2;
     static double gatherPowerForExtraTime = 0.7;
 
     public static Command scoreCoral(ReefSticks reefSticks, int level) {

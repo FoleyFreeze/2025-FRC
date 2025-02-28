@@ -141,6 +141,7 @@ public class AutonSelection {
         s += gatherChoose3.getKey();
         s += scoreLoc4.getKey();
         s += scoreLevel4.getKey();
+        s += Locations.isBlue();
         return s;
     }
 
