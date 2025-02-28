@@ -1,5 +1,6 @@
 package frc.robot.subsystems.climb;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -14,12 +15,14 @@ public class ClimbIOHardware implements ClimbIO {
     ClimbCals k;
     private final SparkMax motor;
     private final RelativeEncoder encoder;
+    private final AbsoluteEncoder absEnc;
     private SparkClosedLoopController closedLoopController;
 
     public ClimbIOHardware(ClimbCals cals) {
         this.k = k;
         motor = new SparkMax(14, MotorType.kBrushless);
         encoder = motor.getEncoder();
+        absEnc = motor.getAbsoluteEncoder();
         closedLoopController = motor.getClosedLoopController();
         // TODO: fill out the nums, yo
         SparkMaxConfig config = new SparkMaxConfig();
@@ -46,6 +49,7 @@ public class ClimbIOHardware implements ClimbIO {
         inputs.climbAppliedVolts = rawVoltage * motor.getAppliedOutput();
         inputs.climbCurrentAmps = motor.getOutputCurrent();
         inputs.climbTempFahrenheit = motor.getMotorTemperature() * 9 / 5.0 + 32;
+        inputs.climbAbsPosition = absEnc.getPosition();
 
         inputs.climbConnected = rawVoltage > 6;
     }

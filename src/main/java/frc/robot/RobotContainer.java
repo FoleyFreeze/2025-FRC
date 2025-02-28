@@ -279,6 +279,8 @@ public class RobotContainer {
                                 Locations.tags.getTagPose(7).get().toPose2d().getTranslation());
         Logger.recordOutput("DistTo7", distToTag);
 
+        SmartDashboard.putNumber("ClimbPos", climb.inputs.climbAbsPosition);
+
         Logger.recordOutput("State/hasCoral", state.hasCoral);
         Logger.recordOutput("State/hasAlgae", state.hasAlgae);
         Logger.recordOutput("State/hasStop", state.hasStop);

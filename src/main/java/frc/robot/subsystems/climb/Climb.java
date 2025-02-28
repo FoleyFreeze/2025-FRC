@@ -8,7 +8,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Climb extends SubsystemBase {
     private final ClimbIO io;
-    private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
+    public final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
 
     public ClimbCals k;
 

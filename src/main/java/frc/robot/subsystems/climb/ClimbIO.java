@@ -12,6 +12,7 @@ public interface ClimbIO {
         public double climbAppliedVolts = 0;
         public double climbCurrentAmps = 0;
         public double climbTempFahrenheit = 0;
+        public double climbAbsPosition = 0;
     }
 
     public default void updateInputs(ClimbIOInputs inputs) {}
