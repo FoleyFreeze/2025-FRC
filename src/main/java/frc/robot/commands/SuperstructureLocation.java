@@ -12,7 +12,7 @@ public enum SuperstructureLocation {
     HOLD(0.25, 8, -50),
     HOLD_GATHER(0.25, 8, -70),
     VERT_ALGAE(19, 8, 193),
-    HOLD_ALGAE(14.7, 127, 228),
+    HOLD_ALGAE(14.7, 90, 228),
 
     LEVEL1(0.25, 66, 15),
     LEVEL2(4.25, 14, 73),
@@ -22,8 +22,8 @@ public enum SuperstructureLocation {
     PRENET(0, 0, 0),
     NET(0, 0, 0),
 
-    ALGAE_LEVEL_2_3(20.3, 127, 228), // 14.7
-    ALGAE_LEVEL_3_4(34.9, 127, 228),
+    ALGAE_LEVEL_2_3(20.3, 114, 228), // 14.7
+    ALGAE_LEVEL_3_4(34.9, 114, 228),
 
     PRE_LEVEL1(0, 0, 0),
     PRE_LEVEL2(0, 0, 0),
