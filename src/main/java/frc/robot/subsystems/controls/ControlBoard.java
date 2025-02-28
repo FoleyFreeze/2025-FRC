@@ -18,7 +18,7 @@ public class ControlBoard {
     public Joystick cb2;
     public LoggedDashboardChooser<Integer> level;
     public LoggedDashboardChooser<ReefSticks> letter;
-    public LoggedDashboardChooser<Boolean> station;
+    public LoggedDashboardChooser<Station> station;
     public LoggedDashboardChooser<Boolean> climbMode;
     public LoggedDashboardChooser<Boolean> algaeMode;
     public LoggedDashboardChooser<Boolean> useShuffleboard;
@@ -55,8 +55,9 @@ public class ControlBoard {
         letter.addOption("K", ReefSticks.K);
         letter.addOption("L", ReefSticks.L);
 
-        station.addDefaultOption("Left", true);
-        station.addOption("Right", false);
+        station.addDefaultOption("Closest", Station.CLOSEST);
+        station.addDefaultOption("Left", Station.LEFT);
+        station.addOption("Right", Station.RIGHT);
 
         climbMode.addDefaultOption("Off", false);
         climbMode.addOption("On", true);
@@ -84,9 +85,15 @@ public class ControlBoard {
         NONE,
     }
 
+    public static enum Station{
+        LEFT,
+        RIGHT,
+        CLOSEST
+    }
+
     public ReefSticks selectedReefPos;
     public int selectedLevel;
-    public boolean selectedStation;
+    public Station selectedStation;
     public boolean selectedClimbMode;
     public boolean selectedAlgae;
 
@@ -95,10 +102,14 @@ public class ControlBoard {
             selectedClimbMode = cb.getRawButton(1);
 
             if (cb.getRawAxis(2) > .5) {
-                selectedStation = true;
+                selectedStation = Station.LEFT;
             } else if (cb.getRawAxis(3) > .5) {
-                selectedStation = false;
+                selectedStation = Station.RIGHT;
+            } else {
+                selectedStation = Station.CLOSEST;
             }
+
+
             if (cb.getPOV() == 270) {
                 selectedLevel = 1;
             } else if (cb.getPOV() == 180) {
@@ -154,19 +165,18 @@ public class ControlBoard {
 
     // left means true
     public Pose2d selectCoralStation() {
-        if (selectedStation) {
+        switch(selectedStation){
+            case LEFT:
             return Locations.getLeftGatherStationFar();
-        } else {
+            case RIGHT:
             return Locations.getRightGatherStationFar();
+            case CLOSEST:
+            return selectClosestCoralStation();
         }
     }
 
     public Rotation2d selectGatherAngle() {
-        if (selectedStation) {
-            return Locations.getLeftGatherStationFar().getRotation().plus(Rotation2d.k180deg);
-        } else {
-            return Locations.getRightGatherStationFar().getRotation().plus(Rotation2d.k180deg);
-        }
+        return selectCoralStation().getRotation().plus(Rotation2d.k180deg);
     }
 
     public Pose2d getPathPose() {

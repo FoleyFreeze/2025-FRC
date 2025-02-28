@@ -230,7 +230,7 @@ public class ComplexCommands {
     public static Command visionCoralScore() {
         Command c =
                 DriveCommands.driveTo(r, r.controlBoard::getPathPose, false)
-                    .raceWith(new JoystickAbort(r))
+                        .raceWith(new JoystickAbort(r))
                         .andThen(goToLoc(r.controlBoard::getCoralLevel))
                         .alongWith(holdCoral())
                         // gather trigger
