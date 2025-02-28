@@ -33,7 +33,7 @@ public class Locations {
                     Units.inchesToMeters(-8),
                     new Rotation2d());
 
-    //TODO: make code that uses this
+    // TODO: make code that uses this
     public static Transform2d halfRobotCoralLevel1 =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(7.5),

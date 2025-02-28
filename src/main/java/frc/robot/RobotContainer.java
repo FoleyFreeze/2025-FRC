@@ -197,7 +197,7 @@ public class RobotContainer {
 
         flysky.leftTriggerSWE // gather sw
                 .and(controlBoard.climbModeT) // climb sw
-                .whileTrue(r.climb.setClimbVoltage(-2));
+                .whileTrue(r.climb.setClimbVoltage(-4));
 
         // right trigger commands
         // score coral camera
@@ -263,6 +263,13 @@ public class RobotContainer {
                         r.arm.getAngle().in(Degrees),
                         r.wrist.getAngleRads().in(Degrees));
         SmartDashboard.putString("SuperPosition", s);
+
+        Pose2d botPose = drive.getPose();
+        s =
+                String.format(
+                        "%.0f,%.0f",
+                        botPose.getMeasureX().in(Inches), botPose.getMeasureY().in(Inches));
+        SmartDashboard.putString("BotLoc", s);
 
         double distToTag =
                 r.drive

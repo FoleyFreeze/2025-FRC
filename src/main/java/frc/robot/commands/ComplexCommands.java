@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -219,11 +221,24 @@ public class ComplexCommands {
     }
 
     public static Command goToLocAlgae(Supplier<SuperstructureLocation> p) {
-        Command c =
+        Command toAlgaeFromCoral =
+                r.arm.goTo(() -> SuperstructureLocation.HOLD)
+                        .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
+                        .andThen(r.elevator.goTo(() -> SuperstructureLocation.HOLD_ALGAE))
+                        .andThen(
+                                r.elevator
+                                        .goTo(p)
+                                        .alongWith(r.arm.goTo(p).alongWith(r.wrist.goTo(p))));
+
+        Command toAlgaeFromAlgae =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD_ALGAE)
                         .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD_ALGAE))
                         .andThen(r.elevator.goTo(p))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
+
+        Command c =
+                new ConditionalCommand(
+                        toAlgaeFromCoral, toAlgaeFromAlgae, () -> r.arm.getAngle().in(Degrees) < 0);
         c.setName("goToLocAlgae");
         return c;
     }
