@@ -32,6 +32,10 @@ public class ComplexCommands {
 
     static double gatherPosition = 0;
 
+    static double pulseGatherOn = 0.2;
+    static double pulseGatherOff = 0.2;
+    static double pulseGatherOffPwr = 0;
+
     public static RobotContainer r;
 
     // ALGAE COMMANDS
@@ -105,6 +109,24 @@ public class ComplexCommands {
         return c;
     }
 
+    public static Command gatherCoral2(){
+        Command c = pulseGather().finallyDo(() -> {
+            r.state.setCoral();
+        });
+
+        c.setName("GatherCoral2");
+        return c;
+    }
+
+    public static Command pulseGather(){
+        Command c = new WaitCommand(pulseGatherOn).deadlineFor(r.hand.setVoltageCmd(intakePowerCoral))
+        .andThen(new WaitCommand(pulseGatherOff).deadlineFor(r.hand.setVoltageCmd(pulseGatherOffPwr))).repeatedly()
+        .finallyDo(() -> r.hand.setVoltage(holdPowerCoral));
+
+        c.setName("PulseGather");
+        return c;
+    }
+
     // applies power to get rid of coral
     public static Command releaseCoral() {
         Command c =
@@ -134,7 +156,7 @@ public class ComplexCommands {
     // applies power to get rid of coral in auton
     public static Command releaseCoralAuton(int level) {
 
-        Command c =
+        Command c = //TODO: this doesnt work, needs to be a supplier
                 (level == 4
                                 ? r.hand.setVoltageCmd(releasePowerCoral4)
                                 : r.hand.setVoltageCmd(releasePowerCoral))
@@ -153,7 +175,7 @@ public class ComplexCommands {
     }
 
     public static Command noDriveGather() {
-        Command c = goToGather().andThen(gatherCoral());
+        Command c = goToGather().andThen(gatherCoral2());
         c.setName("NoDriveGather");
         return c;
     }
