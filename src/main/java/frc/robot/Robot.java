@@ -151,9 +151,11 @@ public class Robot extends LoggedRobot {
     public void disabledPeriodic() {
         autoSelect.periodic();
 
-        if (Locations.isBlue() && !prevIsBlue) {
+        boolean blue = Locations.isBlue();
+        if (blue != prevIsBlue) {
             System.out.println("Generated new path cache");
             robotContainer.pathCache = new PathCache(robotContainer);
+            prevIsBlue = blue;
         }
     }
 
