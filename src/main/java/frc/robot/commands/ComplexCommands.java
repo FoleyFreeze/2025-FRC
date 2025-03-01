@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 public class ComplexCommands {
 
     public static double holdPowerCoral = 0.4;
-    static double releasePowerCoral = -4;
+    static double releasePowerCoral = -3;
     static double releasePowerCoral4 = -4;
     public static double releasePowerCoral1 = -1.5;
     static double releaseTimeCoral = 0.5;
@@ -240,7 +240,8 @@ public class ComplexCommands {
     public static Command blindCoralScore() {
         Command snap = snapToAngle(r.controlBoard::getAlignAngle).alongWith(noDriveScore());
         Command justDrive = DriveCommands.joystickDriveFlysky(r).alongWith(noDriveScore());
-        Command c = new ConditionalCommand(justDrive, snap,()-> r.controlBoard.selectedLevel == 1);
+        Command c =
+                new ConditionalCommand(justDrive, snap, () -> r.controlBoard.selectedLevel == 1);
         c.setName("BlindCoralScore");
         return c;
     }
@@ -410,7 +411,7 @@ public class ComplexCommands {
         c.addCommands(new InstantCommand(() -> r.wrist.resetPositionTo(-54)));
         c.addCommands(new PrintCommand("Rezeroed Wrist!"));
 
-        //c.addRequirements(r.elevator, r.arm, r.wrist, r.hand);
+        // c.addRequirements(r.elevator, r.arm, r.wrist, r.hand);
         c.setName("RezeroWrist");
         return c.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
