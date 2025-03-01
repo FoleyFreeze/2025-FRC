@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
@@ -18,7 +20,7 @@ public class ComplexCommands {
     public static double holdPowerCoral = 0.4;
     static double releasePowerCoral = -4;
     static double releasePowerCoral4 = -4;
-    static double releasePowerCoral1 = -1.5;
+    public static double releasePowerCoral1 = -1.5;
     static double releaseTimeCoral = 0.5;
 
     public static double intakePowerCoral = 2.0;
@@ -59,7 +61,13 @@ public class ComplexCommands {
     }
 
     public static Command scoreAlgaeNet() {
-        Command c = null;
+        Command c =
+                goToLocAlgae(() -> SuperstructureLocation.PRENET)
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.NET))
+                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
+                        .andThen(r.hand.setVoltageCmd(releasePowerAlgae))
+                        .andThen(new RunCommand(() -> {}));
+
         c.setName("ScoreAlgaeNet");
         return c;
     }
@@ -93,7 +101,9 @@ public class ComplexCommands {
     }
 
     public static Command visionAlgaeScore() {
-        Command c = scoreAlgaeProc();
+        Command c =
+                new ConditionalCommand(
+                        scoreAlgaeNet(), scoreAlgaeProc(), () -> r.controlBoard.selectedLevel == 4);
         c.setName("VisionAlgaeScore");
         return c;
     }
@@ -228,7 +238,9 @@ public class ComplexCommands {
     }
 
     public static Command blindCoralScore() {
-        Command c = snapToAngle(r.controlBoard::getAlignAngle).alongWith(noDriveScore());
+        Command snap = snapToAngle(r.controlBoard::getAlignAngle).alongWith(noDriveScore());
+        Command justDrive = DriveCommands.joystickDriveFlysky(r).alongWith(noDriveScore());
+        Command c = new ConditionalCommand(justDrive, snap,()-> r.controlBoard.selectedLevel == 1);
         c.setName("BlindCoralScore");
         return c;
     }
@@ -388,17 +400,18 @@ public class ComplexCommands {
     }
 
     public static Command rezeroWrist() {
-        Command c =
-                r.hand.setVoltageCmd(releasePowerCoral)
-                        .andThen(goToLoc(() -> SuperstructureLocation.HOLD))
-                        .andThen(r.hand.setVoltageCmd(0))
-                        .andThen(r.wrist.setVoltage(-1))
-                        .andThen(new WaitCommand(2))
-                        .andThen(r.wrist.stop())
-                        .andThen(new InstantCommand(() -> r.wrist.resetPositionTo(0)))
-                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        SequentialCommandGroup c = new SequentialCommandGroup();
+        c.addCommands(r.hand.setVoltageCmd(releasePowerCoral));
+        c.addCommands(goToLoc(() -> SuperstructureLocation.HOLD));
+        c.addCommands(r.hand.stop());
+        c.addCommands(r.wrist.setVoltage(-2));
+        c.addCommands(new WaitCommand(2));
+        c.addCommands(r.wrist.stop());
+        c.addCommands(new InstantCommand(() -> r.wrist.resetPositionTo(-54)));
+        c.addCommands(new PrintCommand("Rezeroed Wrist!"));
 
+        //c.addRequirements(r.elevator, r.arm, r.wrist, r.hand);
         c.setName("RezeroWrist");
-        return c;
+        return c.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

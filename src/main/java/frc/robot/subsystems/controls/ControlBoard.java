@@ -8,6 +8,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.SuperstructureLocation;
 import frc.robot.util.Locations;
 import java.util.List;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class ControlBoard {
@@ -96,12 +97,12 @@ public class ControlBoard {
     public Station selectedStation = Station.CLOSEST;
     public boolean selectedClimbMode = false;
     public boolean selectedAlgae = false;
-    public boolean shift = true; // note inverted
+    public boolean shift = false;
     public boolean submerge = false;
 
     public Trigger climbModeT = new Trigger(() -> selectedClimbMode);
     public Trigger algaeModeT = new Trigger(() -> selectedAlgae);
-    public Trigger shiftT = new Trigger(() -> !shift); // note inverted
+    public Trigger shiftT = new Trigger(() -> shift);
     public Trigger submergeT = new Trigger(() -> submerge);
 
     public void periodic() {
@@ -166,6 +167,12 @@ public class ControlBoard {
             selectedClimbMode = climbMode.get();
             selectedAlgae = algaeMode.get();
         }
+
+        Logger.recordOutput("CB/SelectedReef", selectedReefPos);
+        Logger.recordOutput("CB/SelectedLevel", selectedLevel);
+        Logger.recordOutput("CB/SelectedStation", selectedStation);
+        Logger.recordOutput("CB/SelectedClimb", selectedClimbMode);
+        Logger.recordOutput("CB/SelectedAlgae", selectedAlgae);
     }
 
     // left means true

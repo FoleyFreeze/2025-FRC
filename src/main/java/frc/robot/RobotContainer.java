@@ -246,7 +246,7 @@ public class RobotContainer {
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
-                        ComplexCommands.scoreAlgaeProc()
+                        ComplexCommands.visionAlgaeScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
         flysky.rightTriggerSWG // gather sw
@@ -255,6 +255,7 @@ public class RobotContainer {
 
         controlBoard.climbModeT.whileTrue(
                 ComplexCommands.goToLoc(() -> SuperstructureLocation.CLIMB_SAFE)
+                        .andThen(r.hand.setVoltageCmd(ComplexCommands.releasePowerCoral1))
                         .andThen(new RunCommand(() -> {})));
 
         // stop button
