@@ -147,6 +147,11 @@ public class Wrist extends SubsystemBase {
         return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad) < k.closeEnough;
     }
 
+    public Command setVoltage(double volts){
+        return new InstantCommand(() -> {io.setWristVolts(volts);
+            target = null;}, this);
+    }
+
     public Command stop() {
         return new InstantCommand(
                 () -> {
@@ -158,6 +163,10 @@ public class Wrist extends SubsystemBase {
 
     public void zero() {
         io.superZero();
+    }
+
+    public void resetPositionTo(double degrees){
+        io.resetPositionTo(degrees);
     }
 
     public double cvrtLocalToEnc(double localWristAngle, double armAngle) {

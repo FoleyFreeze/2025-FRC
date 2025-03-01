@@ -42,6 +42,7 @@ import frc.robot.subsystems.hand.Hand;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.util.Locations;
+import frc.robot.util.PathCache;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -64,6 +65,7 @@ public class RobotContainer {
     public final Hand hand;
     public final Climb climb;
     public final Vision vision;
+    public PathCache pathCache;
 
     // Controller
     public final Flysky flysky = new Flysky();
@@ -151,6 +153,9 @@ public class RobotContainer {
 
         // rezero superstructure
         flysky.upRTRIM.onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
+
+        // force wrist rezero
+        controlBoard.shiftT.and(controlBoard.submergeT).onTrue(ComplexCommands.rezeroWrist());
 
         // left trigger commands
         // gather coral camera

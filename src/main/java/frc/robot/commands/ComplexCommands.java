@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.RobotContainer;
 import java.util.function.Supplier;
 
@@ -373,6 +374,20 @@ public class ComplexCommands {
                             r.wrist.zero();
                         });
         c.setName("ZeroSuperstructure");
+        return c;
+    }
+
+    public static Command rezeroWrist(){
+        Command c = r.hand.setVoltageCmd(releasePowerCoral)
+                        .andThen(goToLoc(() -> SuperstructureLocation.HOLD))
+                        .andThen(r.hand.setVoltageCmd(0))
+                        .andThen(r.wrist.setVoltage(-1))
+                        .andThen(new WaitCommand(2))
+                        .andThen(r.wrist.stop())
+                        .andThen(new InstantCommand(() -> r.wrist.resetPositionTo(0)))
+                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+
+        c.setName("RezeroWrist");
         return c;
     }
 }

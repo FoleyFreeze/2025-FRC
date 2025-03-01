@@ -77,6 +77,11 @@ public class WristIOHardware implements WristIO {
     }
 
     @Override
+    public void resetPositionTo(double degrees){
+        encoder.setPosition(Units.degreesToRotations(degrees));
+    }
+
+    @Override
     public void setWristVolts(double volts) {
         motor.setVoltage(volts);
     }

@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.auton.AutonSelection;
 import frc.robot.generated.TunerConstants;
+import frc.robot.util.Locations;
+import frc.robot.util.PathCache;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -142,10 +144,17 @@ public class Robot extends LoggedRobot {
     @Override
     public void disabledInit() {}
 
+    boolean prevIsBlue = false;
+
     /** This function is called periodically when disabled. */
     @Override
     public void disabledPeriodic() {
         autoSelect.periodic();
+
+        if (Locations.isBlue() && !prevIsBlue) {
+            System.out.println("Generated new path cache");
+            robotContainer.pathCache = new PathCache(robotContainer);
+        }
     }
 
     /**

@@ -27,4 +27,6 @@ public interface WristIO {
     public default void zero() {}
 
     public default void superZero() {}
+
+    public default void resetPositionTo(double enc) {}
 }

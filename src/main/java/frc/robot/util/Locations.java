@@ -21,33 +21,36 @@ public class Locations {
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(1.5),
                     Units.inchesToMeters(16),
-                    new Rotation2d());
+                    Rotation2d.kZero);
     public static Transform2d halfRobotGatherLeftClose =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(1.5),
                     Units.inchesToMeters(-16),
-                    new Rotation2d());
+                    Rotation2d.kZero);
     public static Transform2d halfRobotGatherRightFar =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(1.5),
-                    Units.inchesToMeters(16),
-                    new Rotation2d());
+                    Units.inchesToMeters(-16),
+                    Rotation2d.kZero);
     public static Transform2d halfRobotGatherRightClose =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(1.5),
-                    Units.inchesToMeters(-16),
-                    new Rotation2d());
+                    Units.inchesToMeters(16),
+                    Rotation2d.kZero);
 
     public static Transform2d halfRobotCoralRight =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(3.25),
                     Units.inchesToMeters(5.5),
-                    new Rotation2d());
+                    Rotation2d.kZero);
     public static Transform2d halfRobotCoralLeft =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(3.5),
                     Units.inchesToMeters(-8),
-                    new Rotation2d());
+                    Rotation2d.kZero);
+
+    public static Transform2d halfRobotAlgae =
+            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(6), 0, Rotation2d.kZero);
 
     // TODO: make code that uses this
     public static Transform2d halfRobotCoralLevel1 =
@@ -171,6 +174,54 @@ public class Locations {
                 }
             default:
                 return null;
+        }
+    }
+
+    public static Pose2d getAlgaeReefLocation(ControlBoard.ReefSticks position) {
+        switch (position) {
+            case A:
+            case B:
+            default:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(18).get().toPose2d().plus(halfRobotAlgae));
+                } else {
+                    return invert(tags.getTagPose(7).get().toPose2d().plus(halfRobotAlgae));
+                }
+            case C:
+            case D:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(17).get().toPose2d().plus(halfRobotAlgae));
+                } else {
+                    return invert(tags.getTagPose(8).get().toPose2d().plus(halfRobotAlgae));
+                }
+            case E:
+            case F:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(22).get().toPose2d().plus(halfRobotAlgae));
+                } else {
+                    return invert(tags.getTagPose(9).get().toPose2d().plus(halfRobotAlgae));
+                }
+            case G:
+            case H:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(21).get().toPose2d().plus(halfRobotAlgae));
+                } else {
+                    return invert(tags.getTagPose(10).get().toPose2d().plus(halfRobotAlgae));
+                }
+            case I:
+            case J:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(20).get().toPose2d().plus(halfRobotAlgae));
+                } else {
+                    return invert(tags.getTagPose(11).get().toPose2d().plus(halfRobotAlgae));
+                }
+            case K:
+            case L:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(19).get().toPose2d().plus(halfRobotAlgae));
+                } else {
+                    return invert(tags.getTagPose(6).get().toPose2d().plus(halfRobotAlgae));
+                }
         }
     }
 
