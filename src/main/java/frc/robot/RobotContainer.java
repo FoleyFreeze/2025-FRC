@@ -157,6 +157,13 @@ public class RobotContainer {
         // force wrist rezero
         controlBoard.shiftT.and(controlBoard.submergeT).onTrue(ComplexCommands.rezeroWrist());
 
+        // descorees the algae after scooring a coral
+        controlBoard
+                .shiftT
+                .negate()
+                .and(controlBoard.submergeT)
+                .whileTrue(ComplexCommands.descoreAlgae());
+
         // left trigger commands
         // gather coral camera
         // gather coral nocam

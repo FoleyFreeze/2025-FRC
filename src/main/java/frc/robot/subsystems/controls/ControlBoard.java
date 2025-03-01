@@ -255,6 +255,18 @@ public class ControlBoard {
     }
     */
 
+    public SuperstructureLocation getAlgaeDescoreLevel() {
+        switch (selectedLevel) {
+            case 1:
+            case 2:
+                return SuperstructureLocation.ALGAE_DESCORE2_3;
+            case 3:
+            case 4:
+            default:
+                return SuperstructureLocation.ALGAE_DESCORE3_4;
+        }
+    }
+
     public SuperstructureLocation getAlgaeLevel() {
         switch (selectedLevel) {
             case 1:

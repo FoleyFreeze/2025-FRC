@@ -98,6 +98,16 @@ public class ComplexCommands {
         return c;
     }
 
+    public static Command descoreAlgae() {
+        Command c =
+                goToLoc(r.controlBoard::getAlgaeDescoreLevel)
+                        .andThen(r.hand.setVoltageCmd(4))
+                        .andThen(new RunCommand(() -> {}))
+                        .finallyDo(() -> r.hand.setVoltage(0));
+        c.setName("descoreAlgae");
+        return c;
+    }
+
     // CORAL COMMANDS
 
     public static Command gatherCoral() {
