@@ -91,11 +91,11 @@ public class ControlBoard {
         CLOSEST
     }
 
-    public ReefSticks selectedReefPos;
-    public int selectedLevel;
-    public Station selectedStation;
-    public boolean selectedClimbMode;
-    public boolean selectedAlgae;
+    public ReefSticks selectedReefPos = ReefSticks.A;
+    public int selectedLevel = 2;
+    public Station selectedStation = Station.CLOSEST;
+    public boolean selectedClimbMode = false;
+    public boolean selectedAlgae = false;
 
     public void periodic() {
         if (!useShuffleboard.get()) {

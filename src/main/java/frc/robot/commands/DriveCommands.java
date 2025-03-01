@@ -450,10 +450,9 @@ public class DriveCommands {
                         () ->
                                 r.drive
                                                 .getPose()
-                                                .minus(destination.get())
                                                 .getTranslation()
-                                                .getNorm()
-                                        > Units.feetToMeters(3))
+                                                .getDistance(destination.get().getTranslation())
+                                        > Units.feetToMeters(6))
                 .andThen(driveToPoint(r, destination));
     }
 
