@@ -5,6 +5,7 @@ import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.controls.ControlBoard.ReefSticks;
@@ -20,7 +21,7 @@ public class PathCache {
     public PathCache(RobotContainer r) {
         this.r = r;
 
-        Transform2d offset = new Transform2d(Units.inchesToMeters(18), 0, Rotation2d.kZero);
+        Transform2d offset = new Transform2d(Units.inchesToMeters(18), 0, Rotation2d.k180deg);
         waypointList = new Pose2d[6];
         waypointList[0] = Locations.getAlgaeReefLocation(ReefSticks.A).plus(offset);
         waypointList[1] = Locations.getAlgaeReefLocation(ReefSticks.C).plus(offset);
@@ -31,7 +32,7 @@ public class PathCache {
     }
 
     public List<Waypoint> getPathTo(Pose2d dest) {
-        //find the waypoint closest to the start and dest
+        // find the waypoint closest to the start and dest
         Pose2d start = r.drive.getPose();
         int closeStart = 0;
         int closeDest = 0;
@@ -50,7 +51,8 @@ public class PathCache {
             }
         }
 
-        //determine the positive or negative "count" distance between the start waypoint and the dest waypoint
+        // determine the positive or negative "count" distance between the start waypoint and the
+        // dest waypoint
         int count;
         if (Math.abs(closeStart - closeDest) > 3) {
             if (closeStart - closeDest < 0) {
@@ -62,13 +64,38 @@ public class PathCache {
             count = closeStart - closeDest;
         }
 
-        //include all points between the closest start and dest waypoints.
-        //ignore the closest points, as the convex hex + offset should allow going to dest from the prev point without hitting the reef
+        // create a start pose with rotation indicating the direction to drive
+        Pose2d currentLocation = r.drive.getPose();
+        Translation2d travelVector =
+                waypointList[closeStart].getTranslation().minus(currentLocation.getTranslation());
+        Pose2d startPose = new Pose2d(currentLocation.getTranslation(), travelVector.getAngle());
+
+        // include all points between the closest start and dest waypoints.
+        // ignore the closest points, as the convex hex + offset should allow going to dest from the
+        // prev point without hitting the reef
         ArrayList<Pose2d> poseList = new ArrayList<>();
+        poseList.add(startPose);
+        Translation2d prevPoint = startPose.getTranslation();
         int inc = count / Math.abs(count);
         for (int delta = inc; Math.abs(delta) < Math.abs(count); delta += inc) {
-            poseList.add(waypointList[(closeStart + delta) % 6]);
+            // create new poses from waypoints that point to the midpoint rotation between the prev
+            // and next pose
+            Pose2d thisPoint = waypointList[(closeStart + delta) % 6];
+            Pose2d nextPoint = waypointList[(closeStart + delta + inc) % 6];
+            Translation2d toPoint = thisPoint.getTranslation().minus(prevPoint);
+            Translation2d fromPoint = nextPoint.getTranslation().minus(thisPoint.getTranslation());
+            Rotation2d avgRot = toPoint.getAngle().plus(fromPoint.getAngle()).times(0.5);
+            poseList.add(new Pose2d(thisPoint.getTranslation(), avgRot));
+            prevPoint = thisPoint.getTranslation();
         }
+
+        // fix the last pose to point at the dest
+        Pose2d thisPoint = poseList.get(poseList.size() - 1);
+        Translation2d toPoint = thisPoint.getTranslation().minus(prevPoint);
+        Translation2d fromPoint = dest.getTranslation().minus(thisPoint.getTranslation());
+        Rotation2d avgRot = toPoint.getAngle().plus(fromPoint.getAngle()).times(0.5);
+        poseList.add(poseList.size() - 1, new Pose2d(thisPoint.getTranslation(), avgRot));
+
         poseList.add(dest);
 
         return PathPlannerPath.waypointsFromPoses(poseList);

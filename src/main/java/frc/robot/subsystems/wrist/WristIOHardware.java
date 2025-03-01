@@ -77,7 +77,7 @@ public class WristIOHardware implements WristIO {
     }
 
     @Override
-    public void resetPositionTo(double degrees){
+    public void resetPositionTo(double degrees) {
         encoder.setPosition(Units.degreesToRotations(degrees));
     }
 

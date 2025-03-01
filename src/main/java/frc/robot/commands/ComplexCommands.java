@@ -4,12 +4,12 @@ import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.RobotContainer;
 import java.util.function.Supplier;
 
@@ -377,8 +377,9 @@ public class ComplexCommands {
         return c;
     }
 
-    public static Command rezeroWrist(){
-        Command c = r.hand.setVoltageCmd(releasePowerCoral)
+    public static Command rezeroWrist() {
+        Command c =
+                r.hand.setVoltageCmd(releasePowerCoral)
                         .andThen(goToLoc(() -> SuperstructureLocation.HOLD))
                         .andThen(r.hand.setVoltageCmd(0))
                         .andThen(r.wrist.setVoltage(-1))

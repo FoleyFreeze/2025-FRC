@@ -96,19 +96,19 @@ public class ControlBoard {
     public Station selectedStation = Station.CLOSEST;
     public boolean selectedClimbMode = false;
     public boolean selectedAlgae = false;
-    public boolean shift = true;//note inverted
+    public boolean shift = true; // note inverted
     public boolean submerge = false;
-    
+
     public Trigger climbModeT = new Trigger(() -> selectedClimbMode);
     public Trigger algaeModeT = new Trigger(() -> selectedAlgae);
-    public Trigger shiftT = new Trigger(() -> !shift);//note inverted
+    public Trigger shiftT = new Trigger(() -> !shift); // note inverted
     public Trigger submergeT = new Trigger(() -> submerge);
 
     public void periodic() {
         if (!useShuffleboard.get()) {
             selectedClimbMode = cb.getRawButton(1);
             submerge = cb.getRawButton(2);
-            shift = !cb.getRawButton(4); //note inverted
+            shift = !cb.getRawButton(4); // note inverted
 
             if (cb.getRawAxis(2) > .5) {
                 selectedStation = Station.LEFT;
@@ -167,7 +167,6 @@ public class ControlBoard {
             selectedAlgae = algaeMode.get();
         }
     }
-
 
     // left means true
     public Pose2d selectCoralStation() {
