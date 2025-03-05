@@ -35,7 +35,8 @@ public enum SuperstructureLocation {
     FLOOR_GATHER_ALGAE(0, 0, 0),
     SCORE_PROCESSOR(4, 110, 248),
     INTAKE(0.25, -48.5 + .5, -67.5 + 2), // was 0, 48.5 + .5, -67.46
-    CLIMB_SAFE(0.25, 45, -20);
+    CLIMB_SAFE(0.25, 45, -20),
+    LOW_CLIMB(0.25, -73, -50);
 
     public final Distance eleHeight;
     public final Angle armAngle;

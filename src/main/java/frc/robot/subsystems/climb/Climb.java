@@ -54,8 +54,10 @@ public class Climb extends SubsystemBase {
 
     private void setVolts(double volts) {
         if (volts > 0 && inputs.climbAbsPosition < 0.15) {
+            // fully in
             volts = 0;
         } else if (volts < 0 && inputs.climbAbsPosition > 0.509) {
+            // fully out
             volts = 0;
         }
         io.setClimbVolts(volts);

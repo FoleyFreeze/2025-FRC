@@ -251,12 +251,17 @@ public class RobotContainer {
 
         flysky.rightTriggerSWG // gather sw
                 .and(controlBoard.climbModeT) // climb sw
-                .whileTrue(r.climb.setClimbVoltage(6));
+                .whileTrue(r.climb.setClimbVoltage(12));
 
+        // get safely into climb mode
         controlBoard.climbModeT.whileTrue(
-                ComplexCommands.goToLoc(() -> SuperstructureLocation.CLIMB_SAFE)
+                ComplexCommands.goToClimb()
                         .andThen(r.hand.setVoltageCmd(ComplexCommands.releasePowerCoral1))
                         .andThen(new RunCommand(() -> {})));
+
+        // get safely out of climb position
+        controlBoard.climbModeT.onFalse(
+                ComplexCommands.rawGoTo(() -> SuperstructureLocation.INTAKE));
 
         // stop button
         flysky.topRightMomentSWC.onTrue(

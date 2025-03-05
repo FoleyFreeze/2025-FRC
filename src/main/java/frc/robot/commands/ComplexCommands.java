@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -373,6 +374,22 @@ public class ComplexCommands {
                         () -> atLocation(SuperstructureLocation.INTAKE));
         c.setName("GoToGather");
         return c;
+    }
+
+    // just goes to, nothing fancy, no protections
+    public static Command rawGoTo(Supplier<SuperstructureLocation> loc) {
+        return r.elevator.goTo(loc).alongWith(r.arm.goTo(loc)).alongWith(r.wrist.goTo(loc));
+    }
+
+    public static Command goToClimb() {
+        Command gatherFirst = goToGather().andThen(rawGoTo(() -> SuperstructureLocation.LOW_CLIMB));
+        Command inGather = rawGoTo(() -> SuperstructureLocation.LOW_CLIMB);
+
+        // if in gather, go straight to climb, otherwise go to gather first
+        return new ConditionalCommand(
+                inGather,
+                gatherFirst,
+                () -> r.elevator.getHeight().in(Inches) < 1 && r.arm.getAngle().in(Degrees) < -44);
     }
 
     public static Command stopSuperstructure() {
