@@ -231,8 +231,6 @@ public class ComplexCommands {
         // gather
         Command c =
                 DriveCommands.driveTo(r, r.controlBoard::selectCoralStation, true)
-                        .andThen(DriveCommands.joystickDriveFlysky(r))
-                        // .raceWith(new JoystickAbort(r))
                         .alongWith(noDriveGather());
         c.setName("VisionCoralGather");
         return c;
@@ -256,18 +254,18 @@ public class ComplexCommands {
     public static Command visionCoralScore() {
         Command c =
                 DriveCommands.driveTo(r, r.controlBoard::getPathPose, false)
-                        .andThen(
-                                goToLoc(r.controlBoard::getCoralLevel)
-                                        .alongWith(holdCoral())
+                        .raceWith(
+                                new WaitUntilCommand(r.inSlowDrivePhase)
                                         .andThen(
-                                                new WaitUntilCommand(
-                                                                () ->
-                                                                        r.flysky.leftTriggerSWE
-                                                                                .getAsBoolean())
-                                                        .raceWith(
-                                                                DriveCommands.joystickDriveFlysky(
-                                                                        r))))
-                        .andThen(releaseCoral());
+                                                goToLoc(r.controlBoard::getCoralLevel)
+                                                        .alongWith(holdCoral())
+                                                        .andThen(
+                                                                new WaitUntilCommand(
+                                                                        () ->
+                                                                                r.flysky
+                                                                                        .leftTriggerSWE
+                                                                                        .getAsBoolean())))
+                                        .andThen(releaseCoral()));
         c.setName("VisionCoralScore");
         return c;
     }

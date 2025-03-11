@@ -66,21 +66,21 @@ public class AutonSelection {
         fillScoreLevel(scoreLevel1);
 
         gatherChoose1 = new SettableLoggableChooser<>("Gather1", tab, 1, 0);
-        FillGatherLoc(gatherChoose1);
+        fillGatherLoc(gatherChoose1);
         scoreLoc2 = new SettableLoggableChooser<>("Score2Loc", tab, 1, 1);
         fillScoreLoc(scoreLoc2);
         scoreLevel2 = new SettableLoggableChooser<>("Score2Level", tab, 1, 2);
         fillScoreLevel(scoreLevel2);
 
         gatherChoose2 = new SettableLoggableChooser<>("Gather2", tab, 2, 0);
-        FillGatherLoc(gatherChoose2);
+        fillGatherLoc(gatherChoose2);
         scoreLoc3 = new SettableLoggableChooser<>("Score3Loc", tab, 2, 1);
         fillScoreLoc(scoreLoc3);
         scoreLevel3 = new SettableLoggableChooser<>("Score3Level", tab, 2, 2);
         fillScoreLevel(scoreLevel3);
 
         gatherChoose3 = new SettableLoggableChooser<>("Gather3", tab, 3, 0);
-        FillGatherLoc(gatherChoose3);
+        fillGatherLoc(gatherChoose3);
         scoreLoc4 = new SettableLoggableChooser<>("Score4Loc", tab, 3, 1);
         fillScoreLoc(scoreLoc4);
         scoreLevel4 = new SettableLoggableChooser<>("Score4Level", tab, 3, 2);
@@ -238,7 +238,7 @@ public class AutonSelection {
         in.addOption("4", 4);
     }
 
-    private void FillGatherLoc(SettableLoggableChooser<GatherType> in) {
+    private void fillGatherLoc(SettableLoggableChooser<GatherType> in) {
         in.addDefaultOption("None", GatherType.NONE);
         in.addOption("Left_Far", GatherType.LEFT_FAR);
         in.addOption("Left_Close", GatherType.LEFT_CLOSE);

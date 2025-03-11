@@ -435,6 +435,21 @@ public class DriveCommands {
 
     public static Command driveToAuto(
             RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
+        if (isGather) {
+            return new NewPathFinder(r, destination, isGather);
+        } else {
+            return new NewPathFinder(r, destination, isGather)
+                    .andThen(driveToPoint(r, destination));
+        }
+    }
+
+    public static Command driveTo(
+            RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
+        return driveToAuto(r, destination, isGather).andThen(joystickDriveFlysky(r));
+    }
+
+    public static Command oldDriveTo(
+            RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
         Transform2d finderDelta = new Transform2d(Units.feetToMeters(-1.5), 0, Rotation2d.kZero);
         Supplier<Pose2d> farDestination =
                 new Supplier<Pose2d>() {
@@ -454,12 +469,6 @@ public class DriveCommands {
                                                 .getDistance(destination.get().getTranslation())
                                         > Units.feetToMeters(6))
                 .andThen(driveToPoint(r, destination));
-    }
-
-    public static Command driveTo(
-            RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
-        return driveToAuto(r, destination, isGather);
-        // TODO: add manual driving after?
     }
 
     public static Command leaveReef(RobotContainer r) {

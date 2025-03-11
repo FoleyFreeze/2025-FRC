@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -72,6 +73,9 @@ public class RobotContainer {
     public final ControlBoard controlBoard = new ControlBoard(this);
     public final BotState state = new BotState();
 
+    // Pathplanner triggers
+    public EventTrigger inSlowDrivePhase;
+
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -94,6 +98,8 @@ public class RobotContainer {
         hand = Hand.create();
         climb = Climb.create();
         vision = Vision.create(this);
+
+        inSlowDrivePhase = new EventTrigger("InSlowDrivePhase");
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices");
