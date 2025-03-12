@@ -17,5 +17,7 @@ public interface HandIO {
 
     public default void setHandVolts(double volts) {}
 
+    public default void changeCurrentLimit(double newLimit) {}
+
     public default void zero() {}
 }
