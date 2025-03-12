@@ -278,6 +278,7 @@ public class RobotContainer {
 
     public void robotPeriodic() {
         controlBoard.periodic();
+        controlBoard.selectApproachingStation(); // TODO: delete me
 
         String s =
                 String.format(

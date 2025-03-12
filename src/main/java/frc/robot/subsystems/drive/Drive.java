@@ -121,6 +121,8 @@ public class Drive extends SubsystemBase {
             new SwerveDrivePoseEstimator(
                     kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
+    private Twist2d robotVelocity = new Twist2d();
+
     private final Consumer<Pose2d> resetSimulationPoseCallBack;
 
     public SwerveDriveSimulation driveSimulation;
@@ -294,6 +296,7 @@ public class Drive extends SubsystemBase {
         double[] sampleTimestamps =
                 modules[0].getOdometryTimestamps(); // All signals are sampled together
         int sampleCount = sampleTimestamps.length;
+        robotVelocity = new Twist2d();
         for (int i = 0; i < sampleCount; i++) {
             // Read wheel positions and deltas from each module
             SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
@@ -308,19 +311,27 @@ public class Drive extends SubsystemBase {
                 lastModulePositions[moduleIndex] = modulePositions[moduleIndex];
             }
 
+            Twist2d twist = kinematics.toTwist2d(moduleDeltas);
+            robotVelocity.dx += twist.dx;
+            robotVelocity.dy += twist.dy;
+            robotVelocity.dtheta += twist.dtheta;
+
             // Update gyro angle
             if (gyroInputs.connected) {
                 // Use the real gyro angle
                 rawGyroRotation = gyroInputs.odometryYawPositions[i];
             } else {
                 // Use the angle delta from the kinematics and module deltas
-                Twist2d twist = kinematics.toTwist2d(moduleDeltas);
                 rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
             }
 
             // Apply update
             poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
         }
+
+        robotVelocity.dx /= 0.02;
+        robotVelocity.dy /= 0.02;
+        robotVelocity.dtheta /= 0.02;
 
         // Update gyro alert
         gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
@@ -460,6 +471,11 @@ public class Drive extends SubsystemBase {
     /** Returns the current odometry rotation. */
     public Rotation2d getRotation() {
         return getPose().getRotation();
+    }
+
+    @AutoLogOutput(key = "Odometry/RobotVel")
+    public Twist2d getVelocity() {
+        return robotVelocity;
     }
 
     /** Resets the current odometry pose. */

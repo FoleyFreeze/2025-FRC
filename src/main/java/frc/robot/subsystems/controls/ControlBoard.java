@@ -2,6 +2,8 @@ package frc.robot.subsystems.controls;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
@@ -308,5 +310,41 @@ public class ControlBoard {
                         List.of(
                                 Locations.getLeftGatherStationFar(),
                                 Locations.getRightGatherStationFar()));
+    }
+
+    public Pose2d selectApproachingStation() {
+        Pose2d robotPos = r.drive.getPose();
+        Twist2d robotVel = r.drive.getVelocity();
+
+        Translation2d distL =
+                Locations.getLeftGatherStationFar()
+                        .getTranslation()
+                        .minus(robotPos.getTranslation());
+        Translation2d distR =
+                Locations.getRightGatherStationFar()
+                        .getTranslation()
+                        .minus(robotPos.getTranslation());
+        Logger.recordOutput("GatherSelect/distL", distL.getNorm());
+        Logger.recordOutput("GatherSelect/distR", distR.getNorm());
+
+        double cosDistL = dotProduct(distL, robotVel);
+        double cosDistR = dotProduct(distR, robotVel);
+        Logger.recordOutput("GatherSelect/cosDistL", cosDistL);
+        Logger.recordOutput("GatherSelect/cosDistR", cosDistR);
+
+        double scoreL = distL.getNorm() - cosDistL * 0.5;
+        double scoreR = distR.getNorm() - cosDistR * 0.5;
+        Logger.recordOutput("GatherSelect/scoreL", scoreL);
+        Logger.recordOutput("GatherSelect/scoreR", scoreR);
+
+        if (scoreR < scoreL) {
+            return Locations.getRightGatherStationFar();
+        } else {
+            return Locations.getLeftGatherStationFar();
+        }
+    }
+
+    public double dotProduct(Translation2d a, Twist2d b) {
+        return a.getX() * b.dy + a.getY() * b.dx;
     }
 }

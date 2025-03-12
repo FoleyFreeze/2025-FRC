@@ -50,7 +50,8 @@ public class NewPathFinder extends Command {
         ConstraintsZone cz =
                 new ConstraintsZone(waypoints.size() - 2, waypoints.size() - 1, finalConstraints);
         RotationTarget rt = new RotationTarget(waypoints.size() - 2, flipPose.getRotation());
-        EventMarker em = new EventMarker("InSlowDrivePhase", waypoints.size() - 2, waypoints.size() - 1);
+        EventMarker em =
+                new EventMarker("InSlowDrivePhase", waypoints.size() - 2, waypoints.size() - 1);
 
         PathPlannerPath path =
                 new PathPlannerPath(
