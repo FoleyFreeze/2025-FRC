@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -34,6 +35,10 @@ public class ComplexCommands {
     static double holdAlgaePower = 2;
     static double releasePowerAlgae = -12;
     static double releaseTimeAlgae = 0.5;
+    static double netAngle = 45;
+    static double superSuckAlgae = 0;
+    static double algaeHighLim = 0;
+    static double algaeLowLim = 0;
 
     static double gatherPosition = 0;
 
@@ -64,9 +69,14 @@ public class ComplexCommands {
     public static Command scoreAlgaeNet() {
         Command c =
                 goToLocAlgae(() -> SuperstructureLocation.PRENET)
-                        .andThen(r.arm.goTo(() -> SuperstructureLocation.NET))
                         .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
-                        .andThen(r.hand.setVoltageCmd(releasePowerAlgae))
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.NET))
+                                .alongWith(r.hand.setCurrentLim(algaeHighLim)
+                                           .andThen(r.hand.setVoltageCmd(superSuckAlgae))
+                                           .andThen(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) < netAngle))
+                                           .andThen(r.hand.setVoltageCmd(releasePowerAlgae)))
+                        .andThen(r.hand.stop())
+                        .andThen(r.hand.setCurrentLim(algaeLowLim))
                         .andThen(new RunCommand(() -> {}));
 
         c.setName("ScoreAlgaeNet");
