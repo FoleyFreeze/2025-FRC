@@ -109,11 +109,12 @@ public class Wrist extends SubsystemBase {
         double angleTarget = target.wristAngle.in(Radians);
 
         // if the funnel is in the way, go to -90 degrees local
-        if (target.armAngle.in(Degrees) < -30) {
+        if (target.armAngle.in(Degrees) < -30 && !r.controlBoard.algaeModeT.getAsBoolean()) {
             // we are going toward the funnel
             angleTarget =
                     cvrtLocalToEnc(Units.degreesToRadians(-110), r.arm.getAngle().in(Radians));
-        } else if (r.arm.getAngle().in(Degrees) < -35) {
+        } else if (r.arm.getAngle().in(Degrees) < -35
+                && !r.controlBoard.algaeModeT.getAsBoolean()) {
             // we are going away from the funnel, but we are not there yet
             angleTarget = cvrtLocalToEnc(Units.degreesToRadians(-90), r.arm.getAngle().in(Radians));
         }

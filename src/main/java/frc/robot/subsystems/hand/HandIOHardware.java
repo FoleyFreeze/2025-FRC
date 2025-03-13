@@ -31,8 +31,6 @@ public class HandIOHardware implements HandIO {
 
     private final TalonFX handTalon;
 
-    private final boolean useTorqueControl = true;
-
     HandCals k;
 
     // velocity control requests
@@ -76,7 +74,7 @@ public class HandIOHardware implements HandIO {
     public void updateInputs(HandIOInputs inputs) {
         var handStatus =
                 BaseStatusSignal.refreshAll(
-                        handPosition, handVelocity, handAppliedVolts, handCurrent);
+                        handPosition, handVelocity, handAppliedVolts, handCurrent, handTemp);
         inputs.handConnected = handConnectedDebounce.calculate(handStatus.isOK());
         inputs.handAppliedVolts = handAppliedVolts.getValue().in(Volts);
         inputs.handCurrent = handCurrent.getValue().in(Amps);

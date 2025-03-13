@@ -4,11 +4,11 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -35,10 +35,10 @@ public class ComplexCommands {
     static double holdAlgaePower = 2;
     static double releasePowerAlgae = -12;
     static double releaseTimeAlgae = 0.5;
-    static double netAngle = 45;
-    static double superSuckAlgae = 0;
-    static double algaeHighLim = 0;
-    static double algaeLowLim = 0;
+    static double netAngle = 60;
+    static double superSuckAlgae = 6;
+    static double algaeHighLim = 90;
+    static double algaeLowLim = 40;
 
     static double gatherPosition = 0;
 
@@ -67,18 +67,29 @@ public class ComplexCommands {
     }
 
     public static Command scoreAlgaeNet() {
+        SequentialCommandGroup launch = new SequentialCommandGroup();
+        launch.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
+        launch.addCommands(r.hand.setVoltageCmd(superSuckAlgae));
+        launch.addCommands(new WaitCommand(0.1));
+        launch.addCommands(
+                forceGoToLoc(() -> SuperstructureLocation.NET)
+                        .raceWith(
+                                new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) < netAngle)
+                                        .andThen(r.hand.setVoltageCmd(releasePowerAlgae))
+                                        .andThen(new WaitCommand(0.5))));
+        launch.setName("launch");
+
         Command c =
                 goToLocAlgae(() -> SuperstructureLocation.PRENET)
                         .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
-                        .andThen(r.arm.goTo(() -> SuperstructureLocation.NET))
-                                .alongWith(r.hand.setCurrentLimCmd(algaeHighLim)
-                                           .andThen(r.hand.setVoltageCmd(superSuckAlgae))
-                                           .andThen(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) < netAngle))
-                                           .andThen(r.hand.setVoltageCmd(releasePowerAlgae)))
+                        .andThen(launch)
                         .andThen(r.hand.stop())
                         .andThen(new RunCommand(() -> {}))
-                        .finallyDo(() -> {r.hand.setVoltage(0);
-                                          r.hand.setCurrentLim(algaeLowLim);});
+                        .finallyDo(
+                                () -> {
+                                    r.hand.setVoltage(0);
+                                    r.hand.setCurrentLim(algaeLowLim);
+                                });
 
         c.setName("ScoreAlgaeNet");
         return c;
@@ -295,6 +306,13 @@ public class ComplexCommands {
         return c;
     }
 
+    // no fancy protection logic, force to position
+    public static Command forceGoToLoc(Supplier<SuperstructureLocation> p) {
+        Command c = new ParallelCommandGroup(r.elevator.goTo(p), r.arm.goTo(p), r.wrist.goTo(p));
+        c.setName("ForceGoToLoc");
+        return c;
+    }
+
     public static Command goToLocAlgae(Supplier<SuperstructureLocation> p) {
         Command toAlgaeFromCoral =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
@@ -313,7 +331,9 @@ public class ComplexCommands {
 
         Command c =
                 new ConditionalCommand(
-                        toAlgaeFromCoral, toAlgaeFromAlgae, () -> r.arm.getAngle().in(Degrees) < 0);
+                        toAlgaeFromCoral,
+                        toAlgaeFromAlgae,
+                        () -> r.arm.getAngle().in(Degrees) < -10);
         c.setName("goToLocAlgae");
         return c;
     }

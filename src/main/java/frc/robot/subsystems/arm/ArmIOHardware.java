@@ -27,11 +27,11 @@ public class ArmIOHardware implements ArmIO {
         closedLoopController = motor.getClosedLoopController();
 
         SparkMaxConfig config = new SparkMaxConfig();
-        config.closedLoop.pid(5, 0.006, 2).outputRange(-0.4, 0.4).iZone(0.05);
+        config.closedLoop.pid(5, 0.006, 2).outputRange(-0.5, 0.5).iZone(0.05);
         config.closedLoopRampRate(0);
 
-        config.smartCurrentLimit(60);
-        config.secondaryCurrentLimit(60);
+        config.smartCurrentLimit(70);
+        config.secondaryCurrentLimit(90);
 
         config.encoder.positionConversionFactor(1.0 / cals.gearRatio);
         config.absoluteEncoder.positionConversionFactor(1.0);
@@ -47,7 +47,7 @@ public class ArmIOHardware implements ArmIO {
 
         inputs.armPositionRad = Units.rotationsToRadians(relEnc);
         inputs.armVelocityRadPerSec =
-                Units.radiansPerSecondToRotationsPerMinute(encoder.getVelocity());
+                Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
         inputs.armAppliedVolts = rawVoltage * motor.getAppliedOutput();
         inputs.armCurrent = motor.getOutputCurrent();
         inputs.armTempF = motor.getMotorTemperature() * 9 / 5.0 + 32;

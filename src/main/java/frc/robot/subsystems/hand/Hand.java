@@ -50,7 +50,7 @@ public class Hand extends SubsystemBase {
         return new InstantCommand(() -> setCurrentLim(limit), this);
     }
 
-    public void setCurrentLim(double limit){
+    public void setCurrentLim(double limit) {
         io.changeCurrentLimit(limit);
     }
 
