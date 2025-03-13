@@ -46,8 +46,12 @@ public class Hand extends SubsystemBase {
         return new InstantCommand(() -> io.setHandVolts(volts), this);
     }
 
-    public Command setCurrentLim(double limit) {
-        return new InstantCommand(/*() -> io.setHandCurrentLim(limit)*/()->{}, this);
+    public Command setCurrentLimCmd(double limit) {
+        return new InstantCommand(() -> setCurrentLim(limit), this);
+    }
+
+    public void setCurrentLim(double limit){
+        io.changeCurrentLimit(limit);
     }
 
     public void setVoltage(double volts) {

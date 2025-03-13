@@ -71,13 +71,14 @@ public class ComplexCommands {
                 goToLocAlgae(() -> SuperstructureLocation.PRENET)
                         .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.NET))
-                                .alongWith(r.hand.setCurrentLim(algaeHighLim)
+                                .alongWith(r.hand.setCurrentLimCmd(algaeHighLim)
                                            .andThen(r.hand.setVoltageCmd(superSuckAlgae))
                                            .andThen(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) < netAngle))
                                            .andThen(r.hand.setVoltageCmd(releasePowerAlgae)))
                         .andThen(r.hand.stop())
-                        .andThen(r.hand.setCurrentLim(algaeLowLim))
-                        .andThen(new RunCommand(() -> {}));
+                        .andThen(new RunCommand(() -> {}))
+                        .finallyDo(() -> {r.hand.setVoltage(0);
+                                          r.hand.setCurrentLim(algaeLowLim);});
 
         c.setName("ScoreAlgaeNet");
         return c;

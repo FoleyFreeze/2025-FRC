@@ -96,7 +96,7 @@ public class HandIOHardware implements HandIO {
             StatusCode code = handTalon.getConfigurator().apply(currLimConfig);
             if (code != StatusCode.OK) {
                 System.out.println(
-                        "Failed to set Hand CurrentLimits !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                        "Failed to set Hand CurrentLimits !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             }
         }
     }
