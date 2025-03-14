@@ -8,7 +8,6 @@ import edu.wpi.first.networktables.RawSubscriber;
 import edu.wpi.first.wpilibj.Timer;
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
-import org.littletonrobotics.junction.Logger;
 
 public class CVisionIO_HW implements CVisionIO {
 
@@ -52,7 +51,7 @@ public class CVisionIO_HW implements CVisionIO {
                             byte type = poseDataCage.get(12);
                             byte numTags = poseDataCage.get(13);
                             int seqNum = poseDataCage.getInt(0);
-                            float current = Logger.getRealTimestamp() / 1000000.0f;
+                            float current = (float) Timer.getFPGATimestamp();
                             float timeStamp =
                                     current
                                             - ((current

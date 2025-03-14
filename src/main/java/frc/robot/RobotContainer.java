@@ -260,13 +260,15 @@ public class RobotContainer {
                         ComplexCommands.blindAlgaeScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
-        // flysky.rightTriggerSWG // score sw
-        //         .and(controlBoard.climbModeT) // climb sw
-        //         .whileTrue(r.climb.setClimbVoltage(12));
+        //CLIMB THINGS
 
         flysky.rightTriggerSWG // score sw
                 .and(controlBoard.climbModeT) // climb sw
-                .whileTrue(new CmdDriveCageTraj(r));
+                .whileTrue(r.climb.setClimbVoltage(12));
+
+        // flysky.rightTriggerSWG // score sw
+        //         .and(controlBoard.climbModeT) // climb sw
+        //         .whileTrue(new CmdDriveCageTraj(r));
 
         // get safely into climb mode
         controlBoard.climbModeT.whileTrue(
@@ -314,9 +316,7 @@ public class RobotContainer {
 
         SmartDashboard.putNumber("ClimbPos", climb.inputs.climbAbsPosition);
 
-        Logger.recordOutput("State/hasCoral", state.hasCoral);
-        Logger.recordOutput("State/hasAlgae", state.hasAlgae);
-        Logger.recordOutput("State/hasStop", state.hasStop);
+        state.periodic();
     }
 
     /**

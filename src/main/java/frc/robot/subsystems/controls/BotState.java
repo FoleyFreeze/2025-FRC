@@ -1,5 +1,7 @@
 package frc.robot.subsystems.controls;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class BotState {
@@ -7,7 +9,7 @@ public class BotState {
     public boolean hasCoral = true;
     public boolean hasAlgae = false;
     public boolean hasStop = false;
-    public boolean pathComplete = true;
+    public boolean pathComplete = true; //default true when no path is running
 
     public Trigger hasCoralT = new Trigger(() -> hasCoral);
     public Trigger hasAlgaeT = new Trigger(() -> hasAlgae);
@@ -27,5 +29,12 @@ public class BotState {
     public void clear() {
         hasAlgae = false;
         hasCoral = false;
+    }
+
+    public void periodic(){
+        Logger.recordOutput("State/hasCoral", hasCoral);
+        Logger.recordOutput("State/hasAlgae", hasAlgae);
+        Logger.recordOutput("State/hasStop", hasStop);
+        Logger.recordOutput("State/pathComplete", pathComplete);
     }
 }

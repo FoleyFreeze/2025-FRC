@@ -13,7 +13,7 @@ public class WristCals {
     double gearRatio = g1 * g2 * g3;
     public double gearRatioToAbsEncoder = g2 * g3;
     double absEncOffset = 0.6643;
-    double startEncVal = 0; // -59;
+    double startEncVal = 0;
 
     Angle minLocalWristAngle = Degrees.of(-124);
     Angle minLocalWristAngleCoral = Degrees.of(-90);
