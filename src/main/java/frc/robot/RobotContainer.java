@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auton.AutonCommands;
-import frc.robot.commands.CmdDriveCageTraj;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SuperstructureLocation;
@@ -260,7 +259,7 @@ public class RobotContainer {
                         ComplexCommands.blindAlgaeScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
-        //CLIMB THINGS
+        // CLIMB THINGS
 
         flysky.rightTriggerSWG // score sw
                 .and(controlBoard.climbModeT) // climb sw

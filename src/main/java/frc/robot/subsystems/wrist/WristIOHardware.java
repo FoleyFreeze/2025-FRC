@@ -33,6 +33,9 @@ public class WristIOHardware implements WristIO {
         config.secondaryCurrentLimit(60);
 
         config.encoder.positionConversionFactor(1.0 / k.gearRatio);
+
+        config.absoluteEncoder.zeroCentered(true);
+        config.absoluteEncoder.zeroOffset(1 - 0.2155);
         config.absoluteEncoder.positionConversionFactor(1);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -69,10 +72,8 @@ public class WristIOHardware implements WristIO {
     public void zero() {
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
-        encoder.setPosition(
-                0
-                        + Units.degreesToRotations(
-                                k.startEncVal)); // add 0.25 revolutions to start at 90deg
+        // 0.4515abs == 0 deg rel
+        encoder.setPosition(absEncVal * k.gearRatioToAbsEncoder - 0.4515);
         // encoder.setPosition(convertAbsToRel(absEncVal, encoder.getPosition()));
     }
 

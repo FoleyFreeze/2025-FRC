@@ -34,6 +34,9 @@ public class ArmIOHardware implements ArmIO {
         config.secondaryCurrentLimit(90);
 
         config.encoder.positionConversionFactor(1.0 / cals.gearRatio);
+        config.absoluteEncoder.zeroCentered(true);
+        config.absoluteEncoder.zeroOffset(0.3180);
+        config.absoluteEncoder.inverted(true);
         config.absoluteEncoder.positionConversionFactor(1.0);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -74,9 +77,10 @@ public class ArmIOHardware implements ArmIO {
     public void zero() {
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
-        encoder.setPosition(absEncVal);
-        absEncVal = (1 - (absEncVal * k.gearRatioToAbsEncoder)) / k.gearRatioToAbsEncoder;
-        encoder.setPosition(0 + Units.degreesToRotations(k.startEncVal));
+        encoder.setPosition(absEncVal / k.gearRatioToAbsEncoder - Units.degreesToRotations(49));
+        // encoder.setPosition(absEncVal);
+        // absEncVal = (1 - (absEncVal * k.gearRatioToAbsEncoder)) / k.gearRatioToAbsEncoder;
+        // encoder.setPosition(0 + Units.degreesToRotations(k.startEncVal));
     }
 
     // if the relative and abs encoders are way apart, this resets the rel to "true" zero
