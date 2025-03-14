@@ -8,12 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-<<<<<<< HEAD
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-=======
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
->>>>>>> 532ad39 (cage drive logic)
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -465,22 +460,5 @@ public class ComplexCommands {
         // c.addRequirements(r.elevator, r.arm, r.wrist, r.hand);
         c.setName("RezeroWrist");
         return c.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
-    }
-
-    public static Command cameraCageDrive(RobotContainer r) {
-
-        Command c =
-                new ParallelDeadlineGroup(
-                        new SequentialCommandGroup(
-                                new ParallelRaceGroup(
-                                        // run camera drive until trigger is released
-                                        new CmdDriveCageTraj(r),
-                                        new WaitUntilCommand(r.inputs.gatherTriggerSWE.negate())),
-
-                                // then immediately return control to the driver
-                                new DriveCommands.joystickDriveFlysky(r)));
-
-        c.setName("CameraCageGather");
-        return c;
     }
 }

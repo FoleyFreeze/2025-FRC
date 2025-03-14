@@ -1,10 +1,8 @@
 package frc.robot.commands;
 
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.auto.AutoBuilder;
 // import com.pathplanner.lib.commands.FollowPathHolonomic;
 import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
@@ -19,14 +17,6 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class CmdDriveCageTraj extends Command {
-
-    public HolonomicPathFollowerConfig notePathFollowerConfig =
-            new HolonomicPathFollowerConfig(
-                    new PIDConstants(5, 0, 0),
-                    new PIDConstants(5, 0, 0),
-                    maxWheelSpeed,
-                    wheelFL.wheelLocation.getNorm(),
-                    new ReplanningConfig());
 
     RobotContainer r;
 
@@ -50,6 +40,7 @@ public class CmdDriveCageTraj extends Command {
     public CmdDriveCageTraj(RobotContainer r) {
         this.r = r;
         addRequirements(r.drive);
+        this.setName("CmdDriveCageTraj");
     }
 
     @Override
@@ -120,10 +111,7 @@ public class CmdDriveCageTraj extends Command {
 
         List<Waypoint> wayPoints =
                 PathPlannerPath.waypointsFromPoses(
-                        new Pose2d(
-                                pathStart,
-                                getVelocityAngle(
-                                        r.drive.getFFCharacterizationVelocity(), pathVector)),
+                        new Pose2d(pathStart, getVelocityAngle(r.drive.getVelocity(), pathVector)),
                         new Pose2d(pathEndLocation, r.drive.getRotation()));
 
         System.out.println("Created path starting at: " + wayPoints.get(0).toString());
@@ -133,9 +121,9 @@ public class CmdDriveCageTraj extends Command {
                 new PathPlannerPath(
                         wayPoints,
                         pathConstraints,
-                        new IdealStartingState(maxAngularVelocity, negativeY),
+                        null,
                         new GoalEndState(0, r.drive.getRotation()));
-
+        /*
         return new FollowPathCommand(
                 path,
                 r.drive::getPose,
@@ -144,6 +132,8 @@ public class CmdDriveCageTraj extends Command {
                 r.drive.k.cagePathFollowerConfig,
                 () -> false,
                 r.drive);
+                */
+        return AutoBuilder.followPath(path);
     }
 
     Rotation2d positiveY = new Rotation2d(Math.PI / 2.0);
