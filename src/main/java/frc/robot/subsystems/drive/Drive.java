@@ -121,7 +121,7 @@ public class Drive extends SubsystemBase {
             new SwerveDrivePoseEstimator(
                     kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
-    private Twist2d robotVelocity = new Twist2d();
+    private ChassisSpeeds robotVelocity = new ChassisSpeeds();
 
     private final Consumer<Pose2d> resetSimulationPoseCallBack;
 
@@ -296,7 +296,7 @@ public class Drive extends SubsystemBase {
         double[] sampleTimestamps =
                 modules[0].getOdometryTimestamps(); // All signals are sampled together
         int sampleCount = sampleTimestamps.length;
-        robotVelocity = new Twist2d();
+        robotVelocity = new ChassisSpeeds();
         for (int i = 0; i < sampleCount; i++) {
             // Read wheel positions and deltas from each module
             SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
@@ -312,9 +312,11 @@ public class Drive extends SubsystemBase {
             }
 
             Twist2d twist = kinematics.toTwist2d(moduleDeltas);
-            robotVelocity.dx += twist.dx;
-            robotVelocity.dy += twist.dy;
-            robotVelocity.dtheta += twist.dtheta;
+            robotVelocity.vxMetersPerSecond += twist.dx;
+            robotVelocity.vyMetersPerSecond += twist.dy;
+            robotVelocity.omegaRadiansPerSecond += twist.dtheta;
+
+            robotVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(robotVelocity, getRotation());
 
             // Update gyro angle
             if (gyroInputs.connected) {
@@ -329,9 +331,9 @@ public class Drive extends SubsystemBase {
             poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
         }
 
-        robotVelocity.dx /= 0.02;
-        robotVelocity.dy /= 0.02;
-        robotVelocity.dtheta /= 0.02;
+        robotVelocity.vxMetersPerSecond /= 0.02;
+        robotVelocity.vyMetersPerSecond /= 0.02;
+        robotVelocity.omegaRadiansPerSecond /= 0.02;
 
         // Update gyro alert
         gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
@@ -474,7 +476,7 @@ public class Drive extends SubsystemBase {
     }
 
     @AutoLogOutput(key = "Odometry/RobotVel")
-    public Twist2d getVelocity() {
+    public ChassisSpeeds getVelocity() {
         return robotVelocity;
     }
 

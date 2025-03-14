@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auton.AutonCommands;
+import frc.robot.commands.CmdDriveCageTraj;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SuperstructureLocation;
@@ -37,6 +38,8 @@ import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.BotState;
 import frc.robot.subsystems.controls.ControlBoard;
 import frc.robot.subsystems.controls.Flysky;
+import frc.robot.subsystems.cvision.CVision;
+import frc.robot.subsystems.cvision.CVisionCals;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hand.Hand;
@@ -67,6 +70,7 @@ public class RobotContainer {
     public final Climb climb;
     public final Vision vision;
     public PathCache pathCache;
+    public final CVision cvision;
 
     // Controller
     public final Flysky flysky = new Flysky();
@@ -98,6 +102,7 @@ public class RobotContainer {
         hand = Hand.create();
         climb = Climb.create();
         vision = Vision.create(this);
+        cvision = new CVision(r, new CVisionCals());
 
         inSlowDrivePhase = new EventTrigger("InSlowDrivePhase");
 
@@ -223,7 +228,7 @@ public class RobotContainer {
         // score algae nocam
         // climb up
 
-        flysky.rightTriggerSWG // gather sw
+        flysky.rightTriggerSWG // score sw
                 .and(controlBoard.algaeModeT.negate()) // algae sw
                 .and(flysky.topRightSWD) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
@@ -231,7 +236,7 @@ public class RobotContainer {
                         ComplexCommands.visionCoralScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
-        flysky.rightTriggerSWG // gather sw
+        flysky.rightTriggerSWG // score sw
                 .and(controlBoard.algaeModeT.negate()) // algae sw
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
@@ -239,7 +244,7 @@ public class RobotContainer {
                         ComplexCommands.blindCoralScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
-        flysky.rightTriggerSWG // gather sw
+        flysky.rightTriggerSWG // score sw
                 .and(controlBoard.algaeModeT) // algae sw
                 .and(flysky.topRightSWD) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
@@ -247,7 +252,7 @@ public class RobotContainer {
                         ComplexCommands.visionAlgaeScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
-        flysky.rightTriggerSWG // gather sw
+        flysky.rightTriggerSWG // score sw
                 .and(controlBoard.algaeModeT) // algae sw
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
@@ -255,9 +260,13 @@ public class RobotContainer {
                         ComplexCommands.blindAlgaeScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
-        flysky.rightTriggerSWG // gather sw
+        // flysky.rightTriggerSWG // score sw
+        //         .and(controlBoard.climbModeT) // climb sw
+        //         .whileTrue(r.climb.setClimbVoltage(12));
+
+        flysky.rightTriggerSWG // score sw
                 .and(controlBoard.climbModeT) // climb sw
-                .whileTrue(r.climb.setClimbVoltage(12));
+                .whileTrue(new CmdDriveCageTraj(r));
 
         // get safely into climb mode
         controlBoard.climbModeT.whileTrue(

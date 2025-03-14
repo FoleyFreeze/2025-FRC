@@ -3,7 +3,7 @@ package frc.robot.subsystems.controls;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
@@ -338,7 +338,7 @@ public class ControlBoard {
 
     public Pose2d selectApproachingStation() {
         Pose2d robotPos = r.drive.getPose();
-        Twist2d robotVel = r.drive.getVelocity();
+        ChassisSpeeds robotVel = r.drive.getVelocity();
 
         Translation2d distL =
                 Locations.getLeftGatherStationFar()
@@ -368,7 +368,7 @@ public class ControlBoard {
         }
     }
 
-    public double dotProduct(Translation2d a, Twist2d b) {
-        return a.getX() * b.dy + a.getY() * b.dx;
+    public double dotProduct(Translation2d a, ChassisSpeeds b) {
+        return a.getX() * b.vyMetersPerSecond + a.getY() * b.vxMetersPerSecond;
     }
 }
