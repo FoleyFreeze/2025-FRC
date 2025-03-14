@@ -519,7 +519,7 @@ public class Drive extends SubsystemBase {
     }
 
     public Translation3d getAccelerometer() {
-
         return new Translation3d(gyroInputs.accelX, gyroInputs.accelY, gyroInputs.accelZ);
     }
+
 }

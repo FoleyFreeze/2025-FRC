@@ -348,8 +348,9 @@ public class ComplexCommands {
         Command inGather =
                 r.elevator
                         .goTo(() -> SuperstructureLocation.PRE_INTAKE)
-                        .andThen(r.arm.goTo(() -> SuperstructureLocation.HOLD))
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.POST_INTAKE))
                         .andThen(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.HOLD))
                         .andThen(r.elevator.goTo(p))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
 
@@ -450,9 +451,13 @@ public class ComplexCommands {
                                         .goToReally(() -> SuperstructureLocation.HOLD_GATHER)
                                         .raceWith(new WaitCommand(0.75)))
                         .alongWith(r.elevator.goTo(() -> SuperstructureLocation.PRE_INTAKE))
-                        .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
-                        .andThen(r.wrist.goToReally(() -> SuperstructureLocation.INTAKE))
-                        .andThen(r.elevator.goTo(() -> SuperstructureLocation.INTAKE));
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.PRE_INTAKE))
+                        .andThen(r.wrist.goToReally(() -> SuperstructureLocation.PRE_INTAKE))
+                        .andThen(r.elevator.goTo(() -> SuperstructureLocation.INTAKE))
+                        .andThen(
+                                r.arm.goTo(() -> SuperstructureLocation.INTAKE)
+                                        .alongWith(
+                                                r.wrist.goTo(() -> SuperstructureLocation.INTAKE)));
 
         Command c =
                 new ConditionalCommand(

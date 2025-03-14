@@ -24,7 +24,7 @@ public class WristIOHardware implements WristIO {
         motor = new SparkMax(15, MotorType.kBrushless);
 
         SparkMaxConfig config = new SparkMaxConfig();
-        config.closedLoop.pid(4, 0, 0).outputRange(-0.4, 0.4);
+        config.closedLoop.pid(4, 0.006, 1).outputRange(-0.2, 0.2).iZone(0.05);
         config.closedLoopRampRate(0);
 
         config.smartCurrentLimit(30);
@@ -34,7 +34,7 @@ public class WristIOHardware implements WristIO {
 
         config.absoluteEncoder.zeroCentered(true);
         // -0.1689 is from skipping 3? teeth
-        config.absoluteEncoder.zeroOffset(1 - 0.2155 - 0.1689);
+        config.absoluteEncoder.zeroOffset(1 - 0.2155 - 0.1689 - 0.0956 - 0.1132 - 0.1044);
         config.absoluteEncoder.positionConversionFactor(1);
 
         PhoenixUtil.tryUntilOkRev(

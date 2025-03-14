@@ -32,8 +32,8 @@ public class ArmIOHardware implements ArmIO {
                 .outputRange(-0.5, 0.5, ClosedLoopSlot.kSlot1)
                 .iZone(0.05, ClosedLoopSlot.kSlot1);
         config.closedLoop
-                .pid(5, 0.006, 2, ClosedLoopSlot.kSlot0)
-                .outputRange(-0.3, 0.3, ClosedLoopSlot.kSlot0)
+                .pid(5, 0.006, 4, ClosedLoopSlot.kSlot0)
+                .outputRange(-0.2, 0.2, ClosedLoopSlot.kSlot0)
                 .iZone(0.05, ClosedLoopSlot.kSlot0);
         config.closedLoopRampRate(0);
 
@@ -101,6 +101,9 @@ public class ArmIOHardware implements ArmIO {
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
         System.out.println("Arm abs enc was: " + absEncVal);
+        if (absEncVal > 0.5) {
+            absEncVal -= 1;
+        }
         encoder.setPosition(absEncVal / k.gearRatioToAbsEncoder - Units.degreesToRotations(49));
         // encoder.setPosition(absEncVal);
         // absEncVal = (1 - (absEncVal * k.gearRatioToAbsEncoder)) / k.gearRatioToAbsEncoder;
@@ -110,7 +113,7 @@ public class ArmIOHardware implements ArmIO {
     // if the relative and abs encoders are way apart, this resets the rel to "true" zero
     @Override
     public void superZero() {
-        encoder.setPosition(0);
+        // encoder.setPosition(0);
         zero();
     }
 
