@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.*;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.revrobotics.spark.ClosedLoopSlot;
+
 public interface ArmIO {
     @AutoLog
     public static class ArmIOInputs {
@@ -28,4 +30,6 @@ public interface ArmIO {
     public default void zero() {}
 
     public default void superZero() {}
+
+    public default void setPIDSlot(ClosedLoopSlot slot){}
 }

@@ -35,7 +35,8 @@ public class WristIOHardware implements WristIO {
         config.encoder.positionConversionFactor(1.0 / k.gearRatio);
 
         config.absoluteEncoder.zeroCentered(true);
-        config.absoluteEncoder.zeroOffset(1 - 0.2155);
+        // -0.1689 is from skipping 3? teeth
+        config.absoluteEncoder.zeroOffset(1 - 0.2155 - 0.1689);
         config.absoluteEncoder.positionConversionFactor(1);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -73,7 +74,7 @@ public class WristIOHardware implements WristIO {
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
         // 0.4515abs == 0 deg rel
-        encoder.setPosition(absEncVal * k.gearRatioToAbsEncoder - 0.4515);
+        encoder.setPosition(absEncVal / k.gearRatioToAbsEncoder - Units.degreesToRotations(69.5));
         // encoder.setPosition(convertAbsToRel(absEncVal, encoder.getPosition()));
     }
 

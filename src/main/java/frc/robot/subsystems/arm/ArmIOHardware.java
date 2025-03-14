@@ -5,6 +5,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -16,6 +17,7 @@ public class ArmIOHardware implements ArmIO {
     private final RelativeEncoder encoder;
     private final AbsoluteEncoder absEncoder;
     private SparkClosedLoopController closedLoopController;
+    private ClosedLoopSlot slot = ClosedLoopSlot.kSlot0;//default to coral
 
     ArmCals k;
 
@@ -27,7 +29,8 @@ public class ArmIOHardware implements ArmIO {
         closedLoopController = motor.getClosedLoopController();
 
         SparkMaxConfig config = new SparkMaxConfig();
-        config.closedLoop.pid(5, 0.006, 2).outputRange(-0.5, 0.5).iZone(0.05);
+        config.closedLoop.pid(5, 0.006, 2, ClosedLoopSlot.kSlot1).outputRange(-0.5, 0.5, ClosedLoopSlot.kSlot1).iZone(0.05, ClosedLoopSlot.kSlot1);
+        config.closedLoop.pid(5, 0.006, 2, ClosedLoopSlot.kSlot0).outputRange(-0.3, 0.3, ClosedLoopSlot.kSlot0).iZone(0.05, ClosedLoopSlot.kSlot0);
         config.closedLoopRampRate(0);
 
         config.smartCurrentLimit(70);
@@ -65,7 +68,7 @@ public class ArmIOHardware implements ArmIO {
     @Override
     public void setArmPosition(double motorPositionRad) {
         double rotations = Units.radiansToRotations(motorPositionRad);
-        closedLoopController.setReference(rotations, ControlType.kPosition);
+        closedLoopController.setReference(rotations, ControlType.kPosition, slot);
     }
 
     @Override
@@ -74,9 +77,15 @@ public class ArmIOHardware implements ArmIO {
     }
 
     @Override
+    public void setPIDSlot(ClosedLoopSlot slot){
+        this.slot = slot;
+    }
+
+    @Override
     public void zero() {
         // read the absolute encoder and reset the relative one
         double absEncVal = absEncoder.getPosition();
+        System.out.println("Arm abs enc was: " + absEncVal);
         encoder.setPosition(absEncVal / k.gearRatioToAbsEncoder - Units.degreesToRotations(49));
         // encoder.setPosition(absEncVal);
         // absEncVal = (1 - (absEncVal * k.gearRatioToAbsEncoder)) / k.gearRatioToAbsEncoder;

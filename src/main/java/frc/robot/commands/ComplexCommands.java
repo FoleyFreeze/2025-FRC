@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -340,11 +339,21 @@ public class ComplexCommands {
 
     // moves elevator to a height with arm tucked up, then deploys arm
     public static Command goToLoc(Supplier<SuperstructureLocation> p) {
-        Command c =
+        Command mainGoTo =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                         .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
                         .andThen(r.elevator.goTo(p))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
+
+        Command inGatherStep = r.elevator.goTo(() -> SuperstructureLocation.PRE_INTAKE);
+
+        Command c =
+                new ConditionalCommand(
+                                inGatherStep,
+                                new InstantCommand(),
+                                () -> atLocation(SuperstructureLocation.INTAKE))
+                        .andThen(mainGoTo);
+
         // arm to 0, elevator move, arm out
         c.setName("GoToLoc");
         return c;
@@ -432,9 +441,10 @@ public class ComplexCommands {
                                 r.wrist
                                         .goToReally(() -> SuperstructureLocation.HOLD_GATHER)
                                         .raceWith(new WaitCommand(0.75)))
-                        .alongWith(r.elevator.goTo(() -> SuperstructureLocation.INTAKE))
+                        .alongWith(r.elevator.goTo(() -> SuperstructureLocation.PRE_INTAKE))
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
-                        .andThen(r.wrist.goToReally(() -> SuperstructureLocation.INTAKE));
+                        .andThen(r.wrist.goToReally(() -> SuperstructureLocation.INTAKE))
+                        .andThen(r.elevator.goTo(() -> SuperstructureLocation.INTAKE));
 
         Command c =
                 new ConditionalCommand(
@@ -451,14 +461,30 @@ public class ComplexCommands {
     }
 
     public static Command goToClimb() {
-        Command gatherFirst = goToGather().andThen(rawGoTo(() -> SuperstructureLocation.LOW_CLIMB));
-        Command inGather = rawGoTo(() -> SuperstructureLocation.LOW_CLIMB);
+        SequentialCommandGroup c = new SequentialCommandGroup();
+        c.addCommands(goToLoc(() -> SuperstructureLocation.HOLD));
+        c.addCommands(r.hand.setVoltageCmd(releasePowerCoral1));
+        c.addCommands(r.wrist.setVoltage(-0.4));
+        c.addCommands(new WaitCommand(0.3));
+        c.addCommands(r.arm.setVoltage(0));
+        c.addCommands(r.hand.setVoltageCmd(0));
 
-        // if in gather, go straight to climb, otherwise go to gather first
-        return new ConditionalCommand(
-                inGather,
-                gatherFirst,
-                () -> r.elevator.getHeight().in(Inches) < 1 && r.arm.getAngle().in(Degrees) < -44);
+        c.setName("GoToClimb");
+        return c;
+    }
+
+    public static Command leaveClimb() {
+        SequentialCommandGroup c = new SequentialCommandGroup();
+        c.addCommands(r.wrist.setVoltage(0));
+        c.addCommands(r.elevator.goTo(() -> SuperstructureLocation.HOLD));
+        c.addCommands(r.arm.setVoltage(2));
+        c.addCommands(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -10));
+        c.addCommands(r.arm.setVoltage(0));
+        c.addCommands(r.wrist.goTo(() -> SuperstructureLocation.HOLD));
+        c.addCommands(r.arm.goTo(() -> SuperstructureLocation.HOLD));
+
+        c.setName("LeaveClimb");
+        return c;
     }
 
     public static Command stopSuperstructure() {

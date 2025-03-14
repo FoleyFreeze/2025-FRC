@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auton.AutonCommands;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.SuperstructureLocation;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.BotState;
@@ -271,13 +270,10 @@ public class RobotContainer {
 
         // get safely into climb mode
         controlBoard.climbModeT.whileTrue(
-                ComplexCommands.goToClimb()
-                        .andThen(r.hand.setVoltageCmd(ComplexCommands.releasePowerCoral1))
-                        .andThen(new RunCommand(() -> {})));
+                ComplexCommands.goToClimb().andThen(new RunCommand(() -> {})));
 
         // get safely out of climb position
-        controlBoard.climbModeT.onFalse(
-                ComplexCommands.rawGoTo(() -> SuperstructureLocation.INTAKE));
+        controlBoard.climbModeT.onFalse(ComplexCommands.leaveClimb());
 
         // stop button
         flysky.topRightMomentSWC.onTrue(

@@ -1,9 +1,7 @@
 package frc.robot.subsystems.wrist;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -108,6 +106,8 @@ public class Wrist extends SubsystemBase {
         this.target = target;
         double angleTarget = target.wristAngle.in(Radians);
 
+        // TODO: do we still need this?
+        /*
         // if the funnel is in the way, go to -90 degrees local
         if (target.armAngle.in(Degrees) < -30 && !r.controlBoard.algaeModeT.getAsBoolean()) {
             // we are going toward the funnel
@@ -135,6 +135,8 @@ public class Wrist extends SubsystemBase {
         }
 
         double newAngleTarget = MathUtil.clamp(angleTarget, minAngle, maxAngle);
+        */
+        double newAngleTarget = angleTarget;
 
         Logger.recordOutput("Wrist/SetpointBounded", newAngleTarget);
         io.setWristPosition(newAngleTarget);

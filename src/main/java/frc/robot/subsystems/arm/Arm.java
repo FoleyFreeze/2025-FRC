@@ -98,4 +98,9 @@ public class Arm extends SubsystemBase {
     public void zero() {
         io.superZero();
     }
+
+    public Command setVoltage(double volts) {
+        Command c = new InstantCommand(() -> io.setArmVolts(volts), this);
+        return c;
+    }
 }
