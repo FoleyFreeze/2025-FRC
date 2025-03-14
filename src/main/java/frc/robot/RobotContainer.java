@@ -37,6 +37,8 @@ import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.BotState;
 import frc.robot.subsystems.controls.ControlBoard;
 import frc.robot.subsystems.controls.Flysky;
+import frc.robot.subsystems.cvision.CVision;
+import frc.robot.subsystems.cvision.CVisionCals;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hand.Hand;
@@ -67,6 +69,7 @@ public class RobotContainer {
     public final Climb climb;
     public final Vision vision;
     public PathCache pathCache;
+    public final CVision cvision;
 
     // Controller
     public final Flysky flysky = new Flysky();
@@ -98,6 +101,7 @@ public class RobotContainer {
         hand = Hand.create();
         climb = Climb.create();
         vision = Vision.create(this);
+        cvision = new CVision(r, new CVisionCals());
 
         inSlowDrivePhase = new EventTrigger("InSlowDrivePhase");
 
@@ -183,6 +187,15 @@ public class RobotContainer {
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
                         ComplexCommands.visionCoralGather()
+                                .alongWith(new InstantCommand(() -> state.hasStop = false)));
+
+        flysky.leftTriggerSWE // gather sw
+                .and(flysky.rightTriggerSWG.negate()) // not scoring
+                .and(controlBoard.algaeModeT.negate()) // algae sw
+                .and(flysky.topLeftSWA) // cam sw
+                .and(controlBoard.climbModeT.negate()) // climb sw
+                .whileTrue(
+                        ComplexCommands.cameraCageDrive(this)
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
         flysky.leftTriggerSWE // gather sw
