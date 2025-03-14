@@ -145,4 +145,8 @@ public class Module {
     public double getFFCharacterizationVelocity() {
         return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
     }
+
+    public void setBrakes(boolean on) {
+        io.setBrakes(on);
+    }
 }

@@ -22,12 +22,14 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auton.AutonCommands;
 import frc.robot.commands.ComplexCommands;
@@ -78,6 +80,8 @@ public class RobotContainer {
 
     // Pathplanner triggers
     public EventTrigger inSlowDrivePhase;
+
+    public Trigger isDisabled = new Trigger(() -> DriverStation.isDisabled());
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -291,6 +295,9 @@ public class RobotContainer {
         controlBoard.algaeModeT.onFalse(
                 new InstantCommand(() -> arm.setPIDSlot(ClosedLoopSlot.kSlot0))
                         .ignoringDisable(true));
+
+        isDisabled.onTrue(new InstantCommand(() -> drive.setBrakes(true)).ignoringDisable(true));
+        isDisabled.onFalse(new InstantCommand(() -> drive.setBrakes(false)).ignoringDisable(true));
     }
 
     public void robotPeriodic() {

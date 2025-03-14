@@ -272,4 +272,14 @@ public class ModuleIOTalonFX implements ModuleIO {
                             rotation.getRotations());
                 });
     }
+
+    boolean brakeStatus = false;
+
+    @Override
+    public void setBrakes(boolean on) {
+        if (on != brakeStatus) {
+            brakeStatus = on;
+            driveTalon.setNeutralMode(on ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        }
+    }
 }
