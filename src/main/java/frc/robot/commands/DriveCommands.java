@@ -435,12 +435,16 @@ public class DriveCommands {
 
     public static Command driveToAuto(
             RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
+        Command c;
+        // NOTE: path complete is set to true in NewPathFinder.init()
         if (isGather) {
-            return new NewPathFinder(r, destination, isGather);
+            c = new NewPathFinder(r, destination, isGather);
         } else {
-            return new NewPathFinder(r, destination, isGather)
-                    .andThen(driveToPoint(r, destination));
+            c = new NewPathFinder(r, destination, isGather).andThen(driveToPoint(r, destination));
         }
+        c = c.finallyDo(() -> r.state.pathComplete = true);
+        c.setName("DriveToAuto");
+        return c;
     }
 
     public static Command driveTo(

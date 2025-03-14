@@ -209,7 +209,7 @@ public class RobotContainer {
                 .and(flysky.topLeftSWA.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
-                        ComplexCommands.gatherAlgae()
+                        ComplexCommands.gatherAlgae(false)
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
         flysky.leftTriggerSWE // gather sw
@@ -252,7 +252,7 @@ public class RobotContainer {
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .whileTrue(
-                        ComplexCommands.visionAlgaeScore()
+                        ComplexCommands.blindAlgaeScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
         flysky.rightTriggerSWG // gather sw

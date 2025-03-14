@@ -16,7 +16,11 @@ public class Locations {
     public static double robotWidth = Units.inchesToMeters(28 + 6);
     public static double robotLength = Units.inchesToMeters(30 + 6);
     public static Transform2d halfRobot = new Transform2d(robotLength / 2.0, 0, new Rotation2d());
+    public static Transform2d halfRobotProc =
+            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(6), 0, new Rotation2d());
 
+    public static Transform2d halfRobotNet =
+            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(1.25), 0, new Rotation2d());
     public static Transform2d halfRobotGatherLeftFar =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(1.5),
@@ -48,7 +52,6 @@ public class Locations {
                     robotLength / 2.0 + Units.inchesToMeters(3.5),
                     Units.inchesToMeters(-8),
                     Rotation2d.kZero);
-
     public static Transform2d halfRobotAlgae =
             new Transform2d(robotLength / 2.0 + Units.inchesToMeters(6), 0, Rotation2d.kZero);
 
@@ -81,6 +84,28 @@ public class Locations {
         } else {
             if (idx >= redStarts.length) return null;
             return redStarts[idx];
+        }
+    }
+
+    public static double getNetX() {
+        if (isBlue()) {
+            return tags.getTagPose(14).get().toPose2d().plus(halfRobotNet).getX();
+        } else {
+            return tags.getTagPose(5).get().toPose2d().plus(halfRobotNet).getX();
+        }
+    }
+
+    public static Pose2d getNetPose(Pose2d robotPose) {
+        if (isBlue()) {
+            double minY = 4.8;
+            double maxY = 7.5;
+            double y = Math.max(minY, Math.min(robotPose.getY(), maxY));
+            return new Pose2d(getNetX(), y, Rotation2d.kZero);
+        } else {
+            double minY = 0.5;
+            double maxY = 3.2;
+            double y = Math.max(minY, Math.min(robotPose.getY(), maxY));
+            return new Pose2d(getNetX(), y, Rotation2d.k180deg);
         }
     }
 
@@ -272,9 +297,9 @@ public class Locations {
 
     public static Pose2d getProcLoc() {
         if (isBlue()) {
-            return invert(tags.getTagPose(16).get().toPose2d().plus(halfRobot));
+            return invert(tags.getTagPose(16).get().toPose2d().plus(halfRobotProc));
         } else {
-            return invert(tags.getTagPose(3).get().toPose2d().plus(halfRobot));
+            return invert(tags.getTagPose(3).get().toPose2d().plus(halfRobotProc));
         }
     }
 }

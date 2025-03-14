@@ -65,6 +65,7 @@ public class NewPathFinder extends Command {
                         new GoalEndState(0, flipPose.getRotation()),
                         false);
 
+        r.state.pathComplete = false;
         c = AutoBuilder.followPath(path);
         c.initialize();
     }

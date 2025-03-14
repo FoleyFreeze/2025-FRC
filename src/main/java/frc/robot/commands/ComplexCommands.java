@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
+import frc.robot.util.Locations;
 import java.util.function.Supplier;
 
 public class ComplexCommands {
@@ -81,7 +82,9 @@ public class ComplexCommands {
 
         Command c =
                 goToLocAlgae(() -> SuperstructureLocation.PRENET)
-                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
+                        .andThen(
+                                new WaitUntilCommand(
+                                        r.flysky.leftTriggerSWE.and(r.state.pathCompleteT)))
                         .andThen(launch)
                         .andThen(r.hand.stop())
                         .andThen(new RunCommand(() -> {}))
@@ -98,16 +101,22 @@ public class ComplexCommands {
     public static Command scoreAlgaeProc() {
         Command c =
                 goToLocAlgae(() -> SuperstructureLocation.SCORE_PROCESSOR)
-                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
+                        .andThen(
+                                new WaitUntilCommand(
+                                        r.flysky.leftTriggerSWE.and(r.state.pathCompleteT)))
                         .andThen(releaseAlgae())
                         .andThen(new RunCommand(() -> {}));
         c.setName("ScoreAalgaeProc");
         return c;
     }
 
-    public static Command gatherAlgae() {
+    public static Command gatherAlgae(boolean cmaMode) {
         Command c =
-                goToLocAlgae(() -> r.controlBoard.getAlgaeLevel())
+                goToLocAlgae(
+                                () ->
+                                        cmaMode
+                                                ? r.controlBoard.getAlgaeReefHeight()
+                                                : r.controlBoard.getAlgaeLevel())
                         .andThen(r.hand.setVoltageCmd(intakeAlgaePower))
                         // .until(() -> r.hand.getCurrent() > intakeCurrentAlgae)
                         .andThen(new InstantCommand(() -> r.state.setAlgae()))
@@ -118,16 +127,48 @@ public class ComplexCommands {
     }
 
     public static Command visionAlgaeGather() {
-        Command c = gatherAlgae();
-        c.setName("VisionAlgaeAlgae");
+        Command c =
+                DriveCommands.driveTo(r, r.controlBoard::getAlgaePathPose, false)
+                        .raceWith(
+                                new WaitUntilCommand(r.inSlowDrivePhase)
+                                        .andThen(gatherAlgae(true)));
+        c.setName("VisionAlgaeGather");
+        return c;
+    }
+
+    public static Command blindAlgaeScore() {
+        Command c =
+                new ConditionalCommand(
+                        scoreAlgaeNet(), scoreAlgaeProc(), () -> r.controlBoard.selectedLevel == 4);
+        c.setName("BlindAlgaeScore");
         return c;
     }
 
     public static Command visionAlgaeScore() {
         Command c =
                 new ConditionalCommand(
-                        scoreAlgaeNet(), scoreAlgaeProc(), () -> r.controlBoard.selectedLevel == 4);
+                        visionScoreAlgaeNet(),
+                        visionScoreAlgaeProc(),
+                        () -> r.controlBoard.selectedLevel == 4);
+
         c.setName("VisionAlgaeScore");
+        return c;
+    }
+
+    public static Command visionScoreAlgaeNet() {
+        Command c =
+                DriveCommands.driveTo(r, () -> Locations.getNetPose(r.drive.getPose()), true)
+                        .alongWith(new WaitCommand(0.25).andThen(scoreAlgaeNet()));
+        c.setName("visionScoreAlgaeNet");
+        return c;
+    }
+
+    public static Command visionScoreAlgaeProc() {
+        Command c =
+                DriveCommands.driveTo(r, Locations::getProcLoc, false)
+                        .alongWith(new WaitCommand(0.25).andThen(scoreAlgaeProc()));
+        // wait a sec to leave the reef before dropping elevator
+        c.setName("VisionScoreAlgaeProc");
         return c;
     }
 
@@ -286,6 +327,9 @@ public class ComplexCommands {
                                                                         () ->
                                                                                 r.flysky
                                                                                         .leftTriggerSWE
+                                                                                        .and(
+                                                                                                r.state
+                                                                                                        .pathCompleteT)
                                                                                         .getAsBoolean())))
                                         .andThen(releaseCoral()));
         c.setName("VisionCoralScore");
@@ -363,11 +407,7 @@ public class ComplexCommands {
                                                         .andThen(new RunCommand(() -> {})),
                                                 () -> atLocation(SuperstructureLocation.INTAKE)),
                                         new ConditionalCommand(
-                                                goToLocAlgae(
-                                                                () ->
-                                                                        SuperstructureLocation
-                                                                                .ALGAE_LEVEL_2_3)
-                                                        .andThen(new RunCommand(() -> {})),
+                                                (new RunCommand(() -> {})),
                                                 goToGather()
                                                         .andThen(
                                                                 new RunCommand(

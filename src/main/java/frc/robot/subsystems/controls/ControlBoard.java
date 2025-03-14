@@ -198,6 +198,10 @@ public class ControlBoard {
         return Locations.getReefLocation(selectedReefPos);
     }
 
+    public Pose2d getAlgaePathPose() {
+        return Locations.getAlgaeReefLocation(selectedReefPos);
+    }
+
     public Rotation2d getAlignAngle() {
         Rotation2d scoringPosition;
         switch (selectedReefPos) {
@@ -285,6 +289,26 @@ public class ControlBoard {
             case 4:
             default:
                 return SuperstructureLocation.ALGAE_LEVEL_3_4;
+        }
+    }
+
+    public SuperstructureLocation getAlgaeReefHeight() {
+        switch (selectedReefPos) {
+            case A:
+            case B:
+            case E:
+            case F:
+            case I:
+            case J:
+                return SuperstructureLocation.ALGAE_LEVEL_3_4;
+            case C:
+            case D:
+            case G:
+            case H:
+            case K:
+            case L:
+            default:
+                return SuperstructureLocation.ALGAE_LEVEL_2_3;
         }
     }
 
