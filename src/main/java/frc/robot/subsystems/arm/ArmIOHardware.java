@@ -2,35 +2,39 @@ package frc.robot.subsystems.arm;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
+import frc.robot.util.PhoenixUtil;
 
 public class ArmIOHardware implements ArmIO {
     private final SparkMax motor;
     private final RelativeEncoder encoder;
     private final AbsoluteEncoder absEncoder;
     private SparkClosedLoopController closedLoopController;
-    private ClosedLoopSlot slot = ClosedLoopSlot.kSlot0;//default to coral
+    private ClosedLoopSlot slot = ClosedLoopSlot.kSlot0; // default to coral
 
     ArmCals k;
 
     public ArmIOHardware(ArmCals cals) {
         k = cals;
         motor = new SparkMax(16, MotorType.kBrushless);
-        absEncoder = motor.getAbsoluteEncoder();
-        encoder = motor.getEncoder();
-        closedLoopController = motor.getClosedLoopController();
 
         SparkMaxConfig config = new SparkMaxConfig();
-        config.closedLoop.pid(5, 0.006, 2, ClosedLoopSlot.kSlot1).outputRange(-0.5, 0.5, ClosedLoopSlot.kSlot1).iZone(0.05, ClosedLoopSlot.kSlot1);
-        config.closedLoop.pid(5, 0.006, 2, ClosedLoopSlot.kSlot0).outputRange(-0.3, 0.3, ClosedLoopSlot.kSlot0).iZone(0.05, ClosedLoopSlot.kSlot0);
+        config.closedLoop
+                .pid(5, 0.006, 2, ClosedLoopSlot.kSlot1)
+                .outputRange(-0.5, 0.5, ClosedLoopSlot.kSlot1)
+                .iZone(0.05, ClosedLoopSlot.kSlot1);
+        config.closedLoop
+                .pid(5, 0.006, 2, ClosedLoopSlot.kSlot0)
+                .outputRange(-0.3, 0.3, ClosedLoopSlot.kSlot0)
+                .iZone(0.05, ClosedLoopSlot.kSlot0);
         config.closedLoopRampRate(0);
 
         config.smartCurrentLimit(70);
@@ -42,7 +46,18 @@ public class ArmIOHardware implements ArmIO {
         config.absoluteEncoder.inverted(true);
         config.absoluteEncoder.positionConversionFactor(1.0);
 
-        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        PhoenixUtil.tryUntilOkRev(
+                5,
+                () ->
+                        motor.configure(
+                                config,
+                                ResetMode.kResetSafeParameters,
+                                PersistMode.kPersistParameters));
+
+        absEncoder = motor.getAbsoluteEncoder();
+        encoder = motor.getEncoder();
+        closedLoopController = motor.getClosedLoopController();
+
         zero();
     }
 
@@ -77,7 +92,7 @@ public class ArmIOHardware implements ArmIO {
     }
 
     @Override
-    public void setPIDSlot(ClosedLoopSlot slot){
+    public void setPIDSlot(ClosedLoopSlot slot) {
         this.slot = slot;
     }
 

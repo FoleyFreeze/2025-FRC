@@ -146,8 +146,13 @@ public class Wrist extends SubsystemBase {
         return Radians.of(inputs.wristPositionRad);
     }
 
+    public boolean atTarget(Supplier<SuperstructureLocation> loc, boolean extraTol) {
+        double tol = extraTol ? k.closeEnough * 3 : k.closeEnough;
+        return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad) < tol;
+    }
+
     public boolean atTarget(Supplier<SuperstructureLocation> loc) {
-        return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad) < k.closeEnough;
+        return atTarget(loc, false);
     }
 
     public Command setVoltage(double volts) {

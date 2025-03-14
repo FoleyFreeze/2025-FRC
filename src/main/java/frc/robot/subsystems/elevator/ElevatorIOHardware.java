@@ -78,7 +78,7 @@ public class ElevatorIOHardware implements ElevatorIO {
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
         config.Slot0.kG = 0;
-        config.Slot0.kS = 30;
+        config.Slot0.kS = 5;
         config.Slot0.kV = 2;
         config.Slot0.kA = 2;
         config.Slot0.kP = 200;

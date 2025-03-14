@@ -2,9 +2,8 @@ package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.*;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import com.revrobotics.spark.ClosedLoopSlot;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
     @AutoLog
@@ -31,5 +30,5 @@ public interface ArmIO {
 
     public default void superZero() {}
 
-    public default void setPIDSlot(ClosedLoopSlot slot){}
+    public default void setPIDSlot(ClosedLoopSlot slot) {}
 }

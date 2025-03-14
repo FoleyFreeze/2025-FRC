@@ -92,10 +92,18 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean atTarget(Supplier<SuperstructureLocation> loc) {
+        return atTarget(loc, false);
+    }
+
+    public boolean atTarget(Supplier<SuperstructureLocation> loc, boolean tolerantElevator) {
         double target = loc.get().eleHeight.in(Inches);
         double curr = inputs.elevatorPositionInches;
 
-        return Math.abs(target - curr) < k.closeEnough;
+        if (tolerantElevator) {
+            return Math.abs(target - curr) < k.closeEnough * 4;
+        } else {
+            return Math.abs(target - curr) < k.closeEnough;
+        }
     }
 
     public void zero() {

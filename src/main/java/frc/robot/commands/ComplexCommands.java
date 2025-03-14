@@ -339,20 +339,25 @@ public class ComplexCommands {
 
     // moves elevator to a height with arm tucked up, then deploys arm
     public static Command goToLoc(Supplier<SuperstructureLocation> p) {
-        Command mainGoTo =
+        Command notInGather =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                         .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
                         .andThen(r.elevator.goTo(p))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
 
-        Command inGatherStep = r.elevator.goTo(() -> SuperstructureLocation.PRE_INTAKE);
+        Command inGather =
+                r.elevator
+                        .goTo(() -> SuperstructureLocation.PRE_INTAKE)
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.HOLD))
+                        .andThen(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
+                        .andThen(r.elevator.goTo(p))
+                        .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
 
         Command c =
                 new ConditionalCommand(
-                                inGatherStep,
-                                new InstantCommand(),
-                                () -> atLocation(SuperstructureLocation.INTAKE))
-                        .andThen(mainGoTo);
+                        inGather,
+                        notInGather,
+                        () -> atLocation(SuperstructureLocation.INTAKE, true));
 
         // arm to 0, elevator move, arm out
         c.setName("GoToLoc");
@@ -414,7 +419,10 @@ public class ComplexCommands {
                                                 new RunCommand(() -> {}),
                                                 goToLoc(() -> SuperstructureLocation.HOLD)
                                                         .andThen(new RunCommand(() -> {})),
-                                                () -> atLocation(SuperstructureLocation.INTAKE)),
+                                                () ->
+                                                        atLocation(
+                                                                SuperstructureLocation.INTAKE,
+                                                                true)),
                                         new ConditionalCommand(
                                                 (new RunCommand(() -> {})),
                                                 goToGather()
@@ -450,7 +458,7 @@ public class ComplexCommands {
                 new ConditionalCommand(
                         new InstantCommand(), // do nothing
                         toGather, // go to gather position
-                        () -> atLocation(SuperstructureLocation.INTAKE));
+                        () -> atLocation(SuperstructureLocation.INTAKE, true));
         c.setName("GoToGather");
         return c;
     }
@@ -494,10 +502,10 @@ public class ComplexCommands {
         return c;
     }
 
-    public static boolean atLocation(SuperstructureLocation loc) {
-        return r.arm.atTarget(() -> loc)
-                && r.elevator.atTarget(() -> loc)
-                && r.wrist.atTarget(() -> loc);
+    public static boolean atLocation(SuperstructureLocation loc, boolean extraTolerance) {
+        return r.arm.atTarget(() -> loc, extraTolerance)
+                && r.elevator.atTarget(() -> loc, extraTolerance)
+                && r.wrist.atTarget(() -> loc, extraTolerance);
     }
 
     public static Command zeroSuperstructure() {

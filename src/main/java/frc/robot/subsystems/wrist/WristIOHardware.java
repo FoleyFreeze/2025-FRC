@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
+import frc.robot.util.PhoenixUtil;
 
 public class WristIOHardware implements WristIO {
     private final SparkMax motor;
@@ -21,9 +22,6 @@ public class WristIOHardware implements WristIO {
     public WristIOHardware(WristCals k) {
         this.k = k;
         motor = new SparkMax(15, MotorType.kBrushless);
-        absEncoder = motor.getAbsoluteEncoder();
-        encoder = motor.getEncoder();
-        closedLoopController = motor.getClosedLoopController();
 
         SparkMaxConfig config = new SparkMaxConfig();
         config.closedLoop.pid(4, 0, 0).outputRange(-0.4, 0.4);
@@ -39,7 +37,17 @@ public class WristIOHardware implements WristIO {
         config.absoluteEncoder.zeroOffset(1 - 0.2155 - 0.1689);
         config.absoluteEncoder.positionConversionFactor(1);
 
-        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        PhoenixUtil.tryUntilOkRev(
+                5,
+                () ->
+                        motor.configure(
+                                config,
+                                ResetMode.kResetSafeParameters,
+                                PersistMode.kPersistParameters));
+
+        absEncoder = motor.getAbsoluteEncoder();
+        encoder = motor.getEncoder();
+        closedLoopController = motor.getClosedLoopController();
 
         zero();
     }

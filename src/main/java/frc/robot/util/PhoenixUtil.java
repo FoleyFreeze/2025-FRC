@@ -16,6 +16,7 @@ package frc.robot.util;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.StatusCode;
+import com.revrobotics.REVLibError;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
@@ -29,6 +30,17 @@ public class PhoenixUtil {
             if (error.isOK()) break;
         }
         if (i == maxAttempts) System.out.println("FAILED TO APPLY CTRE COMMAND!!!!!!!!!!!!!!");
+        if (i > 0) System.out.println("CTRE init took " + i + " trys");
+    }
+
+    public static void tryUntilOkRev(int maxAttempts, Supplier<REVLibError> command) {
+        int i = 0;
+        for (; i < maxAttempts; i++) {
+            var error = command.get();
+            if (error == REVLibError.kOk) break;
+        }
+        if (i == maxAttempts) System.out.println("FAILED TO APPLY REV COMMAND!!!!!!!!!!!!!!");
+        if (i > 0) System.out.println("Rev init took " + i + " trys");
     }
 
     public static double[] getSimulationOdometryTimeStamps() {

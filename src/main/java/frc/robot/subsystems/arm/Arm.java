@@ -2,6 +2,7 @@ package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Radians;
 
+import com.revrobotics.spark.ClosedLoopSlot;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -79,11 +80,16 @@ public class Arm extends SubsystemBase {
         })*/ ;
     }
 
-    public boolean atTarget(Supplier<SuperstructureLocation> loc) {
+    public boolean atTarget(Supplier<SuperstructureLocation> loc, boolean extraTol) {
         double target = loc.get().armAngle.in(Radians);
         double curr = inputs.armPositionRad;
 
-        return Math.abs(target - curr) < k.closeEnough;
+        double tol = extraTol ? k.closeEnough * 3 : k.closeEnough;
+        return Math.abs(target - curr) < tol;
+    }
+
+    public boolean atTarget(Supplier<SuperstructureLocation> loc) {
+        return atTarget(loc, false);
     }
 
     public Command stop() {
@@ -102,5 +108,10 @@ public class Arm extends SubsystemBase {
     public Command setVoltage(double volts) {
         Command c = new InstantCommand(() -> io.setArmVolts(volts), this);
         return c;
+    }
+
+    public void setPIDSlot(ClosedLoopSlot slot) {
+        io.setPIDSlot(slot);
+        System.out.println("Arm PID set to slot: " + slot);
     }
 }

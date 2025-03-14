@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
+import frc.robot.util.PhoenixUtil;
 
 public class ClimbIOHardware implements ClimbIO {
     ClimbCals k;
@@ -19,12 +20,9 @@ public class ClimbIOHardware implements ClimbIO {
     private SparkClosedLoopController closedLoopController;
 
     public ClimbIOHardware(ClimbCals cals) {
-        this.k = k;
+        this.k = cals;
         motor = new SparkMax(14, MotorType.kBrushless);
-        encoder = motor.getEncoder();
-        absEnc = motor.getAbsoluteEncoder();
-        closedLoopController = motor.getClosedLoopController();
-        // TODO: fill out the nums, yo
+
         SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(true);
         config.idleMode(IdleMode.kBrake);
@@ -35,7 +33,18 @@ public class ClimbIOHardware implements ClimbIO {
         config.secondaryCurrentLimit(60);
         config.encoder.positionConversionFactor(1.0 / cals.gearRatio);
 
-        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        PhoenixUtil.tryUntilOkRev(
+                5,
+                () ->
+                        motor.configure(
+                                config,
+                                ResetMode.kResetSafeParameters,
+                                PersistMode.kPersistParameters));
+
+        encoder = motor.getEncoder();
+        absEnc = motor.getAbsoluteEncoder();
+        closedLoopController = motor.getClosedLoopController();
+
         zero();
     }
 

@@ -18,6 +18,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.events.EventTrigger;
+import com.revrobotics.spark.ClosedLoopSlot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -275,10 +276,20 @@ public class RobotContainer {
         // get safely out of climb position
         controlBoard.climbModeT.onFalse(ComplexCommands.leaveClimb());
 
+        // OTHER
+
         // stop button
         flysky.topRightMomentSWC.onTrue(
                 ComplexCommands.stopSuperstructure()
                         .alongWith(new InstantCommand(() -> state.hasStop = true))
+                        .ignoringDisable(true));
+
+        // slot 0 for coral, 1 for algae
+        controlBoard.algaeModeT.onTrue(
+                new InstantCommand(() -> arm.setPIDSlot(ClosedLoopSlot.kSlot1))
+                        .ignoringDisable(true));
+        controlBoard.algaeModeT.onFalse(
+                new InstantCommand(() -> arm.setPIDSlot(ClosedLoopSlot.kSlot0))
                         .ignoringDisable(true));
     }
 
