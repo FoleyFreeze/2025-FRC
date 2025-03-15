@@ -91,7 +91,7 @@ public class PathCache {
         if (!isGather) {
             poseList.add(
                     dest.transformBy(
-                            new Transform2d(Units.inchesToMeters(-12), 0, Rotation2d.kZero)));
+                            new Transform2d(Units.inchesToMeters(-20), 0, Rotation2d.kZero)));
         }
         poseList.add(dest);
 

@@ -20,9 +20,9 @@ import java.util.function.Supplier;
 public class ComplexCommands {
 
     public static double holdPowerCoral = 0.4;
-    static double releasePowerCoral = -3;
-    static double releasePowerCoral4 = -4;
-    public static double releasePowerCoral1 = -1.5;
+    static double releasePowerCoral = -2;
+    static double releasePowerCoral4 = -2.5;
+    public static double releasePowerCoral1 = -1.0;
     static double releaseTimeCoral = 0.5;
 
     public static double intakePowerCoral = 2.0;
@@ -44,7 +44,7 @@ public class ComplexCommands {
 
     static double pulseGatherOn = 0.2;
     static double pulseGatherOff = 0.2;
-    static double pulseGatherOffPwr = 0;
+    static double pulseGatherOffPwr = -0.05;
 
     public static RobotContainer r;
 
@@ -461,8 +461,8 @@ public class ComplexCommands {
 
         Command c =
                 new ConditionalCommand(
-                        new InstantCommand(), // do nothing
-                        toGather, // go to gather position
+                        rawGoTo(() -> SuperstructureLocation.INTAKE), // go directly to intake
+                        toGather, // go to gather position via sequence
                         () -> atLocation(SuperstructureLocation.INTAKE, true));
         c.setName("GoToGather");
         return c;

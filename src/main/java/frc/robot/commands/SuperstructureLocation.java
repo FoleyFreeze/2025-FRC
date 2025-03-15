@@ -15,7 +15,7 @@ public enum SuperstructureLocation {
     HOLD_ALGAE(14.7, 90, 228),
 
     LEVEL1(0.25, 66, 15),
-    LEVEL2(4.25, 14, 73),
+    LEVEL2(5.25, 14, 73),
     LEVEL3(18.5, 14, 73),
     LEVEL4(40.7 + 1.75, 20, 88),
     ALGAE_DESCORE2_3(24, 98, 75),
@@ -36,8 +36,8 @@ public enum SuperstructureLocation {
     SCORE_PROCESSOR(4, 110, 248),
 
     PRE_INTAKE(0.10, -49, -69.5),
-    INTAKE(1.5, -53, -66),
-    POST_INTAKE(0.10, -30, -30),
+    INTAKE(2.1, -56, -66),
+    POST_INTAKE(0.10, -27, -30),
 
     CLIMB_SAFE(0.25, 45, -20),
     LOW_CLIMB(0.25, -73, -50);

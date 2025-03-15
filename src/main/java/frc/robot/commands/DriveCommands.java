@@ -501,4 +501,21 @@ public class DriveCommands {
                     () -> Locations.isBlue());
         }
     }
+
+    public static Command zeroDrive60(RobotContainer r) {
+        return new ConditionalCommand(
+                new InstantCommand(
+                        () ->
+                                r.drive.setPose(
+                                        new Pose2d(
+                                                r.drive.getPose().getTranslation(),
+                                                new Rotation2d(Units.degreesToRadians(60))))),
+                new InstantCommand(
+                        () ->
+                                r.drive.setPose(
+                                        new Pose2d(
+                                                r.drive.getPose().getTranslation(),
+                                                new Rotation2d(Units.degreesToRadians(240))))),
+                () -> Locations.isBlue());
+    }
 }

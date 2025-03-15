@@ -81,12 +81,12 @@ public class ElevatorIOHardware implements ElevatorIO {
         config.Slot0.kS = 5;
         config.Slot0.kV = 2;
         config.Slot0.kA = 2;
-        config.Slot0.kP = 200;
+        config.Slot0.kP = 250;
         config.Slot0.kI = 400; // 15;
         config.Slot0.kD = 15;
 
         config.TorqueCurrent.PeakForwardTorqueCurrent = 140;
-        config.TorqueCurrent.PeakReverseTorqueCurrent = -60;
+        config.TorqueCurrent.PeakReverseTorqueCurrent = -100;
 
         config.MotionMagic.MotionMagicCruiseVelocity = 15;
         config.MotionMagic.MotionMagicAcceleration = 35;

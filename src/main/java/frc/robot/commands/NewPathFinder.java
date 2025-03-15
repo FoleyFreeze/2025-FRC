@@ -24,9 +24,9 @@ public class NewPathFinder extends Command {
     private Supplier<Pose2d> poseSupplier;
     private Command c;
     PathConstraints globalConstraints =
-            new PathConstraints(2, 3, 2, 2); // vel, accel, rotvel, rotaccel
+            new PathConstraints(3.5, 3.5, 6, 4); // vel, accel, rotvel, rotaccel
     PathConstraints finalConstraints =
-            new PathConstraints(1, 1.5, 2, 2); // vel, accel, rotvel, rotaccel
+            new PathConstraints(1.25, 1.5, 3, 2); // vel, accel, rotvel, rotaccel
 
     public NewPathFinder(RobotContainer r, Supplier<Pose2d> poseSupplier, boolean isGather) {
         this.poseSupplier = poseSupplier;
@@ -51,7 +51,7 @@ public class NewPathFinder extends Command {
                 new ConstraintsZone(waypoints.size() - 2, waypoints.size() - 1, finalConstraints);
         RotationTarget rt = new RotationTarget(waypoints.size() - 2, flipPose.getRotation());
         EventMarker em =
-                new EventMarker("InSlowDrivePhase", waypoints.size() - 2, waypoints.size() - 1);
+                new EventMarker("InSlowDrivePhase", waypoints.size() - 2.8, waypoints.size() - 1);
 
         PathPlannerPath path =
                 new PathPlannerPath(
