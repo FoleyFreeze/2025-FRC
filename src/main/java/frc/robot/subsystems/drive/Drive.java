@@ -368,14 +368,13 @@ public class Drive extends SubsystemBase {
         ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
-
         // Log unoptimized setpoints and setpoint speeds
         Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
         Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
 
         // Send setpoints to modules
         for (int i = 0; i < 4; i++) {
-            modules[i].runSetpoint(setpointStates[i]);
+            modules[i].runSetpoint(setpointStates[i], accels.accelerationsMPSSq()[i]);
         }
 
         // Log optimized setpoints (runSetpoint mutates each state)
@@ -475,9 +474,10 @@ public class Drive extends SubsystemBase {
         return getPose().getRotation();
     }
 
+    //field oriented speeds
     @AutoLogOutput(key = "Odometry/RobotVel")
     public ChassisSpeeds getVelocity() {
-        return robotVelocity;
+        return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getRotation());
     }
 
     /** Resets the current odometry pose. */
