@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -64,6 +65,8 @@ public class Wrist extends SubsystemBase {
                 "Wrist/MaxBound",
                 cvrtLocalToEnc(
                         k.maxLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians)));
+
+        SmartDashboard.putNumber("WristAbs", inputs.absEncAngleRaw);
     }
 
     public double getVoltage() {

@@ -310,10 +310,10 @@ public class RobotContainer {
                                         () -> SuperstructureLocation.HOLD_ALGAE_XFER)));
         controlBoard.algaeModeT.onFalse(ComplexCommands.goToLoc(() -> SuperstructureLocation.HOLD));
 
-        isDisabledOrAuto.onTrue(
-                new InstantCommand(() -> drive.setBrakes(true)).ignoringDisable(true));
-        isDisabledOrAuto.onFalse(
-                new InstantCommand(() -> drive.setBrakes(false)).ignoringDisable(true));
+        // isDisabledOrAuto.onTrue(
+        //         new InstantCommand(() -> drive.setBrakes(true)).ignoringDisable(true));
+        // isDisabledOrAuto.onFalse(
+        //         new InstantCommand(() -> drive.setBrakes(false)).ignoringDisable(true));
     }
 
     public void robotPeriodic() {

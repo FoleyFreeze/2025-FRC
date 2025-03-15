@@ -42,7 +42,8 @@ public class ArmIOHardware implements ArmIO {
 
         config.encoder.positionConversionFactor(1.0 / cals.gearRatio);
         config.absoluteEncoder.zeroCentered(true);
-        config.absoluteEncoder.zeroOffset(0.3180);
+        // inverted, so subtract positives and add negatives
+        config.absoluteEncoder.zeroOffset(0.3180 + 0.1337 + 0.0106);
         config.absoluteEncoder.inverted(true);
         config.absoluteEncoder.positionConversionFactor(1.0);
 

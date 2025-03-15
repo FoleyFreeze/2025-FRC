@@ -38,7 +38,7 @@ public enum SuperstructureLocation {
     SCORE_PROCESSOR(4, 110, 248),
 
     PRE_INTAKE(0.10, -49, -69.5),
-    INTAKE(2.1, -56, -66),
+    INTAKE(2.1, -56, -63),
     POST_INTAKE(0.10, -27, -30),
 
     CLIMB_SAFE(0.25, 45, -20),
