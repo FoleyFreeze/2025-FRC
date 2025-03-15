@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.events.EventTrigger;
 import com.revrobotics.spark.ClosedLoopSlot;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auton.AutonCommands;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SuperstructureLocation;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.BotState;
@@ -81,7 +83,8 @@ public class RobotContainer {
     // Pathplanner triggers
     public EventTrigger inSlowDrivePhase;
 
-    public Trigger isDisabled = new Trigger(() -> DriverStation.isDisabled());
+    public Trigger isDisabledOrAuto =
+            new Trigger(() -> DriverStation.isDisabled() || DriverStation.isAutonomous());
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -110,7 +113,8 @@ public class RobotContainer {
         inSlowDrivePhase = new EventTrigger("InSlowDrivePhase");
 
         // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices");
+        // autoChooser = new LoggedDashboardChooser<>("Auto Choices");
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         autoChooser.addDefaultOption("Selectable", null);
 
@@ -298,8 +302,18 @@ public class RobotContainer {
                 new InstantCommand(() -> arm.setPIDSlot(ClosedLoopSlot.kSlot0))
                         .ignoringDisable(true));
 
-        isDisabled.onTrue(new InstantCommand(() -> drive.setBrakes(true)).ignoringDisable(true));
-        isDisabled.onFalse(new InstantCommand(() -> drive.setBrakes(false)).ignoringDisable(true));
+        // move to a hold position when switching modes
+        controlBoard.algaeModeT.onTrue(
+                new InstantCommand(() -> state.hasCoral = false)
+                        .andThen(
+                                ComplexCommands.goToLoc(
+                                        () -> SuperstructureLocation.HOLD_ALGAE_XFER)));
+        controlBoard.algaeModeT.onFalse(ComplexCommands.goToLoc(() -> SuperstructureLocation.HOLD));
+
+        isDisabledOrAuto.onTrue(
+                new InstantCommand(() -> drive.setBrakes(true)).ignoringDisable(true));
+        isDisabledOrAuto.onFalse(
+                new InstantCommand(() -> drive.setBrakes(false)).ignoringDisable(true));
     }
 
     public void robotPeriodic() {

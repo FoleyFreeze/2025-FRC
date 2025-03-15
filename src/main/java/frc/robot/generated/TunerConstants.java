@@ -35,7 +35,7 @@ public class TunerConstants {
                     .withKD(0)
                     .withKS(0.21)
                     .withKV(0.124 * 6.12)
-                    .withKA(0.03939);//see excel sheet
+                    .withKA(0.015 * 6.12); // see excel sheet
 
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors

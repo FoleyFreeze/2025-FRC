@@ -11,6 +11,8 @@ public enum SuperstructureLocation {
     // inches, degress, degrees
     HOLD(0.25, 5, -25),
     HOLD_GATHER(0.25, 5, -70),
+    HOLD_ALGAE_XFER(16, 5, 140),
+
     VERT_ALGAE(19, 8, 193),
     HOLD_ALGAE(14.7, 90, 228),
 

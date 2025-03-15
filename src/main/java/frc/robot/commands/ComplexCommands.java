@@ -528,7 +528,8 @@ public class ComplexCommands {
     public static Command rezeroWrist() {
         SequentialCommandGroup c = new SequentialCommandGroup();
         c.addCommands(r.hand.setVoltageCmd(releasePowerCoral));
-        c.addCommands(goToLoc(() -> SuperstructureLocation.HOLD));
+        c.addCommands(r.arm.goTo(() -> SuperstructureLocation.HOLD));
+        c.addCommands(r.elevator.goTo(() -> SuperstructureLocation.HOLD));
         c.addCommands(r.hand.stop());
         c.addCommands(r.wrist.setVoltage(-2));
         c.addCommands(new WaitCommand(2));

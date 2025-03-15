@@ -371,6 +371,7 @@ public class Drive extends SubsystemBase {
         // Log unoptimized setpoints and setpoint speeds
         Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
         Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
+        Logger.recordOutput("SwerveChassisSpeeds/Accel", accels.accelerationsMPSSq());
 
         // Send setpoints to modules
         for (int i = 0; i < 4; i++) {
@@ -474,7 +475,7 @@ public class Drive extends SubsystemBase {
         return getPose().getRotation();
     }
 
-    //field oriented speeds
+    // field oriented speeds
     @AutoLogOutput(key = "Odometry/RobotVel")
     public ChassisSpeeds getVelocity() {
         return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getRotation());

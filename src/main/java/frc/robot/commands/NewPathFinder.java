@@ -23,10 +23,12 @@ public class NewPathFinder extends Command {
 
     private Supplier<Pose2d> poseSupplier;
     private Command c;
-    PathConstraints globalConstraints =
-            new PathConstraints(3.5, 3.5, 6, 4); // vel, accel, rotvel, rotaccel
-    PathConstraints finalConstraints =
-            new PathConstraints(1.25, 1.5, 3, 2); // vel, accel, rotvel, rotaccel
+
+    // vel, accel, rotvel, rotaccel
+    PathConstraints globalConstraints = new PathConstraints(3.5, 6, 6, 4);
+    // PathConstraints globalConstraints = new PathConstraints(1, 3, 6, 4);
+    PathConstraints finalConstraints = new PathConstraints(1.25, 1.5, 3, 2);
+    PathConstraints finalConstraintsAlgae = new PathConstraints(2, 2, 3, 2);
 
     public NewPathFinder(RobotContainer r, Supplier<Pose2d> poseSupplier, boolean isGather) {
         this.poseSupplier = poseSupplier;
@@ -47,11 +49,34 @@ public class NewPathFinder extends Command {
             flipPose = targetPose;
         }
 
+        double startMovingThingsPosition;
+        if (r.controlBoard.algaeModeT.getAsBoolean()) {
+            startMovingThingsPosition = 0.25;
+        } else {
+            // coral
+            if (r.controlBoard.selectedLevel == 4) {
+                startMovingThingsPosition = waypoints.size() - 2.8;
+            } else {
+                startMovingThingsPosition = waypoints.size() - 2.2;
+            }
+        }
+        if (startMovingThingsPosition < 0) {
+            startMovingThingsPosition = 0;
+        }
+
+        PathConstraints selectedConstraint;
+        if (r.controlBoard.algaeModeT.getAsBoolean()) {
+            selectedConstraint = finalConstraintsAlgae;
+        } else {
+            selectedConstraint = finalConstraints;
+        }
+
         ConstraintsZone cz =
-                new ConstraintsZone(waypoints.size() - 2, waypoints.size() - 1, finalConstraints);
+                new ConstraintsZone(waypoints.size() - 2, waypoints.size() - 1, selectedConstraint);
         RotationTarget rt = new RotationTarget(waypoints.size() - 2, flipPose.getRotation());
         EventMarker em =
-                new EventMarker("InSlowDrivePhase", waypoints.size() - 2.8, waypoints.size() - 1);
+                new EventMarker(
+                        "InSlowDrivePhase", startMovingThingsPosition, waypoints.size() - 1);
 
         PathPlannerPath path =
                 new PathPlannerPath(

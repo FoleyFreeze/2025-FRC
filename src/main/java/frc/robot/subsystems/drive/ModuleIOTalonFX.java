@@ -269,7 +269,9 @@ public class ModuleIOTalonFX implements ModuleIO {
         double accelRotations = Units.radiansToRotations(accel);
         driveTalon.setControl(
                 switch (constants.DriveMotorClosedLoopOutput) {
-                    case Voltage -> velocityVoltageRequest.withVelocity(velocityRotPerSec).withAcceleration(accelRotations);
+                    case Voltage -> velocityVoltageRequest
+                            .withVelocity(velocityRotPerSec)
+                            .withAcceleration(accelRotations);
                     case TorqueCurrentFOC -> velocityTorqueCurrentRequest.withVelocity(
                             velocityRotPerSec);
                 });
