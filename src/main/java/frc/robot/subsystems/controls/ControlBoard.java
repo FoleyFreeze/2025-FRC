@@ -107,6 +107,10 @@ public class ControlBoard {
     public Trigger shiftT = new Trigger(() -> shift);
     public Trigger submergeT = new Trigger(() -> submerge);
 
+    public Trigger jogA = new Trigger(() -> cb.getRawButton(7));
+    public Trigger jogB = new Trigger(() -> cb.getRawButton(8));
+    public Trigger gatherBtn = new Trigger(() -> cb.getRawButton(6));
+
     public void periodic() {
         if (!useShuffleboard.get()) {
             selectedClimbMode = cb.getRawButton(1);
@@ -133,28 +137,53 @@ public class ControlBoard {
 
             if (cb2.getRawButton(1)) {
                 selectedReefPos = ReefSticks.A;
+                r.localLedVal = 0;
+                r.ledOutputSet(1, true);
             } else if (cb2.getRawButton(2)) {
                 selectedReefPos = ReefSticks.B;
+                r.localLedVal = 0;
+                r.ledOutputSet(4, true);
             } else if (cb2.getRawButton(3)) {
                 selectedReefPos = ReefSticks.C;
+                r.localLedVal = 0;
+                r.ledOutputSet(7, true);
             } else if (cb2.getRawButton(4)) {
                 selectedReefPos = ReefSticks.D;
+                r.localLedVal = 0;
+                r.ledOutputSet(10, true);
             } else if (cb2.getRawButton(5)) {
                 selectedReefPos = ReefSticks.E;
+                r.localLedVal = 0;
+                r.ledOutputSet(13, true);
             } else if (cb2.getRawButton(6)) {
                 selectedReefPos = ReefSticks.F;
+                r.localLedVal = 0;
+                r.ledOutputSet(16, true);
             } else if (cb2.getRawButton(7)) {
                 selectedReefPos = ReefSticks.G;
+                r.localLedVal = 0;
+                r.ledOutputSet(19, true);
             } else if (cb2.getRawButton(8)) {
                 selectedReefPos = ReefSticks.H;
+                r.localLedVal = 0;
+                r.ledOutputSet(25, true);
             } else if (cb2.getPOV() == 270) {
                 selectedReefPos = ReefSticks.I;
+                r.localLedVal = 0;
+                r.ledOutputSet(28, true);
             } else if (cb2.getPOV() == 0) {
                 selectedReefPos = ReefSticks.J;
+                r.localLedVal = 0;
+                r.ledOutputSet(31, true);
             } else if (cb2.getPOV() == 90) {
                 selectedReefPos = ReefSticks.K;
+                r.localLedVal = 0;
+
             } else if (cb2.getPOV() == 180) {
                 selectedReefPos = ReefSticks.L;
+                r.localLedVal = 0;
+                r.ledOutputSet(2, true);
+                r.ledOutputSet(3, true);
             }
 
             if (cb2.getRawButton(9)) {
@@ -370,5 +399,25 @@ public class ControlBoard {
 
     public double dotProduct(Translation2d a, ChassisSpeeds b) {
         return a.getX() * b.vyMetersPerSecond + a.getY() * b.vxMetersPerSecond;
+    }
+
+    public SuperstructureLocation getAlgaeReefDSHeight() {
+        switch (selectedReefPos) {
+            case A:
+            case B:
+            case E:
+            case F:
+            case I:
+            case J:
+                return SuperstructureLocation.ALGAE_DESCORE3_4;
+            case C:
+            case D:
+            case G:
+            case H:
+            case K:
+            case L:
+            default:
+                return SuperstructureLocation.ALGAE_DESCORE2_3;
+        }
     }
 }

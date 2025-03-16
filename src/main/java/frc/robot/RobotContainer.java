@@ -23,6 +23,10 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -144,6 +148,8 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+
+        initOutputLed();
     }
 
     /**
@@ -347,6 +353,33 @@ public class RobotContainer {
         SmartDashboard.putNumber("ClimbPos", climb.inputs.climbAbsPosition);
 
         state.periodic();
+
+        ledEnable.set(true);
+        // ledValue.set(localLedVal);
+    }
+
+    BooleanPublisher ledEnable;
+    IntegerPublisher ledValue;
+    public int localLedVal = 0;
+
+    public void ledOutputSet(int value, boolean on) {
+        int v = 1 << value;
+        if (on) {
+            localLedVal |= v;
+        } else {
+            localLedVal &= ~v;
+        }
+        ledValue.set(localLedVal);
+    }
+
+    public void initOutputLed() {
+        NetworkTableInstance nt = NetworkTableInstance.getDefault();
+        NetworkTable table = nt.getTable("ControlBoard");
+        ledEnable = table.getBooleanTopic("LED_Enable").publish();
+        ledValue = table.getIntegerTopic("LED_Output").publish();
+
+        ledEnable.set(true);
+        ledValue.set(65535);
     }
 
     /**
