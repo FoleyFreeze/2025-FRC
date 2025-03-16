@@ -20,8 +20,8 @@ public enum SuperstructureLocation {
     LEVEL2(5.25, 14, 73),
     LEVEL3(18.5, 14, 73),
     LEVEL4(40.7 + 1.75, 20, 88),
-    ALGAE_DESCORE2_3(24, 98, 75),
-    ALGAE_DESCORE3_4(39, 98, 75),
+    ALGAE_DESCORE2_3(28.5, 115, 42),
+    ALGAE_DESCORE3_4(41.4, 115, 42),
 
     PRENET(22, 90, 228),
     NET(32, 22, 165),

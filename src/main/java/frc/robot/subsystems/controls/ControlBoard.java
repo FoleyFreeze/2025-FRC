@@ -371,4 +371,24 @@ public class ControlBoard {
     public double dotProduct(Translation2d a, ChassisSpeeds b) {
         return a.getX() * b.vyMetersPerSecond + a.getY() * b.vxMetersPerSecond;
     }
+
+    public SuperstructureLocation getAlgaeReefDSHeight() {
+        switch (selectedReefPos) {
+            case A:
+            case B:
+            case E:
+            case F:
+            case I:
+            case J:
+                return SuperstructureLocation.ALGAE_DESCORE3_4;
+            case C:
+            case D:
+            case G:
+            case H:
+            case K:
+            case L:
+            default:
+                return SuperstructureLocation.ALGAE_DESCORE2_3;
+        }
+    }
 }
