@@ -16,7 +16,7 @@ public class CVisionCals {
     // need to offset along Y for the camera offset this is 12 inches
     public Pose2d camLocation =
             new Pose2d(
-                    Units.inchesToMeters(6), Units.inchesToMeters(-12), Rotation2d.fromDegrees(0));
+                    Units.inchesToMeters(12), Units.inchesToMeters(6), Rotation2d.fromDegrees(90));
 
     /*
     public Pose3d tagCamLocation = new Pose3d(new Translation3d(

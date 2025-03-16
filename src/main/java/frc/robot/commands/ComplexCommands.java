@@ -434,7 +434,7 @@ public class ComplexCommands {
                                                 // ending
                                                 r.controlBoard.algaeModeT), // coral/algae sw
                                         r.state.hasCoralT),
-                                r.state.hasStopT)
+                                r.state.hasStopT.or(r.controlBoard.climbModeT))
                         .andThen(new WaitUntilCommand(() -> false));
         c.setName("HomeLogic");
         return c;

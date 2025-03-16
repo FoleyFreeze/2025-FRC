@@ -275,12 +275,13 @@ public class RobotContainer {
                 .and(controlBoard.climbModeT) // climb sw
                 .whileTrue(r.climb.setClimbVoltage(12));
 
+        // camera climb
         // flysky.rightTriggerSWG // score sw
-        //         .and(controlBoard.climbModeT) // climb sw
-        //         .whileTrue(new CmdDriveCageTraj(r));
+        //        .and(controlBoard.climbModeT) // climb sw
+        //        .whileTrue(new CmdDriveCageTraj(r));
 
         // get safely into climb mode
-        controlBoard.climbModeT.whileTrue(
+        controlBoard.climbModeT.onTrue(
                 ComplexCommands.goToClimb().andThen(new RunCommand(() -> {})));
 
         // get safely out of climb position

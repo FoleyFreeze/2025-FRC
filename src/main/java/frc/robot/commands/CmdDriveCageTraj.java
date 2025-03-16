@@ -111,7 +111,9 @@ public class CmdDriveCageTraj extends Command {
         List<Waypoint> wayPoints =
                 PathPlannerPath.waypointsFromPoses(
                         new Pose2d(pathStart, getVelocityAngle(r.drive.getVelocity(), pathVector)),
-                        new Pose2d(pathEndLocation, r.drive.getRotation()));
+                        new Pose2d(
+                                pathEndLocation,
+                                r.drive.getRotation().plus(Rotation2d.kCCW_90deg)));
 
         System.out.println("Created path starting at: " + wayPoints.get(0).toString());
         System.out.println("and Ending at: " + wayPoints.get(wayPoints.size() - 1).toString());
