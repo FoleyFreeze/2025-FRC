@@ -39,6 +39,7 @@ public class ComplexCommands {
     static double superSuckAlgae = 6;
     static double algaeHighLim = 90;
     static double algaeLowLim = 40;
+    static double stripTime = 2; // make smaller
 
     static double gatherPosition = 0;
 
@@ -49,6 +50,26 @@ public class ComplexCommands {
     public static RobotContainer r;
 
     // ALGAE COMMANDS
+
+    public static Command stripAlgae() {
+        Command c =
+                // hand goes up
+                r.wrist
+                        .goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3)
+                        // robot slides over to center
+                        .andThen(DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose))
+                        // arm angles down
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3))
+                        .andThen(r.hand.setVoltageCmd(intakeAlgaePower))
+                        // drops elevator on algae
+                        .andThen(r.elevator.goTo(r.controlBoard::getAlgaeReefDSHeight))
+                        .andThen(new WaitCommand(stripTime))
+                        .andThen(r.hand.setVoltageCmd(0));
+                        
+
+        c.setName("StripAlgae");
+        return c;
+    }
 
     public static Command releaseAlgae() {
         Command c =
@@ -330,7 +351,12 @@ public class ComplexCommands {
                                                                                                 r.state
                                                                                                         .pathCompleteT)
                                                                                         .getAsBoolean())))
-                                        .andThen(releaseCoral()));
+                                        .andThen(releaseCoral()))
+                        .andThen(
+                                new ConditionalCommand(
+                                        stripAlgae(),
+                                        new InstantCommand(),
+                                        r.flysky.botRightSWHLo.negate()));
         c.setName("VisionCoralScore");
         return c;
     }
