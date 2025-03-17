@@ -3,6 +3,8 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -18,6 +20,9 @@ public class Elevator extends SubsystemBase {
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
     public ElevatorCals k;
+
+    private final Alert elevatorDisconnectedAlert =
+            new Alert("Elevator Disconnected.", AlertType.kError);
 
     SuperstructureLocation target = null;
 
@@ -51,6 +56,8 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
 
         Logger.recordOutput("Elevator/Setpoint", target == null ? 0 : target.eleHeight.in(Inches));
+
+        elevatorDisconnectedAlert.set(!inputs.elevatorConnected);
     }
 
     public Distance getHeight() {

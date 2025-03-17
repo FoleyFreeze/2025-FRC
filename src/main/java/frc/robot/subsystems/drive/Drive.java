@@ -108,6 +108,8 @@ public class Drive extends SubsystemBase {
     private final Alert gyroDisconnectedAlert =
             new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
+    private final Alert driveTempAlert = new Alert("Drive Motor Temp > 150", AlertType.kWarning);
+
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     private Rotation2d rawGyroRotation = new Rotation2d();
     private SwerveModulePosition[] lastModulePositions = // For delta tracking
@@ -337,6 +339,17 @@ public class Drive extends SubsystemBase {
 
         // Update gyro alert
         gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+
+        double maxTemp = 0;
+        for(var module : modules){
+            double temp = module.inputs.driveTempF;
+            if(temp > maxTemp) maxTemp = temp;
+            temp = module.inputs.turnTempF;
+            if(temp > maxTemp) maxTemp = temp;
+        }
+
+        //update temperature alert
+        driveTempAlert.set(maxTemp > 150);
     }
 
     /**
