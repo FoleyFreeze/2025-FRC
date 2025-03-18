@@ -32,7 +32,7 @@ public class ArmIOHardware implements ArmIO {
                 .outputRange(-0.5, 0.5, ClosedLoopSlot.kSlot1)
                 .iZone(0.05, ClosedLoopSlot.kSlot1);
         config.closedLoop
-                .pid(10, 0.006, 150, ClosedLoopSlot.kSlot0)
+                .pid(4, 0.006, 100, ClosedLoopSlot.kSlot0)
                 .outputRange(-0.3, 0.3, ClosedLoopSlot.kSlot0)
                 .iZone(0.05, ClosedLoopSlot.kSlot0);
         config.closedLoopRampRate(0);
@@ -43,7 +43,7 @@ public class ArmIOHardware implements ArmIO {
         config.encoder.positionConversionFactor(1.0 / cals.gearRatio);
         config.absoluteEncoder.zeroCentered(true);
         // inverted, so subtract positives and add negatives
-        config.absoluteEncoder.zeroOffset(0.3180 + 0.1337 + 0.0106);
+        config.absoluteEncoder.zeroOffset(0.3180 + 0.1337 + 0.0106 - 0.0799);
         config.absoluteEncoder.inverted(true);
         config.absoluteEncoder.positionConversionFactor(1.0);
 

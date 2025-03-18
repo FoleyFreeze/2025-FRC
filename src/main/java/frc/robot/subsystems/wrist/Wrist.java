@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -18,6 +20,8 @@ import org.littletonrobotics.junction.Logger;
 public class Wrist extends SubsystemBase {
     private final WristIO io;
     private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
+
+    private final Alert wristDisconnectedAlert = new Alert("Wrist Disconnected", AlertType.kError);
 
     SuperstructureLocation target = null;
     WristCals k;
@@ -67,6 +71,8 @@ public class Wrist extends SubsystemBase {
                         k.maxLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians)));
 
         SmartDashboard.putNumber("WristAbs", inputs.absEncAngleRaw);
+
+        wristDisconnectedAlert.set(!inputs.wristConnected);
     }
 
     public double getVoltage() {

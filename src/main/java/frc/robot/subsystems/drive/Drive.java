@@ -341,14 +341,14 @@ public class Drive extends SubsystemBase {
         gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
         double maxTemp = 0;
-        for(var module : modules){
+        for (var module : modules) {
             double temp = module.inputs.driveTempF;
-            if(temp > maxTemp) maxTemp = temp;
+            if (temp > maxTemp) maxTemp = temp;
             temp = module.inputs.turnTempF;
-            if(temp > maxTemp) maxTemp = temp;
+            if (temp > maxTemp) maxTemp = temp;
         }
 
-        //update temperature alert
+        // update temperature alert
         driveTempAlert.set(maxTemp > 150);
     }
 

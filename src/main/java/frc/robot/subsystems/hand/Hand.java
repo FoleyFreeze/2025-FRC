@@ -1,6 +1,8 @@
 package frc.robot.subsystems.hand;
 // this is the grabby thing
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -10,6 +12,8 @@ import org.littletonrobotics.junction.Logger;
 public class Hand extends SubsystemBase {
     private final HandIO io;
     private final HandIOInputsAutoLogged inputs = new HandIOInputsAutoLogged();
+
+    private final Alert handDisconnectedAlert = new Alert("Hand Disconnected", AlertType.kError);
 
     public static Hand create() {
         Hand hand;
@@ -36,6 +40,8 @@ public class Hand extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Hand", inputs);
+
+        handDisconnectedAlert.set(!inputs.handConnected);
     }
 
     public double getCurrent() {

@@ -57,7 +57,10 @@ public class Locations {
                     Units.inchesToMeters(-8),
                     Rotation2d.kZero);
     public static Transform2d halfRobotAlgae =
-            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(2.5), 0, Rotation2d.kZero);
+            new Transform2d(
+                    robotLength / 2.0 + Units.inchesToMeters(2.5),
+                    Units.inchesToMeters(-2.5),
+                    Rotation2d.kZero);
 
     // TODO: make code that uses this
     public static Transform2d halfRobotCoralLevel1 =

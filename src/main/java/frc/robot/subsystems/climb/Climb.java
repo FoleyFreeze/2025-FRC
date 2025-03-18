@@ -1,5 +1,7 @@
 package frc.robot.subsystems.climb;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -9,6 +11,8 @@ import org.littletonrobotics.junction.Logger;
 public class Climb extends SubsystemBase {
     private final ClimbIO io;
     public final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
+
+    private final Alert climbDisconnectedAlert = new Alert("Climb Disconnected", AlertType.kError);
 
     public ClimbCals k;
 
@@ -42,6 +46,8 @@ public class Climb extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Climb", inputs);
+
+        climbDisconnectedAlert.set(!inputs.climbConnected);
     }
 
     public double getVoltage() {

@@ -20,10 +20,12 @@ import java.util.function.Supplier;
 public class ComplexCommands {
 
     public static double holdPowerCoral = 0.4;
-    static double releasePowerCoral = -2;
-    static double releasePowerCoral4 = -2.5;
+    static double releasePowerCoral23 = -2;
+    static double releasePowerCoral4 = -2.5 - 1.5;
     public static double releasePowerCoral1 = -1.0;
-    static double releaseTimeCoral = 0.5;
+    static double releaseTimeCoral1 = 0.3;
+    static double releaseTimeCoral23 = 0.25;
+    static double releaseTimeCoral4 = 0.0;
 
     public static double intakePowerCoral = 2.0;
     public static double intakeCurrentCoral = 15;
@@ -39,6 +41,7 @@ public class ComplexCommands {
     static double superSuckAlgae = 6;
     static double algaeHighLim = 90;
     static double algaeLowLim = 40;
+    static double descoreAlgaePower = -4;
     static double stripTime = 2; // make smaller
 
     static double gatherPosition = 0;
@@ -60,12 +63,11 @@ public class ComplexCommands {
                         .andThen(DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose))
                         // arm angles down
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3))
-                        .andThen(r.hand.setVoltageCmd(intakeAlgaePower))
+                        .andThen(r.hand.setVoltageCmd(descoreAlgaePower))
                         // drops elevator on algae
                         .andThen(r.elevator.goTo(r.controlBoard::getAlgaeReefDSHeight))
                         .andThen(new WaitCommand(stripTime))
                         .andThen(r.hand.setVoltageCmd(0));
-                        
 
         c.setName("StripAlgae");
         return c;
@@ -256,14 +258,27 @@ public class ComplexCommands {
                                         case 2:
                                         case 3:
                                         default:
-                                            r.hand.setVoltage(releasePowerCoral);
+                                            r.hand.setVoltage(releasePowerCoral23);
                                             break;
                                         case 4:
                                             r.hand.setVoltage(releasePowerCoral4);
                                             break;
                                     }
                                 })
-                        .andThen(new WaitCommand(releaseTimeCoral))
+                        .andThen(
+                                new DynamicWaitCommand(
+                                        () -> {
+                                            switch (r.controlBoard.selectedLevel) {
+                                                case 1:
+                                                    return releaseTimeCoral1;
+                                                case 2:
+                                                case 3:
+                                                    return releaseTimeCoral23;
+                                                case 4:
+                                                default:
+                                                    return releaseTimeCoral4;
+                                            }
+                                        }))
                         .andThen(new InstantCommand(() -> r.state.clear()))
                         .andThen(r.hand.stop());
         c.setName("ReleaseCoral");
@@ -273,11 +288,24 @@ public class ComplexCommands {
     // applies power to get rid of coral in auton
     public static Command releaseCoralAuton(int level) {
 
-        Command c = // TODO: this doesnt work, needs to be a supplier
+        Command c = // this doesnt work in teleop, but who cares, would need to be a supplier
                 (level == 4
                                 ? r.hand.setVoltageCmd(releasePowerCoral4)
-                                : r.hand.setVoltageCmd(releasePowerCoral))
-                        .andThen(new WaitCommand(releaseTimeCoral))
+                                : r.hand.setVoltageCmd(releasePowerCoral23))
+                        .andThen(
+                                new DynamicWaitCommand(
+                                        () -> {
+                                            switch (r.controlBoard.selectedLevel) {
+                                                case 1:
+                                                    return releaseTimeCoral1;
+                                                case 2:
+                                                case 3:
+                                                    return releaseTimeCoral23;
+                                                case 4:
+                                                default:
+                                                    return releaseTimeCoral4;
+                                            }
+                                        }))
                         .andThen(new InstantCommand(() -> r.state.clear()))
                         .andThen(r.hand.stop());
         c.setName("ReleaseCoralAuton");
@@ -375,8 +403,10 @@ public class ComplexCommands {
                 r.elevator
                         .goTo(() -> SuperstructureLocation.PRE_INTAKE)
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.POST_INTAKE))
-                        .andThen(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
-                        .andThen(r.arm.goTo(() -> SuperstructureLocation.HOLD))
+                        .andThen(r.wrist.goTo(() -> SuperstructureLocation.POST_INTAKE))
+                        .andThen(
+                                r.arm.goTo(() -> SuperstructureLocation.HOLD)
+                                        .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD)))
                         .andThen(r.elevator.goTo(p))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
 
@@ -480,10 +510,8 @@ public class ComplexCommands {
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.PRE_INTAKE))
                         .andThen(r.wrist.goToReally(() -> SuperstructureLocation.PRE_INTAKE))
                         .andThen(r.elevator.goTo(() -> SuperstructureLocation.INTAKE))
-                        .andThen(
-                                r.arm.goTo(() -> SuperstructureLocation.INTAKE)
-                                        .alongWith(
-                                                r.wrist.goTo(() -> SuperstructureLocation.INTAKE)));
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
+                        .andThen(r.wrist.goTo(() -> SuperstructureLocation.INTAKE));
 
         Command c =
                 new ConditionalCommand(
@@ -503,8 +531,9 @@ public class ComplexCommands {
         SequentialCommandGroup c = new SequentialCommandGroup();
         c.addCommands(goToLoc(() -> SuperstructureLocation.HOLD));
         c.addCommands(r.hand.setVoltageCmd(releasePowerCoral1));
-        c.addCommands(r.wrist.setVoltage(-0.4));
+        c.addCommands(r.wrist.setVoltage(-0.7));
         c.addCommands(new WaitCommand(0.3));
+        c.addCommands(r.wrist.setVoltage(-0.4));
         c.addCommands(r.arm.setVoltage(0));
         c.addCommands(r.hand.setVoltageCmd(0));
 
@@ -553,7 +582,7 @@ public class ComplexCommands {
 
     public static Command rezeroWrist() {
         SequentialCommandGroup c = new SequentialCommandGroup();
-        c.addCommands(r.hand.setVoltageCmd(releasePowerCoral));
+        c.addCommands(r.hand.setVoltageCmd(releasePowerCoral23));
         c.addCommands(r.arm.goTo(() -> SuperstructureLocation.HOLD));
         c.addCommands(r.elevator.goTo(() -> SuperstructureLocation.HOLD));
         c.addCommands(r.hand.stop());

@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Radians;
 
 import com.revrobotics.spark.ClosedLoopSlot;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -17,6 +19,8 @@ import org.littletonrobotics.junction.Logger;
 public class Arm extends SubsystemBase {
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
+
+    private final Alert armDisconnectedAlert = new Alert("Arm Disconnected", AlertType.kError);
 
     public ArmCals k;
 
@@ -53,6 +57,8 @@ public class Arm extends SubsystemBase {
 
         Logger.recordOutput("Arm/Setpoint", target == null ? 0 : target.armAngle.in(Radians));
         SmartDashboard.putNumber("ArmAbs", inputs.absEncAngleRaw);
+
+        armDisconnectedAlert.set(!inputs.armConnected);
     }
 
     public Angle getAngle() {
