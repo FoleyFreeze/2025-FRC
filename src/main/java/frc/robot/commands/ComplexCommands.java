@@ -62,10 +62,10 @@ public class ComplexCommands {
                         // robot slides over to center
                         .andThen(DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose))
                         // arm angles down
-                        .andThen(r.arm.goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3))
                         .andThen(r.hand.setVoltageCmd(descoreAlgaePower))
                         // drops elevator on algae
                         .andThen(r.elevator.goTo(r.controlBoard::getAlgaeReefDSHeight))
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3))
                         .andThen(new WaitCommand(stripTime))
                         .andThen(r.hand.setVoltageCmd(0));
 
