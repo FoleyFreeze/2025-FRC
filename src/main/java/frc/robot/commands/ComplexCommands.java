@@ -25,7 +25,7 @@ public class ComplexCommands {
     public static double releasePowerCoral1 = -1.0;
     static double releaseTimeCoral1 = 0.3;
     static double releaseTimeCoral23 = 0.25;
-    static double releaseTimeCoral4 = 0.0;
+    static double releaseTimeCoral4 = 0.05;
 
     public static double intakePowerCoral = 2.0;
     public static double intakeCurrentCoral = 15;
@@ -590,6 +590,7 @@ public class ComplexCommands {
         c.addCommands(new WaitCommand(2));
         c.addCommands(r.wrist.stop());
         c.addCommands(new InstantCommand(() -> r.wrist.resetPositionTo(-54)));
+        c.addCommands(new WaitCommand(0.2));
         c.addCommands(new PrintCommand("Rezeroed Wrist!"));
 
         // c.addRequirements(r.elevator, r.arm, r.wrist, r.hand);

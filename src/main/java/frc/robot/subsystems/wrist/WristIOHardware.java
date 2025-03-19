@@ -35,9 +35,11 @@ public class WristIOHardware implements WristIO {
         config.absoluteEncoder.zeroCentered(true);
         // add positives and subtract negatives
         config.absoluteEncoder.zeroOffset(
-                1 - 0.2155 - 0.1689 - 0.0956 - 0.1132 - 0.1044 + 0.0995 + 0.0605 + 0.3229 - 0.117
-                        + 0.1580 + 0.0546 - 0.4829 + 0.0546 + 0.0576 + 0.1630 - 0.0517 - 0.1161
-                        + 0.0097 - 0.1190 - 0.0966 + 0.4224);
+                (1 - 0.2155 - 0.1689 - 0.0956 - 0.1132 - 0.1044 + 0.0995 + 0.0605 + 0.3229 - 0.117
+                                + 0.1580 + 0.0546 - 0.4829 + 0.0546 + 0.0576 + 0.1630 - 0.0517
+                                - 0.1161 + 0.0097 - 0.1190 - 0.0966 + 0.4224 + 0.1620 + 0.0633
+                                + 0.2536 + .1100 + .0443)
+                        % 1);
         config.absoluteEncoder.positionConversionFactor(1);
 
         PhoenixUtil.tryUntilOkRev(

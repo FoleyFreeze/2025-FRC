@@ -30,11 +30,11 @@ public class ArmIOHardware implements ArmIO {
         config.closedLoop
                 .pid(5, 0.006, 2, ClosedLoopSlot.kSlot1)
                 .outputRange(-0.5, 0.5, ClosedLoopSlot.kSlot1)
-                .iZone(0.05, ClosedLoopSlot.kSlot1);
+                .iZone(0.1, ClosedLoopSlot.kSlot1);
         config.closedLoop
                 .pid(4, 0.006, 100, ClosedLoopSlot.kSlot0)
                 .outputRange(-0.3, 0.3, ClosedLoopSlot.kSlot0)
-                .iZone(0.05, ClosedLoopSlot.kSlot0);
+                .iZone(0.1, ClosedLoopSlot.kSlot0);
         config.closedLoopRampRate(0);
 
         config.smartCurrentLimit(70);

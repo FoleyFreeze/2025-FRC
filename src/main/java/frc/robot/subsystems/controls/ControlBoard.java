@@ -117,9 +117,9 @@ public class ControlBoard {
             submerge = cb.getRawButton(2);
             shift = !cb.getRawButton(4); // note inverted
 
-            if (cb.getRawAxis(2) > .5) {
+            if (cb.getRawAxis(2) < -0.5) {
                 selectedStation = Station.LEFT;
-            } else if (cb.getRawAxis(3) > .5) {
+            } else if (cb.getRawAxis(3) > 0.5) {
                 selectedStation = Station.RIGHT;
             } else {
                 selectedStation = Station.CLOSEST;

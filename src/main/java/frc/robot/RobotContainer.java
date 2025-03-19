@@ -234,7 +234,7 @@ public class RobotContainer {
 
         flysky.leftTriggerSWE // gather sw
                 .and(controlBoard.climbModeT) // climb sw
-                .whileTrue(r.climb.setClimbVoltage(-6));
+                .whileTrue(r.climb.setClimbVoltage(-12));
 
         // right trigger commands
         // score coral camera
@@ -296,7 +296,7 @@ public class RobotContainer {
         // OTHER
 
         // stop button
-        flysky.topRightMomentSWC.onTrue(
+        flysky.topRightMomentSWC.whileTrue(
                 ComplexCommands.stopSuperstructure()
                         .alongWith(new InstantCommand(() -> state.hasStop = true))
                         .ignoringDisable(true));

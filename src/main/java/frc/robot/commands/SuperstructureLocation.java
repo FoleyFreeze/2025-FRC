@@ -35,11 +35,11 @@ public enum SuperstructureLocation {
     PRE_LEVEL4(50, 60, 0),
 
     FLOOR_GATHER_ALGAE(0, 0, 0),
-    SCORE_PROCESSOR(4, 110, 248),
+    SCORE_PROCESSOR(1, 110, 248),
 
-    PRE_INTAKE(0.10, -49 + 7, -69.5 - 5),
+    PRE_INTAKE(-0.20, -49 + 7, -69.5 - 5),
     INTAKE(2.1, -56, -63),
-    POST_INTAKE(0.10, -27, -10),
+    POST_INTAKE(-0.20, -27, -10),
 
     CLIMB_SAFE(0.25, 45, -20),
     LOW_CLIMB(0.25, -73, -50);
