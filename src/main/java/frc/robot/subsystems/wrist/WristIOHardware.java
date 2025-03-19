@@ -29,7 +29,8 @@ public class WristIOHardware implements WristIO {
         motor = new SparkMax(15, MotorType.kBrushless);
 
         config = new SparkMaxConfig();
-        config.closedLoop.pid(4, 0.006, 1).outputRange(-0.4, 0.4).iZone(0.05);
+        config.closedLoop.pid(4, 0.018, 1).outputRange(-0.4, 0.4).iZone(0.05);
+        //                 i was 0.006
         config.closedLoopRampRate(0);
 
         config.smartCurrentLimit(30);
