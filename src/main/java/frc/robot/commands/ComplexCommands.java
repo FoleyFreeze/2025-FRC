@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -582,16 +581,16 @@ public class ComplexCommands {
 
     public static Command rezeroWrist() {
         SequentialCommandGroup c = new SequentialCommandGroup();
+        c.addCommands(r.wrist.setVoltage(0.01));
         c.addCommands(r.hand.setVoltageCmd(releasePowerCoral23));
-        c.addCommands(r.arm.goTo(() -> SuperstructureLocation.HOLD));
+        c.addCommands(r.arm.goTo(() -> SuperstructureLocation.ZERO_WRIST));
         c.addCommands(r.elevator.goTo(() -> SuperstructureLocation.HOLD));
         c.addCommands(r.hand.stop());
-        c.addCommands(r.wrist.setVoltage(-2));
+        c.addCommands(r.wrist.setVoltage(-1));
         c.addCommands(new WaitCommand(2));
         c.addCommands(r.wrist.stop());
-        c.addCommands(new InstantCommand(() -> r.wrist.resetPositionTo(-54)));
+        c.addCommands(new InstantCommand(() -> r.wrist.rezeroAbsEnc()));
         c.addCommands(new WaitCommand(0.2));
-        c.addCommands(new PrintCommand("Rezeroed Wrist!"));
 
         // c.addRequirements(r.elevator, r.arm, r.wrist, r.hand);
         c.setName("RezeroWrist");

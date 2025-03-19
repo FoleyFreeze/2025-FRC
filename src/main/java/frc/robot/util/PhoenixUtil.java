@@ -33,7 +33,7 @@ public class PhoenixUtil {
         if (i > 0) System.out.println("CTRE init took " + i + " trys");
     }
 
-    public static void tryUntilOkRev(int maxAttempts, Supplier<REVLibError> command) {
+    public static boolean tryUntilOkRev(int maxAttempts, Supplier<REVLibError> command) {
         int i = 0;
         for (; i < maxAttempts; i++) {
             var error = command.get();
@@ -41,6 +41,8 @@ public class PhoenixUtil {
         }
         if (i == maxAttempts) System.out.println("FAILED TO APPLY REV COMMAND!!!!!!!!!!!!!!");
         if (i > 0) System.out.println("Rev init took " + i + " trys");
+
+        return i != maxAttempts;
     }
 
     public static double[] getSimulationOdometryTimeStamps() {

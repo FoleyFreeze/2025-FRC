@@ -186,8 +186,8 @@ public class Wrist extends SubsystemBase {
         io.superZero();
     }
 
-    public void resetPositionTo(double degrees) {
-        io.resetPositionTo(degrees);
+    public void rezeroAbsEnc() {
+        io.rezeroAbsEnc();
     }
 
     public double cvrtLocalToEnc(double localWristAngle, double armAngle) {

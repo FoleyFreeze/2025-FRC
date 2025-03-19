@@ -10,6 +10,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.util.PhoenixUtil;
 
 public class WristIOHardware implements WristIO {
@@ -19,11 +21,14 @@ public class WristIOHardware implements WristIO {
     private SparkClosedLoopController closedLoopController;
     WristCals k;
 
+    private final SparkMaxConfig config;
+    boolean needToFlashWhenDisabled = false;
+
     public WristIOHardware(WristCals k) {
         this.k = k;
         motor = new SparkMax(15, MotorType.kBrushless);
 
-        SparkMaxConfig config = new SparkMaxConfig();
+        config = new SparkMaxConfig();
         config.closedLoop.pid(4, 0.006, 1).outputRange(-0.4, 0.4).iZone(0.05);
         config.closedLoopRampRate(0);
 
@@ -34,12 +39,12 @@ public class WristIOHardware implements WristIO {
 
         config.absoluteEncoder.zeroCentered(true);
         // add positives and subtract negatives
-        config.absoluteEncoder.zeroOffset(
-                (1 - 0.2155 - 0.1689 - 0.0956 - 0.1132 - 0.1044 + 0.0995 + 0.0605 + 0.3229 - 0.117
-                                + 0.1580 + 0.0546 - 0.4829 + 0.0546 + 0.0576 + 0.1630 - 0.0517
-                                - 0.1161 + 0.0097 - 0.1190 - 0.0966 + 0.4224 + 0.1620 + 0.0633
-                                + 0.2536 + .1100 + .0443)
-                        % 1);
+        /*config.absoluteEncoder.zeroOffset(
+        (1 - 0.2155 - 0.1689 - 0.0956 - 0.1132 - 0.1044 + 0.0995 + 0.0605 + 0.3229 - 0.117
+                        + 0.1580 + 0.0546 - 0.4829 + 0.0546 + 0.0576 + 0.1630 - 0.0517
+                        - 0.1161 + 0.0097 - 0.1190 - 0.0966 + 0.4224 + 0.1620 + 0.0633
+                        + 0.2536 + .1100 + .0443)
+                % 1);*/
         config.absoluteEncoder.positionConversionFactor(1);
 
         PhoenixUtil.tryUntilOkRev(
@@ -74,6 +79,21 @@ public class WristIOHardware implements WristIO {
                 Units.rotationsToRadians(convertAbsToRel(inputs.absEncAngleRaw, relEncPos));
 
         inputs.wristConnected = rawVolts > 6;
+
+        if (needToFlashWhenDisabled && DriverStation.isDisabled()) {
+            boolean success =
+                    PhoenixUtil.tryUntilOkRev(
+                            5,
+                            () ->
+                                    motor.configure(
+                                            config,
+                                            ResetMode.kResetSafeParameters,
+                                            PersistMode.kPersistParameters));
+            if (success) {
+                needToFlashWhenDisabled = false;
+                System.out.println("Persisted spark parameters");
+            }
+        }
     }
 
     @Override
@@ -93,8 +113,39 @@ public class WristIOHardware implements WristIO {
     }
 
     @Override
-    public void resetPositionTo(double degrees) {
-        encoder.setPosition(Units.degreesToRotations(degrees));
+    public void rezeroAbsEnc() {
+        double abs = absEncoder.getPosition();
+        if (abs < 0) {
+            abs += 1;
+        }
+        double oldOffset = motor.configAccessor.absoluteEncoder.getZeroOffset();
+
+        double newOffset = (oldOffset + abs) % 1;
+        if (newOffset < 0) newOffset += 1;
+
+        config.absoluteEncoder.zeroOffset(newOffset);
+        boolean success =
+                PhoenixUtil.tryUntilOkRev(
+                        5,
+                        () ->
+                                motor.configure(
+                                        config,
+                                        ResetMode.kResetSafeParameters,
+                                        PersistMode.kNoPersistParameters));
+        needToFlashWhenDisabled = true;
+
+        String s =
+                String.format(
+                        "AbsVal: %.4f\nOldZero: %.4f\nNewZero: %.4f\n", abs, oldOffset, newOffset);
+        if (success) {
+            SmartDashboard.putString("ResetWrist", s);
+            System.out.println(s);
+        } else {
+            SmartDashboard.putString("ResetWrist", "Failed");
+            System.out.println("Failed to reset wrist");
+        }
+
+        encoder.setPosition(Units.degreesToRotations(-69.5));
     }
 
     @Override

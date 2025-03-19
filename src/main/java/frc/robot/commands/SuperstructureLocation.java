@@ -42,7 +42,9 @@ public enum SuperstructureLocation {
     POST_INTAKE(-0.20, -27, -10),
 
     CLIMB_SAFE(0.25, 45, -20),
-    LOW_CLIMB(0.25, -73, -50);
+    LOW_CLIMB(0.25, -73, -50),
+
+    ZERO_WRIST(0.1, 9, 0);
 
     public final Distance eleHeight;
     public final Angle armAngle;
