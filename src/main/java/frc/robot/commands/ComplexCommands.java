@@ -512,7 +512,7 @@ public class ComplexCommands {
                         .andThen(r.elevator.goTo(() -> SuperstructureLocation.INTAKE))
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
                         .andThen(r.wrist.goTo(() -> SuperstructureLocation.INTAKE))
-                        .andThen(new InstantCommand(() ->r.state.setCoral()));
+                        .andThen(new InstantCommand(() -> r.state.setCoral()));
 
         Command c =
                 new ConditionalCommand(
