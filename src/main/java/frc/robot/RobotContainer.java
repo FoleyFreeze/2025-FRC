@@ -317,6 +317,12 @@ public class RobotContainer {
                                         () -> SuperstructureLocation.HOLD_ALGAE_XFER)));
         controlBoard.algaeModeT.onFalse(ComplexCommands.goToLoc(() -> SuperstructureLocation.HOLD));
 
+        // gather and unjam
+        controlBoard.gatherBtn.and(controlBoard.shiftT.negate()).onTrue(hand.setVoltageCmd(3));
+        controlBoard.gatherBtn.and(controlBoard.shiftT.negate()).onFalse(hand.setVoltageCmd(0));
+        controlBoard.gatherBtn.and(controlBoard.shiftT).onTrue(hand.setVoltageCmd(-3));
+        controlBoard.gatherBtn.and(controlBoard.shiftT).onFalse(hand.setVoltageCmd(0));
+
         // isDisabledOrAuto.onTrue(
         //         new InstantCommand(() -> drive.setBrakes(true)).ignoringDisable(true));
         // isDisabledOrAuto.onFalse(

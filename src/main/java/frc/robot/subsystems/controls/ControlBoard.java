@@ -107,9 +107,12 @@ public class ControlBoard {
     public Trigger shiftT = new Trigger(() -> shift);
     public Trigger submergeT = new Trigger(() -> submerge);
 
-    public Trigger jogA = new Trigger(() -> cb.getRawButton(7));
-    public Trigger jogB = new Trigger(() -> cb.getRawButton(8));
-    public Trigger gatherBtn = new Trigger(() -> cb.getRawButton(6));
+    public Trigger jogA = new Trigger(() -> cb.getRawButton(7) && !useShuffleboard.get());
+    public Trigger jogB = new Trigger(() -> cb.getRawButton(8) && !useShuffleboard.get());
+    public Trigger jog1 = new Trigger(() -> cb.getRawButton(9) && !useShuffleboard.get());
+    public Trigger jog2 = new Trigger(() -> cb.getRawButton(10) && !useShuffleboard.get());
+    public Trigger gatherBtn = new Trigger(() -> cb.getRawButton(6) && !useShuffleboard.get());
+    public Trigger escBtn = new Trigger(() -> cb.getRawButton(3) && !useShuffleboard.get());
 
     public void periodic() {
         if (!useShuffleboard.get()) {
