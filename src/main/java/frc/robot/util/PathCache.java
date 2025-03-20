@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.controls.ControlBoard.ReefSticks;
@@ -17,6 +18,8 @@ public class PathCache {
     // note cache is regenerated when alliance changes
     RobotContainer r;
     Pose2d[] waypointList;
+
+    double velocityThreshold = 5;
 
     public PathCache(RobotContainer r) {
         this.r = r;
@@ -66,8 +69,25 @@ public class PathCache {
 
         // create a start pose with rotation indicating the direction to drive
         Pose2d currentLocation = r.drive.getPose();
+        ChassisSpeeds currentVel = r.drive.getVelocity();
+
+        // if velocity is high, point the path along the direction of velocity
+        /*
+        Translation2d travelVector;
+        if (Math.hypot(currentVel.vxMetersPerSecond, currentVel.vyMetersPerSecond)
+                > velocityThreshold) {
+            travelVector =
+                    new Translation2d(currentVel.vxMetersPerSecond, currentVel.vyMetersPerSecond);
+        } else {
+            travelVector =
+                    waypointList[closeStart]
+                            .getTranslation()
+                            .minus(currentLocation.getTranslation());
+        }
+        */
         Translation2d travelVector =
                 waypointList[closeStart].getTranslation().minus(currentLocation.getTranslation());
+
         Pose2d startPose = new Pose2d(currentLocation.getTranslation(), travelVector.getAngle());
 
         // include all points between the closest start and dest waypoints.

@@ -24,7 +24,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.IntegerArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -82,7 +82,7 @@ public class RobotContainer {
     // Controller
     public final Flysky flysky = new Flysky();
     public final ControlBoard controlBoard = new ControlBoard(this);
-    public final BotState state = new BotState();
+    public final BotState state = new BotState(this);
 
     // Pathplanner triggers
     public EventTrigger inSlowDrivePhase;
@@ -325,7 +325,7 @@ public class RobotContainer {
 
     public void robotPeriodic() {
         controlBoard.periodic();
-        controlBoard.selectApproachingStation(); // TODO: delete me
+        //controlBoard.selectApproachingStation(); // TODO: delete me
 
         String s =
                 String.format(
@@ -342,6 +342,9 @@ public class RobotContainer {
                         botPose.getMeasureX().in(Inches), botPose.getMeasureY().in(Inches));
         SmartDashboard.putString("BotLoc", s);
 
+        SmartDashboard.putNumber("BotAngle", botPose.getRotation().getDegrees());
+
+        /*
         double distToTag =
                 r.drive
                         .getPose()
@@ -349,6 +352,7 @@ public class RobotContainer {
                         .getDistance(
                                 Locations.tags.getTagPose(7).get().toPose2d().getTranslation());
         Logger.recordOutput("DistTo7", distToTag);
+        */
 
         SmartDashboard.putNumber("ClimbPos", climb.inputs.climbAbsPosition);
 
@@ -359,27 +363,50 @@ public class RobotContainer {
     }
 
     BooleanPublisher ledEnable;
-    IntegerPublisher ledValue;
-    public int localLedVal = 0;
+    IntegerArrayPublisher ledValue;
+    public long[] localLedVal = {0, 0, 0};
 
     public void ledOutputSet(int value, boolean on) {
-        int v = 1 << value;
-        if (on) {
-            localLedVal |= v;
+        if (value < 32) {
+            int v = 1 << value;
+            if (on) {
+                localLedVal[2] |= v;
+            } else {
+                localLedVal[2] &= ~v;
+            }
+        } else if (value < 64) {
+            int v = 1 << (value - 32);
+            if (on) {
+                localLedVal[1] |= v;
+            } else {
+                localLedVal[1] &= ~v;
+            }
         } else {
-            localLedVal &= ~v;
+            int v = 1 << (value - 64);
+            if (on) {
+                localLedVal[0] |= v;
+            } else {
+                localLedVal[0] &= ~v;
+            }
         }
+
         ledValue.set(localLedVal);
+    }
+
+    public void ledsOff() {
+        localLedVal[0] = 0;
+        localLedVal[1] = 0;
+        localLedVal[2] = 0;
     }
 
     public void initOutputLed() {
         NetworkTableInstance nt = NetworkTableInstance.getDefault();
         NetworkTable table = nt.getTable("ControlBoard");
         ledEnable = table.getBooleanTopic("LED_Enable").publish();
-        ledValue = table.getIntegerTopic("LED_Output").publish();
+        ledValue = table.getIntegerArrayTopic("LED_Output").publish();
 
         ledEnable.set(true);
-        ledValue.set(65535);
+        ledValue.set(localLedVal);
     }
 
     /**

@@ -329,7 +329,7 @@ public class ComplexCommands {
                 goToLoc(() -> r.controlBoard.getCoralLevel())
                         .alongWith(holdCoral())
                         // gather trigger
-                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
+                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE.or(r.state.onTargetT)))
                         .andThen(releaseCoral());
         c.setName("NoDriveScore");
         return c;

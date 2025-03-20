@@ -262,6 +262,11 @@ public class DriveCommands {
                                     ChassisSpeeds.fromFieldRelativeSpeeds(
                                             new ChassisSpeeds(xVel, yVel, 0),
                                             r.drive.getRotation()));
+
+                            //only enable autoshoot if we got the right spot and there is an april tag confirming it
+                            if(error[0] < POS_TOL) {
+                                r.state.onTarget = r.vision.selectedTagOnTarget();
+                            }
                         },
                         r.drive)
                 .until(() -> error[0] < POS_TOL || timer.hasElapsed(POS_MAX_TIME))
@@ -270,6 +275,7 @@ public class DriveCommands {
                             pidX.reset();
                             pidY.reset();
                             timer.restart();
+                            r.state.onTarget = false;
                         })
                 .andThen(
                         new InstantCommand(
@@ -443,6 +449,7 @@ public class DriveCommands {
             c = new NewPathFinder(r, destination, isGather).andThen(driveToPoint(r, destination));
         }
         c = c.finallyDo(() -> r.state.pathComplete = true);
+        c = c.alongWith(new InstantCommand(() -> r.state.onTarget = false));
         c.setName("DriveToAuto");
         return c;
     }

@@ -23,11 +23,15 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -35,6 +39,8 @@ import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.util.Locations;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.dyn4j.geometry.Transform;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
@@ -47,6 +53,8 @@ public class Vision extends SubsystemBase {
     private final Debouncer isEnabledDebounce = new Debouncer(5, DebounceType.kFalling);
     private final Debouncer angleAgrees = new Debouncer(1, DebounceType.kFalling);
     LinearFilter accelFilter = LinearFilter.singlePoleIIR(1.0, 0.02);
+
+    private Pose3d defaultPose = new Pose3d();
 
     public static Vision create(RobotContainer r) {
         Vision v;
@@ -110,6 +118,12 @@ public class Vision extends SubsystemBase {
         return inputs[cameraIndex].latestTargetObservation.tx();
     }
 
+    public Transform2d distToPose;
+    public int closestSeenTag;
+    public Timer lastResetTime = new Timer();
+    public double maxMemoryTime = 0.5;
+
+
     @Override
     public void periodic() {
         for (int i = 0; i < io.length; i++) {
@@ -145,6 +159,14 @@ public class Vision extends SubsystemBase {
                 if (tagPose.isPresent()) {
                     tagPoses.add(tagPose.get());
                 }
+            }
+
+            if(inputs[cameraIndex].tagIds.length != 0 || inputs[cameraIndex].poseObservations.length != 0 || lastResetTime.hasElapsed(
+                maxMemoryTime
+            )){
+                distToPose = new Transform2d(100,100,Rotation2d.kZero);
+                closestSeenTag = 0;
+                lastResetTime.restart();
             }
 
             // Loop over pose observations
@@ -223,21 +245,26 @@ public class Vision extends SubsystemBase {
                         observation.timestamp(),
                         VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
 
+                //find closest tag in shot to robot
+                
+                Pose2d observationPose = observation.pose().toPose2d();
+                for(int i=0;i < inputs[cameraIndex].tagIds.length; i++){
+                        int id = inputs[cameraIndex].tagIds[i];
+                        var tagPose = aprilTagLayout.getTagPose(id).orElse(defaultPose).toPose2d();
+                        Transform2d dist = tagPose.minus(observationPose);
+                        if(dist.getTranslation().getNorm() < distToPose.getTranslation().getNorm()){
+                                distToPose = dist;
+                                closestSeenTag = id;
+                        }
+                }
+                
+
                 Logger.recordOutput(
-                        "Vision/AcceptTagDist",
-                        observation
-                                .pose()
-                                .toPose2d()
-                                .minus(Locations.tags.getTagPose(8).get().toPose2d())
-                                .getTranslation()
-                                .getNorm());
+                        "Vision/ClosestTagDist",
+                        distToPose.getTranslation().getNorm());
                 Logger.recordOutput(
-                        "Vision/AcceptTagAngle",
-                        observation
-                                .pose()
-                                .getRotation()
-                                .toRotation2d()
-                                .minus(r.drive.getRotation())
+                        "Vision/ClosestTagAngle",
+                        distToPose.getRotation()
                                 .getDegrees());
             }
 
@@ -272,6 +299,16 @@ public class Vision extends SubsystemBase {
         Logger.recordOutput(
                 "Vision/Summary/RobotPosesRejected",
                 allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
+    }
+
+    public boolean selectedTagOnTarget(){
+        int targetId = Locations.getTagId(r.controlBoard.selectedReefPos);
+        if(targetId == closestSeenTag){
+                if(distToPose.getTranslation().getNorm() < Units.inchesToMeters(20)){
+                        return true;
+                }
+        }
+        return false;
     }
 
     @FunctionalInterface

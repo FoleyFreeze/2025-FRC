@@ -23,7 +23,7 @@ public class Locations {
             new Transform2d(robotLength / 2.0 + Units.inchesToMeters(1.25), 0, new Rotation2d());
 
     // TODO: remove extra before comp
-    static double extraGatherX = 12;
+    static double extraGatherX = 8; // 12
     static double extraGatherY = 20;
     public static Transform2d halfRobotGatherLeftFar =
             new Transform2d(
@@ -253,6 +253,54 @@ public class Locations {
                     return invert(tags.getTagPose(19).get().toPose2d().plus(halfRobotAlgae));
                 } else {
                     return invert(tags.getTagPose(6).get().toPose2d().plus(halfRobotAlgae));
+                }
+        }
+    }
+
+    public static int getTagId(ControlBoard.ReefSticks position) {
+        switch (position) {
+            case A:
+            case B:
+            default:
+                if (isBlue()) {
+                    return 18;
+                } else {
+                    return 7;
+                }
+            case C:
+            case D:
+                if (isBlue()) {
+                    return 17;
+                } else {
+                    return 8;
+                }
+            case E:
+            case F:
+                if (isBlue()) {
+                    return 22;
+                } else {
+                    return 9;
+                }
+            case G:
+            case H:
+                if (isBlue()) {
+                    return 21;
+                } else {
+                    return 10;
+                }
+            case I:
+            case J:
+                if (isBlue()) {
+                    return 20;
+                } else {
+                    return 11;
+                }
+            case K:
+            case L:
+                if (isBlue()) {
+                    return 19;
+                } else {
+                    return 6;
                 }
         }
     }

@@ -119,7 +119,7 @@ public class ControlBoard {
 
             if (cb.getRawAxis(2) < -0.5) {
                 selectedStation = Station.LEFT;
-            } else if (cb.getRawAxis(3) > 0.5) {
+            } else if (cb.getRawAxis(2) > 0.5) {
                 selectedStation = Station.RIGHT;
             } else {
                 selectedStation = Station.CLOSEST;
@@ -137,53 +137,52 @@ public class ControlBoard {
 
             if (cb2.getRawButton(1)) {
                 selectedReefPos = ReefSticks.A;
-                r.localLedVal = 0;
+                r.ledsOff();
                 r.ledOutputSet(1, true);
             } else if (cb2.getRawButton(2)) {
                 selectedReefPos = ReefSticks.B;
-                r.localLedVal = 0;
+                r.ledsOff();
                 r.ledOutputSet(4, true);
             } else if (cb2.getRawButton(3)) {
                 selectedReefPos = ReefSticks.C;
-                r.localLedVal = 0;
+                r.ledsOff();
                 r.ledOutputSet(7, true);
             } else if (cb2.getRawButton(4)) {
                 selectedReefPos = ReefSticks.D;
-                r.localLedVal = 0;
+                r.ledsOff();
                 r.ledOutputSet(10, true);
             } else if (cb2.getRawButton(5)) {
                 selectedReefPos = ReefSticks.E;
-                r.localLedVal = 0;
+                r.ledsOff();
                 r.ledOutputSet(13, true);
             } else if (cb2.getRawButton(6)) {
                 selectedReefPos = ReefSticks.F;
-                r.localLedVal = 0;
+                r.ledsOff();
                 r.ledOutputSet(16, true);
             } else if (cb2.getRawButton(7)) {
                 selectedReefPos = ReefSticks.G;
-                r.localLedVal = 0;
+                r.ledsOff();
                 r.ledOutputSet(19, true);
             } else if (cb2.getRawButton(8)) {
                 selectedReefPos = ReefSticks.H;
-                r.localLedVal = 0;
+                r.ledsOff();
                 r.ledOutputSet(25, true);
             } else if (cb2.getPOV() == 270) {
                 selectedReefPos = ReefSticks.I;
-                r.localLedVal = 0;
+                r.ledsOff();
                 r.ledOutputSet(28, true);
             } else if (cb2.getPOV() == 0) {
                 selectedReefPos = ReefSticks.J;
-                r.localLedVal = 0;
+                r.ledsOff();
                 r.ledOutputSet(31, true);
             } else if (cb2.getPOV() == 90) {
                 selectedReefPos = ReefSticks.K;
-                r.localLedVal = 0;
-
+                r.ledsOff();
+                r.ledOutputSet(34, true);
             } else if (cb2.getPOV() == 180) {
                 selectedReefPos = ReefSticks.L;
-                r.localLedVal = 0;
-                r.ledOutputSet(2, true);
-                r.ledOutputSet(3, true);
+                r.ledsOff();
+                r.ledOutputSet(37, true);
             }
 
             if (cb2.getRawButton(9)) {
