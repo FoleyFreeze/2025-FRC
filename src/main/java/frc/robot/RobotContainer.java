@@ -52,7 +52,6 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hand.Hand;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.wrist.Wrist;
-import frc.robot.util.Locations;
 import frc.robot.util.PathCache;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
@@ -331,7 +330,7 @@ public class RobotContainer {
 
     public void robotPeriodic() {
         controlBoard.periodic();
-        //controlBoard.selectApproachingStation(); // TODO: delete me
+        // controlBoard.selectApproachingStation(); // TODO: delete me
 
         String s =
                 String.format(

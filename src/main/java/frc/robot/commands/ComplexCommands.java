@@ -329,7 +329,8 @@ public class ComplexCommands {
                 goToLoc(() -> r.controlBoard.getCoralLevel())
                         .alongWith(holdCoral())
                         // gather trigger
-                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE.or(r.state.onTargetT)))
+                        .andThen(
+                                new WaitUntilCommand(r.flysky.leftTriggerSWE.or(r.state.onTargetT)))
                         .andThen(releaseCoral());
         c.setName("NoDriveScore");
         return c;
@@ -510,7 +511,8 @@ public class ComplexCommands {
                         .andThen(r.wrist.goToReally(() -> SuperstructureLocation.PRE_INTAKE))
                         .andThen(r.elevator.goTo(() -> SuperstructureLocation.INTAKE))
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.INTAKE))
-                        .andThen(r.wrist.goTo(() -> SuperstructureLocation.INTAKE));
+                        .andThen(r.wrist.goTo(() -> SuperstructureLocation.INTAKE))
+                        .andThen(new InstantCommand(() ->r.state.setCoral()));
 
         Command c =
                 new ConditionalCommand(

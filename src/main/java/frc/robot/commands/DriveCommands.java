@@ -263,8 +263,9 @@ public class DriveCommands {
                                             new ChassisSpeeds(xVel, yVel, 0),
                                             r.drive.getRotation()));
 
-                            //only enable autoshoot if we got the right spot and there is an april tag confirming it
-                            if(error[0] < POS_TOL) {
+                            // only enable autoshoot if we got the right spot and there is an april
+                            // tag confirming it
+                            if (error[0] < POS_TOL) {
                                 r.state.onTarget = r.vision.selectedTagOnTarget();
                             }
                         },

@@ -3,7 +3,6 @@ package frc.robot.subsystems.controls;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
-
 import org.littletonrobotics.junction.Logger;
 
 public class BotState {
@@ -20,9 +19,14 @@ public class BotState {
     public Trigger hasAlgaeT = new Trigger(() -> hasAlgae);
     public Trigger hasStopT = new Trigger(() -> hasStop);
     public Trigger pathCompleteT = new Trigger(() -> pathComplete);
-    public Trigger onTargetT = new Trigger(() -> onTarget && (r.flysky.topRightSWD.getAsBoolean() || DriverStation.isAutonomous()));
+    public Trigger onTargetT =
+            new Trigger(
+                    () ->
+                            onTarget
+                                    && (r.flysky.topRightSWD.getAsBoolean()
+                                            || DriverStation.isAutonomous()));
 
-    public BotState(RobotContainer r){
+    public BotState(RobotContainer r) {
         this.r = r;
     }
 
