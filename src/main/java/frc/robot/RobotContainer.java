@@ -23,10 +23,6 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.IntegerArrayPublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -40,6 +36,7 @@ import frc.robot.auton.AutonCommands;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SuperstructureLocation;
+import frc.robot.subsystems.LEDs.LED;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.BotState;
@@ -77,6 +74,7 @@ public class RobotContainer {
     public final Vision vision;
     public PathCache pathCache;
     public final CVision cvision;
+    public final LED leds;
 
     // Controller
     public final Flysky flysky = new Flysky();
@@ -112,6 +110,7 @@ public class RobotContainer {
         climb = Climb.create();
         vision = Vision.create(this);
         cvision = new CVision(r, new CVisionCals());
+        leds = new LED(r);
 
         inSlowDrivePhase = new EventTrigger("InSlowDrivePhase");
 
@@ -148,7 +147,7 @@ public class RobotContainer {
         // Configure the button bindings
         configureButtonBindings();
 
-        initOutputLed();
+        leds.initOutputLed();
     }
 
     /**
@@ -321,11 +320,6 @@ public class RobotContainer {
         controlBoard.gatherBtn.and(controlBoard.shiftT.negate()).onFalse(hand.setVoltageCmd(0));
         controlBoard.gatherBtn.and(controlBoard.shiftT).onTrue(hand.setVoltageCmd(-3));
         controlBoard.gatherBtn.and(controlBoard.shiftT).onFalse(hand.setVoltageCmd(0));
-
-        // isDisabledOrAuto.onTrue(
-        //         new InstantCommand(() -> drive.setBrakes(true)).ignoringDisable(true));
-        // isDisabledOrAuto.onFalse(
-        //         new InstantCommand(() -> drive.setBrakes(false)).ignoringDisable(true));
     }
 
     public void robotPeriodic() {
@@ -363,55 +357,7 @@ public class RobotContainer {
 
         state.periodic();
 
-        ledEnable.set(true);
         // ledValue.set(localLedVal);
-    }
-
-    BooleanPublisher ledEnable;
-    IntegerArrayPublisher ledValue;
-    public long[] localLedVal = {0, 0, 0};
-
-    public void ledOutputSet(int value, boolean on) {
-        if (value < 32) {
-            int v = 1 << value;
-            if (on) {
-                localLedVal[2] |= v;
-            } else {
-                localLedVal[2] &= ~v;
-            }
-        } else if (value < 64) {
-            int v = 1 << (value - 32);
-            if (on) {
-                localLedVal[1] |= v;
-            } else {
-                localLedVal[1] &= ~v;
-            }
-        } else {
-            int v = 1 << (value - 64);
-            if (on) {
-                localLedVal[0] |= v;
-            } else {
-                localLedVal[0] &= ~v;
-            }
-        }
-
-        ledValue.set(localLedVal);
-    }
-
-    public void ledsOff() {
-        localLedVal[0] = 0;
-        localLedVal[1] = 0;
-        localLedVal[2] = 0;
-    }
-
-    public void initOutputLed() {
-        NetworkTableInstance nt = NetworkTableInstance.getDefault();
-        NetworkTable table = nt.getTable("ControlBoard");
-        ledEnable = table.getBooleanTopic("LED_Enable").publish();
-        ledValue = table.getIntegerArrayTopic("LED_Output").publish();
-
-        ledEnable.set(true);
-        ledValue.set(localLedVal);
     }
 
     /**

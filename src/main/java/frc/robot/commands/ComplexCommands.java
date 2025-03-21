@@ -41,7 +41,7 @@ public class ComplexCommands {
     static double algaeHighLim = 90;
     static double algaeLowLim = 40;
     static double descoreAlgaePower = -4;
-    static double stripTime = 2; // make smaller
+    static double stripTime = 0.75; // make smaller
 
     static double gatherPosition = 0;
 
@@ -61,12 +61,23 @@ public class ComplexCommands {
                         // robot slides over to center
                         .andThen(DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose))
                         // arm angles down
-                        .andThen(r.hand.setVoltageCmd(descoreAlgaePower))
-                        // drops elevator on algae
-                        .andThen(r.elevator.goTo(r.controlBoard::getAlgaeReefDSHeight))
-                        .andThen(r.arm.goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3))
-                        .andThen(new WaitCommand(stripTime))
-                        .andThen(r.hand.setVoltageCmd(0));
+                        .andThen(
+                                r.hand.setVoltageCmd(descoreAlgaePower)
+                                        // drops elevator on algae
+                                        .andThen(
+                                                r.elevator.goTo(
+                                                        r.controlBoard::getAlgaeReefDSHeight))
+                                        .andThen(
+                                                r.arm.goTo(
+                                                        () ->
+                                                                SuperstructureLocation
+                                                                        .ALGAE_DESCORE2_3))
+                                        .andThen(new WaitCommand(stripTime))
+                                        .andThen(
+                                                r.elevator.goTo(
+                                                        r.controlBoard::getAlgaeReefDSHeightLower)))
+                        .alongWith(DriveCommands.joystickDriveFlysky(r))
+                        .finallyDo(() -> r.hand.setVoltage(0));
 
         c.setName("StripAlgae");
         return c;
@@ -127,7 +138,7 @@ public class ComplexCommands {
                                         r.flysky.leftTriggerSWE.and(r.state.pathCompleteT)))
                         .andThen(releaseAlgae())
                         .andThen(new RunCommand(() -> {}));
-        c.setName("ScoreAalgaeProc");
+        c.setName("ScoreAlgaeProc");
         return c;
     }
 
@@ -245,7 +256,7 @@ public class ComplexCommands {
         return c;
     }
 
-    // applies power to get rid of coral
+    // applies power to get rid of coral\
     public static Command releaseCoral() {
         Command c =
                 new InstantCommand(
@@ -582,9 +593,18 @@ public class ComplexCommands {
     }
 
     public static Command rezeroWrist() {
+        SequentialCommandGroup liftArm = new SequentialCommandGroup();
+        liftArm.addCommands(r.wrist.setVoltage(-1));
+        liftArm.addCommands(r.elevator.goTo(() -> SuperstructureLocation.HOLD));
+        liftArm.addCommands(new WaitCommand(1.5));
+        liftArm.addCommands(r.arm.setVoltage(2));
+        liftArm.addCommands(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -10));
+
         SequentialCommandGroup c = new SequentialCommandGroup();
         c.addCommands(r.wrist.setVoltage(0.01));
-        c.addCommands(r.hand.setVoltageCmd(releasePowerCoral23));
+        c.addCommands(
+                new ConditionalCommand(
+                        liftArm, new InstantCommand(), () -> r.arm.getAngle().in(Degrees) < -10));
         c.addCommands(r.arm.goTo(() -> SuperstructureLocation.ZERO_WRIST));
         c.addCommands(r.elevator.goTo(() -> SuperstructureLocation.HOLD));
         c.addCommands(r.hand.stop());

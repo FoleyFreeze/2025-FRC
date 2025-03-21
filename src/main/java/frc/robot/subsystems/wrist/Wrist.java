@@ -156,7 +156,9 @@ public class Wrist extends SubsystemBase {
     }
 
     public boolean atTarget(Supplier<SuperstructureLocation> loc, boolean extraTol) {
-        double tol = extraTol ? k.closeEnough * 3 : k.closeEnough;
+        // for determining position treat the wrist as always there
+        if (extraTol) return true;
+        double tol = k.closeEnough;
         return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad) < tol;
     }
 

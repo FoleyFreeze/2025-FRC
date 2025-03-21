@@ -1,3 +1,9 @@
 package frc.robot.subsystems.LEDs;
 
-public class LEDIO {}
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+
+public interface LEDIO {
+
+    public default void setData(AddressableLEDBuffer buffer) {}
+    ;
+}
