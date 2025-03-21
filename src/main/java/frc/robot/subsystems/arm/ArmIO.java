@@ -31,4 +31,6 @@ public interface ArmIO {
     public default void superZero() {}
 
     public default void setPIDSlot(ClosedLoopSlot slot) {}
+
+    public default void setBrake(boolean on) {}
 }

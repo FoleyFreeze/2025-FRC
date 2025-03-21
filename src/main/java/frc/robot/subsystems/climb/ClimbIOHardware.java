@@ -18,12 +18,12 @@ public class ClimbIOHardware implements ClimbIO {
     private final RelativeEncoder encoder;
     private final AbsoluteEncoder absEnc;
     private SparkClosedLoopController closedLoopController;
+    SparkMaxConfig config = new SparkMaxConfig();
 
     public ClimbIOHardware(ClimbCals cals) {
         this.k = cals;
         motor = new SparkMax(14, MotorType.kBrushless);
 
-        SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(true);
         config.idleMode(IdleMode.kBrake);
         config.closedLoop.pid(0, 0, 0).outputRange(0, 0);
@@ -71,5 +71,11 @@ public class ClimbIOHardware implements ClimbIO {
     @Override
     public void setClimbVolts(double volts) {
         motor.setVoltage(volts);
+    }
+
+    @Override
+    public void setBrake(boolean on) {
+        config.idleMode(on ? IdleMode.kBrake : IdleMode.kCoast);
+        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 }

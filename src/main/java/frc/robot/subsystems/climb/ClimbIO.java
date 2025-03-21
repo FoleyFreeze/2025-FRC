@@ -20,4 +20,6 @@ public interface ClimbIO {
     public default void setClimbVolts(double volts) {}
 
     public default void zero() {}
+
+    public default void setBrake(boolean on) {}
 }

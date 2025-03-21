@@ -255,6 +255,7 @@ public class Vision extends SubsystemBase {
                 }
 
                 Logger.recordOutput("Vision/ClosestTagDist", distToPose.getTranslation().getNorm());
+                Logger.recordOutput("Vision/ClosestTagId", closestSeenTag);
                 Logger.recordOutput(
                         "Vision/ClosestTagAngle", distToPose.getRotation().getDegrees());
             }
@@ -295,7 +296,7 @@ public class Vision extends SubsystemBase {
     public boolean selectedTagOnTarget() {
         int targetId = Locations.getTagId(r.controlBoard.selectedReefPos);
         if (targetId == closestSeenTag) {
-            if (distToPose.getTranslation().getNorm() < Units.inchesToMeters(20)) {
+            if (distToPose.getTranslation().getNorm() < Units.inchesToMeters(27)) {
                 return true;
             }
         }

@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
 import frc.robot.util.PhoenixUtil;
@@ -19,6 +20,7 @@ public class ArmIOHardware implements ArmIO {
     private final AbsoluteEncoder absEncoder;
     private SparkClosedLoopController closedLoopController;
     private ClosedLoopSlot slot = ClosedLoopSlot.kSlot0; // default to coral
+    SparkMaxConfig config = new SparkMaxConfig();
 
     ArmCals k;
 
@@ -26,7 +28,7 @@ public class ArmIOHardware implements ArmIO {
         k = cals;
         motor = new SparkMax(16, MotorType.kBrushless);
 
-        SparkMaxConfig config = new SparkMaxConfig();
+        config.idleMode(IdleMode.kBrake);
         config.closedLoop
                 .pid(5, 0.006, 2, ClosedLoopSlot.kSlot1)
                 .outputRange(-0.5, 0.5, ClosedLoopSlot.kSlot1)
@@ -136,5 +138,11 @@ public class ArmIOHardware implements ArmIO {
             double result = extraRevOfAbsEnc / k.gearRatioToAbsEncoder + absEnc;
             return result;
         }
+    }
+
+    @Override
+    public void setBrake(boolean on) {
+        config.idleMode(on ? IdleMode.kBrake : IdleMode.kCoast);
+        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 }

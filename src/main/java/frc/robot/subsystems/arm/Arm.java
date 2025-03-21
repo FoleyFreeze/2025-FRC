@@ -122,4 +122,8 @@ public class Arm extends SubsystemBase {
         io.setPIDSlot(slot);
         System.out.println("Arm PID set to slot: " + slot);
     }
+
+    public void setBrake(boolean on) {
+        io.setBrake(on);
+    }
 }

@@ -250,6 +250,7 @@ public class DriveCommands {
                                     target.getTranslation().minus(meas.getTranslation());
                             error[0] = pointErr.getNorm();
                             Logger.recordOutput("Odometry/PointErr", pointErr);
+                            Logger.recordOutput("Odometry/PointErrNorm", error[0]);
 
                             double xVel = pidX.calculate(meas.getX(), target.getX());
                             double yVel = pidY.calculate(meas.getY(), target.getY());

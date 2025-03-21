@@ -116,4 +116,8 @@ public class Elevator extends SubsystemBase {
     public void zero() {
         io.zero();
     }
+
+    public void setBrake(boolean on) {
+        io.setBrake(on);
+    }
 }

@@ -1,7 +1,5 @@
 package frc.robot.subsystems.LEDs;
 
-import static edu.wpi.first.units.Units.Percent;
-import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.networktables.BooleanPublisher;
@@ -9,7 +7,10 @@ import edu.wpi.first.networktables.IntegerArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -22,11 +23,10 @@ public class LED extends SubsystemBase {
         BLUE(LEDPattern.solid(Color.kBlue)),
         GREEN(LEDPattern.solid(Color.kGreen)),
         RED(LEDPattern.solid(Color.kRed)),
-        BLINK_BLUE(LEDPattern.solid(Color.kBlue).blink(Seconds.of(0.3), Seconds.of(0.1))),
+        BLINK_BLUE(LEDPattern.solid(Color.kBlue).blink(Seconds.of(1), Seconds.of(1))),
         BREATHE_BLUE(
-                LEDPattern.solid(Color.kBlue)
-                        .breathe(Seconds.of(3))
-                        .scrollAtRelativeSpeed(Percent.per(Second).of(20)));
+                LEDPattern.solid(Color.kBlue).breathe(Seconds.of(3))
+                /*.scrollAtRelativeSpeed(Percent.per(Second).of(20))*/ );
 
         public final LEDPattern pattern;
 
@@ -36,10 +36,11 @@ public class LED extends SubsystemBase {
     }
 
     private RobotContainer r;
+    public PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
 
     LEDIO io;
 
-    AddressableLEDBuffer buffer = new AddressableLEDBuffer(80);
+    AddressableLEDBuffer buffer = new AddressableLEDBuffer(40);
 
     public LED(RobotContainer r) {
         this.r = r;
@@ -61,18 +62,30 @@ public class LED extends SubsystemBase {
     @Override
     public void periodic() {
         ledEnable.set(true);
+
+        LED_MODES.BLUE.pattern.applyTo(buffer);
         io.setData(buffer);
+
+        // only underglow on the field or enabled
+        if (DriverStation.isFMSAttached() || DriverStation.isEnabled()) {
+            pdh.setSwitchableChannel(true);
+        } else {
+            pdh.setSwitchableChannel(true);
+        }
     }
 
     public Command setLEDMode(LED_MODES mode) {
-        return new RunCommand(() -> mode.pattern.applyTo(buffer), this);
+        Command c = new RunCommand(() -> mode.pattern.applyTo(buffer), this).ignoringDisable(true);
+        c.setName("LED Command");
+        return c;
     }
 
     BooleanPublisher ledEnable;
-    IntegerArrayPublisher ledValue;
+    public IntegerArrayPublisher ledValue;
     public long[] localLedVal = {0, 0, 0};
 
     public void ledOutputSet(int value, boolean on) {
+        value--;
         if (value < 32) {
             int v = 1 << value;
             if (on) {

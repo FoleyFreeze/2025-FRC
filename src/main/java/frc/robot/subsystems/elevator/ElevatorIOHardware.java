@@ -150,4 +150,13 @@ public class ElevatorIOHardware implements ElevatorIO {
     public void zero() {
         tryUntilOk(5, () -> elevatorTalon.setPosition(0.0, 0.25));
     }
+
+    @Override
+    public void setBrake(boolean on) {
+        if (on) {
+            elevatorTalon.setNeutralMode(NeutralModeValue.Brake);
+        } else {
+            elevatorTalon.setNeutralMode(NeutralModeValue.Coast);
+        }
+    }
 }

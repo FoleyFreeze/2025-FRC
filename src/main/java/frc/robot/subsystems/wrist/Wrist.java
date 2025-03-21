@@ -203,4 +203,8 @@ public class Wrist extends SubsystemBase {
         double wristLocalAngle = wristAngle - extraArm;
         return wristLocalAngle;
     }
+
+    public void setBrake(boolean on) {
+        io.setBrake(on);
+    }
 }

@@ -29,4 +29,6 @@ public interface WristIO {
     public default void superZero() {}
 
     public default void rezeroAbsEnc() {}
+
+    public default void setBrake(boolean on) {}
 }

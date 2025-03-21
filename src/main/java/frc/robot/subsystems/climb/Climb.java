@@ -59,7 +59,8 @@ public class Climb extends SubsystemBase {
     }
 
     private void setVolts(double volts) {
-        if (volts > 0 && inputs.climbAbsPosition < 0.15) {
+        // climb height limit... lower number = higher climb
+        if (volts > 0 && inputs.climbAbsPosition < 0.190) { // 0.15
             // fully in
             volts = 0;
         } else if (volts < 0 && inputs.climbAbsPosition > 0.509) {
@@ -75,5 +76,9 @@ public class Climb extends SubsystemBase {
 
     public Command stopCmd() {
         return new RunCommand(this::stop, this);
+    }
+
+    public void setBrake(boolean on) {
+        io.setBrake(on);
     }
 }

@@ -24,4 +24,6 @@ public interface ElevatorIO {
     public default void setElevatorPosition(double motorPositionInches) {}
 
     public default void zero() {}
+
+    public default void setBrake(boolean on) {}
 }

@@ -75,8 +75,8 @@ public class ComplexCommands {
                                         .andThen(new WaitCommand(stripTime))
                                         .andThen(
                                                 r.elevator.goTo(
-                                                        r.controlBoard::getAlgaeReefDSHeightLower)))
-                        .alongWith(DriveCommands.joystickDriveFlysky(r))
+                                                        r.controlBoard::getAlgaeReefDSHeightLower))
+                                        .alongWith(DriveCommands.joystickDriveFlysky(r)))
                         .finallyDo(() -> r.hand.setVoltage(0));
 
         c.setName("StripAlgae");
@@ -415,6 +415,8 @@ public class ComplexCommands {
                         .goTo(() -> SuperstructureLocation.PRE_INTAKE)
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.POST_INTAKE))
                         .andThen(r.wrist.goTo(() -> SuperstructureLocation.POST_INTAKE))
+                        .andThen(r.arm.goTo(() -> SuperstructureLocation.POST_INTAKE2))
+                        .andThen(r.wrist.goTo(() -> SuperstructureLocation.POST_INTAKE2))
                         .andThen(
                                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                                         .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD)))
@@ -617,5 +619,19 @@ public class ComplexCommands {
         // c.addRequirements(r.elevator, r.arm, r.wrist, r.hand);
         c.setName("RezeroWrist");
         return c.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+
+    public static Command setBrakeSuperStructure(boolean on) {
+        return new InstantCommand(
+                () -> {
+                    r.arm.setBrake(on);
+                    r.elevator.setBrake(on);
+                    r.wrist.setBrake(on);
+                    r.climb.setBrake(on);
+                },
+                r.arm,
+                r.elevator,
+                r.wrist,
+                r.climb);
     }
 }

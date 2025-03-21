@@ -23,6 +23,7 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -37,7 +38,6 @@ import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SuperstructureLocation;
 import frc.robot.subsystems.LEDs.LED;
-import frc.robot.subsystems.LEDs.LED.LED_MODES;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.BotState;
@@ -84,6 +84,8 @@ public class RobotContainer {
 
     // Pathplanner triggers
     public EventTrigger inSlowDrivePhase;
+    public DigitalInput dio1 = new DigitalInput(9);
+    public Trigger neutralSwitch = new Trigger(() -> !dio1.get() && DriverStation.isDisabled());
 
     public Trigger isDisabledOrAuto =
             new Trigger(() -> DriverStation.isDisabled() || DriverStation.isAutonomous());
@@ -170,7 +172,7 @@ public class RobotContainer {
 
         climb.setDefaultCommand(climb.setClimbVoltage(0));
 
-        leds.setDefaultCommand(leds.setLEDMode(LED_MODES.BREATHE_BLUE));
+        // leds.setDefaultCommand(leds.setLEDMode(LED_MODES.RED));
 
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(DriveCommands.zeroDrive(this).ignoringDisable(true));
@@ -320,14 +322,23 @@ public class RobotContainer {
 
         // gather and unjam
         controlBoard.gatherBtn.and(controlBoard.shiftT.negate()).onTrue(hand.setVoltageCmd(3));
-        controlBoard.gatherBtn.and(controlBoard.shiftT.negate()).onFalse(hand.setVoltageCmd(0));
+        controlBoard
+                .gatherBtn
+                .and(controlBoard.shiftT.negate())
+                .onFalse(hand.setVoltageCmd(ComplexCommands.holdPowerCoral));
         controlBoard.gatherBtn.and(controlBoard.shiftT).onTrue(hand.setVoltageCmd(-3));
         controlBoard.gatherBtn.and(controlBoard.shiftT).onFalse(hand.setVoltageCmd(0));
+
+        // neutral switch
+        neutralSwitch.onTrue(ComplexCommands.setBrakeSuperStructure(false).ignoringDisable(true));
+        neutralSwitch.onFalse(ComplexCommands.setBrakeSuperStructure(true).ignoringDisable(true));
     }
 
     public void robotPeriodic() {
         controlBoard.periodic();
         // controlBoard.selectApproachingStation(); // TODO: delete me
+
+        Logger.recordOutput("State/DisableBtn", !dio1.get());
 
         String s =
                 String.format(
