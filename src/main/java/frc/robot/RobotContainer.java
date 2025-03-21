@@ -37,6 +37,7 @@ import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SuperstructureLocation;
 import frc.robot.subsystems.LEDs.LED;
+import frc.robot.subsystems.LEDs.LED.LED_MODES;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.controls.BotState;
@@ -168,6 +169,8 @@ public class RobotContainer {
         elevator.setDefaultCommand(ComplexCommands.homeLogic());
 
         climb.setDefaultCommand(climb.setClimbVoltage(0));
+
+        leds.setDefaultCommand(leds.setLEDMode(LED_MODES.BREATHE_BLUE));
 
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(DriveCommands.zeroDrive(this).ignoringDisable(true));
