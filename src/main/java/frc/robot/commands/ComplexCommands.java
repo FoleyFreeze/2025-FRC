@@ -566,6 +566,9 @@ public class ComplexCommands {
         c.addCommands(r.wrist.setVoltage(-0.6));
         c.addCommands(r.arm.setVoltage(-0.75));
         c.addCommands(r.hand.setVoltageCmd(0));
+        c.addCommands(new WaitCommand(1));
+        c.addCommands(r.wrist.setVoltage(-0.1));
+        c.addCommands(r.arm.setVoltage(-0.1));
 
         c.setName("GoToClimb");
         return c;
