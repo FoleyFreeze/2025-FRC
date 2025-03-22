@@ -118,7 +118,7 @@ public class Vision extends SubsystemBase {
     public Transform2d distToPose;
     public int closestSeenTag;
     public Timer lastResetTime = new Timer();
-    public double maxMemoryTime = 0.5;
+    public double maxMemoryTime = 1.5;
 
     @Override
     public void periodic() {
@@ -157,6 +157,7 @@ public class Vision extends SubsystemBase {
                 }
             }
 
+            /*
             if (inputs[cameraIndex].tagIds.length != 0
                     || inputs[cameraIndex].poseObservations.length != 0
                     || lastResetTime.hasElapsed(maxMemoryTime)) {
@@ -164,6 +165,7 @@ public class Vision extends SubsystemBase {
                 closestSeenTag = 0;
                 lastResetTime.restart();
             }
+            */
 
             // Loop over pose observations
             for (var observation : inputs[cameraIndex].poseObservations) {
@@ -244,18 +246,24 @@ public class Vision extends SubsystemBase {
                 // find closest tag in shot to robot
 
                 Pose2d observationPose = observation.pose().toPose2d();
+                boolean first = true;
                 for (int i = 0; i < inputs[cameraIndex].tagIds.length; i++) {
                     int id = inputs[cameraIndex].tagIds[i];
                     var tagPose = aprilTagLayout.getTagPose(id).orElse(defaultPose).toPose2d();
                     Transform2d dist = tagPose.minus(observationPose);
-                    if (dist.getTranslation().getNorm() < distToPose.getTranslation().getNorm()) {
+                    if (first
+                            || dist.getTranslation().getNorm()
+                                    < distToPose.getTranslation().getNorm()) {
                         distToPose = dist;
                         closestSeenTag = id;
+                        lastResetTime.restart();
                     }
+                    first = false;
                 }
 
                 Logger.recordOutput("Vision/ClosestTagDist", distToPose.getTranslation().getNorm());
                 Logger.recordOutput("Vision/ClosestTagId", closestSeenTag);
+                Logger.recordOutput("Vision/ClosestTime", lastResetTime.get());
                 Logger.recordOutput(
                         "Vision/ClosestTagAngle", distToPose.getRotation().getDegrees());
             }
@@ -295,8 +303,13 @@ public class Vision extends SubsystemBase {
 
     public boolean selectedTagOnTarget() {
         int targetId = Locations.getTagId(r.controlBoard.selectedReefPos);
+        Logger.recordOutput("Vision/OnTarget/targetID", targetId);
+        Logger.recordOutput("Vision/OnTarget/closeID", closestSeenTag);
+        Logger.recordOutput("Vision/OnTarget/TagDist", distToPose.getTranslation().getNorm());
+        Logger.recordOutput("Vision/OnTarget/ResetTime", lastResetTime.get());
         if (targetId == closestSeenTag) {
-            if (distToPose.getTranslation().getNorm() < Units.inchesToMeters(27)) {
+            if (distToPose.getTranslation().getNorm() < Units.inchesToMeters(27)
+                    && !lastResetTime.hasElapsed(maxMemoryTime)) {
                 return true;
             }
         }

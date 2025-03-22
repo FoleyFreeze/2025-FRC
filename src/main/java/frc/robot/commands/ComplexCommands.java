@@ -561,9 +561,9 @@ public class ComplexCommands {
         SequentialCommandGroup c = new SequentialCommandGroup();
         c.addCommands(goToLoc(() -> SuperstructureLocation.HOLD));
         c.addCommands(r.hand.setVoltageCmd(releasePowerCoral1));
-        c.addCommands(r.wrist.setVoltage(-1));
-        c.addCommands(new WaitCommand(0.5));
-        c.addCommands(r.wrist.setVoltage(-0.4));
+        c.addCommands(r.wrist.setVoltage(-1.5));
+        c.addCommands(new WaitCommand(0.75));
+        c.addCommands(r.wrist.setVoltage(-0.6));
         c.addCommands(r.arm.setVoltage(-0.75));
         c.addCommands(r.hand.setVoltageCmd(0));
 
