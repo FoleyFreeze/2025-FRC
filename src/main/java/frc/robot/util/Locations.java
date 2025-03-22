@@ -17,14 +17,15 @@ public class Locations {
     public static double robotLength = Units.inchesToMeters(30 + 6);
     public static Transform2d halfRobot = new Transform2d(robotLength / 2.0, 0, new Rotation2d());
     public static Transform2d halfRobotProc =
-            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(6 + 12), 0, new Rotation2d());
+            new Transform2d(
+                    robotLength / 2.0 + Units.inchesToMeters(6 + 6 /*12 */), 0, new Rotation2d());
 
     public static Transform2d halfRobotNet =
             new Transform2d(robotLength / 2.0 + Units.inchesToMeters(1.25), 0, new Rotation2d());
 
     // TODO: remove extra before comp
     static double extraGatherX = 8; // 12
-    static double extraGatherY = 20;
+    static double extraGatherY = 20 - 4;
     public static Transform2d halfRobotGatherLeftFar =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(2.5 + extraGatherX),

@@ -268,6 +268,7 @@ public class DriveCommands {
                             // tag confirming it
                             if (error[0] < POS_TOL) {
                                 r.state.onTarget = r.vision.selectedTagOnTarget();
+                                // r.state.onTarget = true;
                             }
                         },
                         r.drive)

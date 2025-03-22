@@ -340,8 +340,7 @@ public class ComplexCommands {
                 goToLoc(() -> r.controlBoard.getCoralLevel())
                         .alongWith(holdCoral())
                         // gather trigger
-                        .andThen(
-                                new WaitUntilCommand(r.flysky.leftTriggerSWE.or(r.state.onTargetT)))
+                        .andThen(new WaitUntilCommand(r.flysky.leftTriggerSWE))
                         .andThen(releaseCoral());
         c.setName("NoDriveScore");
         return c;
@@ -389,6 +388,9 @@ public class ComplexCommands {
                                                                                         .and(
                                                                                                 r.state
                                                                                                         .pathCompleteT)
+                                                                                        .or(
+                                                                                                r.state
+                                                                                                        .onTargetT)
                                                                                         .getAsBoolean())))
                                         .andThen(releaseCoral()))
                         .andThen(
@@ -410,13 +412,24 @@ public class ComplexCommands {
                         .andThen(r.elevator.goTo(p))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
 
-        Command inGather =
+        Command inGatherOld =
                 r.elevator
                         .goTo(() -> SuperstructureLocation.PRE_INTAKE)
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.POST_INTAKE))
                         .andThen(r.wrist.goTo(() -> SuperstructureLocation.POST_INTAKE))
                         .andThen(r.arm.goTo(() -> SuperstructureLocation.POST_INTAKE2))
                         .andThen(r.wrist.goTo(() -> SuperstructureLocation.POST_INTAKE2))
+                        .andThen(
+                                r.arm.goTo(() -> SuperstructureLocation.HOLD)
+                                        .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD)))
+                        .andThen(r.elevator.goTo(p))
+                        .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
+
+        Command inGather =
+                r.elevator
+                        .goTo(() -> SuperstructureLocation.PRE_INTAKE)
+                        .andThen(r.wrist.setVoltage(-0.001).alongWith(r.arm.setVoltage(3)))
+                        .until(() -> r.arm.getAngle().in(Degrees) > -20)
                         .andThen(
                                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                                         .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD)))
@@ -545,10 +558,10 @@ public class ComplexCommands {
         SequentialCommandGroup c = new SequentialCommandGroup();
         c.addCommands(goToLoc(() -> SuperstructureLocation.HOLD));
         c.addCommands(r.hand.setVoltageCmd(releasePowerCoral1));
-        c.addCommands(r.wrist.setVoltage(-0.7));
-        c.addCommands(new WaitCommand(0.3));
+        c.addCommands(r.wrist.setVoltage(-1));
+        c.addCommands(new WaitCommand(0.5));
         c.addCommands(r.wrist.setVoltage(-0.4));
-        c.addCommands(r.arm.setVoltage(0));
+        c.addCommands(r.arm.setVoltage(-0.75));
         c.addCommands(r.hand.setVoltageCmd(0));
 
         c.setName("GoToClimb");
