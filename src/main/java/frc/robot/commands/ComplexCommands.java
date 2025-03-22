@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -428,8 +429,10 @@ public class ComplexCommands {
         Command inGather =
                 r.elevator
                         .goTo(() -> SuperstructureLocation.PRE_INTAKE)
-                        .andThen(r.wrist.setVoltage(-0.001).alongWith(r.arm.setVoltage(3)))
-                        .until(() -> r.arm.getAngle().in(Degrees) > -20)
+                        .andThen(new PrintCommand("starting lift"))
+                        .andThen(r.wrist.setVoltage(0.5).alongWith(r.arm.setVoltage(2)))
+                        .andThen(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -15))
+                        .andThen(new PrintCommand("lift complete"))
                         .andThen(
                                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                                         .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD)))
