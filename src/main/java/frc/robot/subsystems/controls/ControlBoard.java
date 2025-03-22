@@ -25,6 +25,7 @@ public class ControlBoard {
     public LoggedDashboardChooser<Boolean> climbMode;
     public LoggedDashboardChooser<Boolean> algaeMode;
     public LoggedDashboardChooser<Boolean> useShuffleboard;
+    public LoggedDashboardChooser<Boolean> stationDist;
 
     RobotContainer r;
 
@@ -39,6 +40,7 @@ public class ControlBoard {
         climbMode = new LoggedDashboardChooser<>("climbMode");
         algaeMode = new LoggedDashboardChooser<>("AlgaeMode");
         useShuffleboard = new LoggedDashboardChooser<>("UseShuffleboard");
+        stationDist = new LoggedDashboardChooser<>("StationDist");
 
         level.addDefaultOption("1", 1);
         level.addOption("2", 2);
@@ -61,6 +63,9 @@ public class ControlBoard {
         station.addDefaultOption("Closest", Station.CLOSEST);
         station.addDefaultOption("Left", Station.LEFT);
         station.addOption("Right", Station.RIGHT);
+
+        stationDist.addDefaultOption("Far", true);
+        stationDist.addOption("Close", false);
 
         climbMode.addDefaultOption("Off", false);
         climbMode.addOption("On", true);
@@ -97,6 +102,7 @@ public class ControlBoard {
     public ReefSticks selectedReefPos = ReefSticks.A;
     public int selectedLevel = 2;
     public Station selectedStation = Station.CLOSEST;
+    public boolean useFarStation = true;
     public boolean selectedClimbMode = false;
     public boolean selectedAlgae = false;
     public boolean shift = false;
@@ -206,6 +212,8 @@ public class ControlBoard {
             selectedAlgae = algaeMode.get();
         }
 
+        useFarStation = stationDist.get();
+
         Logger.recordOutput("CB/SelectedReef", selectedReefPos);
         Logger.recordOutput("CB/SelectedLevel", selectedLevel);
         Logger.recordOutput("CB/SelectedStation", selectedStation);
@@ -217,12 +225,15 @@ public class ControlBoard {
     public Pose2d selectCoralStation() {
         switch (selectedStation) {
             case LEFT:
-                return Locations.getLeftGatherStationFar();
+                if(useFarStation) return Locations.getLeftGatherStationFar();
+                else return Locations.getLeftGatherStationClose();
             case RIGHT:
-                return Locations.getRightGatherStationFar();
+                if(useFarStation) return Locations.getRightGatherStationFar();
+                else return Locations.getRightGatherStationClose();
             case CLOSEST:
             default:
-                return selectClosestCoralStation();
+                if(useFarStation) return selectClosestFarCoralStation();
+                else return selectClosestCloseCoralStation();
         }
     }
 
@@ -363,13 +374,22 @@ public class ControlBoard {
         }
     }
 
-    public Pose2d selectClosestCoralStation() {
+    public Pose2d selectClosestFarCoralStation() {
         return r.drive
                 .getPose()
                 .nearest(
                         List.of(
                                 Locations.getLeftGatherStationFar(),
                                 Locations.getRightGatherStationFar()));
+    }
+
+    public Pose2d selectClosestCloseCoralStation() {
+        return r.drive
+                .getPose()
+                .nearest(
+                        List.of(
+                                Locations.getLeftGatherStationClose(),
+                                Locations.getRightGatherStationClose()));
     }
 
     public Pose2d selectApproachingStation() {
