@@ -25,7 +25,6 @@ public class ControlBoard {
     public LoggedDashboardChooser<Boolean> climbMode;
     public LoggedDashboardChooser<Boolean> algaeMode;
     public LoggedDashboardChooser<Boolean> useShuffleboard;
-    
 
     RobotContainer r;
 

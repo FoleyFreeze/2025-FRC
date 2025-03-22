@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -295,9 +294,11 @@ public class RobotContainer {
         controlBoard
                 .climbModeT
                 .onTrue(ComplexCommands.goToClimb().andThen(new RunCommand(() -> {})))
-                .onTrue(r.climb.setClimbVoltage(-12)
-                        .raceWith(new WaitCommand(3))
-                        .finallyDo(() -> r.climb.setVolts(0)));
+                .onTrue(
+                        r.climb
+                                .setClimbVoltage(-12)
+                                .raceWith(new WaitCommand(3))
+                                .finallyDo(() -> r.climb.setVolts(0)));
 
         // get safely out of climb position
         controlBoard.climbModeT.onFalse(ComplexCommands.leaveClimb());

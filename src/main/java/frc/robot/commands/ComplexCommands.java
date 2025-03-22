@@ -637,7 +637,10 @@ public class ComplexCommands {
 
         // c.addRequirements(r.elevator, r.arm, r.wrist, r.hand);
         c.setName("RezeroWrist");
-        return c.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        Command cmd = c.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        cmd = cmd.raceWith(new WaitCommand(10));
+
+        return cmd;
     }
 
     public static Command setBrakeSuperStructure(boolean on) {

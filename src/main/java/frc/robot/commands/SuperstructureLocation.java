@@ -10,7 +10,7 @@ public enum SuperstructureLocation {
     // elevator, arm, wrist
     // inches, degress, degrees
     HOLD(0.25, 5, -25 + 65),
-    HOLD_GATHER(0.25, 5, -70),
+    HOLD_GATHER(0.25, 5, -60), // 70
     HOLD_ALGAE_XFER(16, 5, 140),
 
     VERT_ALGAE(19, 8, 193),
