@@ -58,7 +58,7 @@ public class Climb extends SubsystemBase {
         return new RunCommand(() -> setVolts(volts), this);
     }
 
-    private void setVolts(double volts) {
+    public void setVolts(double volts) {
         // climb height limit... lower number = higher climb
         if (volts > 0 && inputs.climbAbsPosition < 0.190) { // 0.15
             // fully in

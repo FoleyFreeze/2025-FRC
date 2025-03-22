@@ -295,9 +295,9 @@ public class RobotContainer {
         controlBoard
                 .climbModeT
                 .onTrue(ComplexCommands.goToClimb().andThen(new RunCommand(() -> {})))
-                .onTrue(
-                        new SequentialCommandGroup(
-                                r.climb.setClimbVoltage(-12), new WaitCommand(3)));
+                .onTrue(r.climb.setClimbVoltage(-12)
+                        .raceWith(new WaitCommand(3))
+                        .finallyDo(() -> r.climb.setVolts(0)));
 
         // get safely out of climb position
         controlBoard.climbModeT.onFalse(ComplexCommands.leaveClimb());
