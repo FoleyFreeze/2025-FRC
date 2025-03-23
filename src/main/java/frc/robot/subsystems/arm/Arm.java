@@ -114,7 +114,13 @@ public class Arm extends SubsystemBase {
     }
 
     public Command setVoltage(double volts) {
-        Command c = new InstantCommand(() -> io.setArmVolts(volts), this);
+        Command c =
+                new InstantCommand(
+                        () -> {
+                            io.setArmVolts(volts);
+                            target = null;
+                        },
+                        this);
         return c;
     }
 

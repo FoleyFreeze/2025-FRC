@@ -10,7 +10,7 @@ public enum SuperstructureLocation {
     // elevator, arm, wrist
     // inches, degress, degrees
     HOLD(0.25, 5, -25 + 65),
-    HOLD_GATHER(0.25, 5, -60), // 70
+    HOLD_GATHER(0.25, 5, -55), // 70
     HOLD_ALGAE_XFER(16, 5, 140),
 
     VERT_ALGAE(19, 8, 193),
@@ -39,7 +39,7 @@ public enum SuperstructureLocation {
     FLOOR_GATHER_ALGAE(0, 0, 0),
     SCORE_PROCESSOR(1, 110, 238),
 
-    PRE_INTAKE(-0.20, -49 + 7, -69.5),
+    PRE_INTAKE(-0.20, -49 + 7, -60), // -69.5
     INTAKE(1.3, -55, -60), // 2.1 -56, -63
     POST_INTAKE(-0.20, -42, -50),
     POST_INTAKE2(-0.20, -27, -10),
