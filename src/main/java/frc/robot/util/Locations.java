@@ -52,7 +52,7 @@ public class Locations {
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(3.25),
                     Units.inchesToMeters(5.5),
-                    Rotation2d.fromDegrees(3.5));
+                    Rotation2d.fromDegrees(1 /*3.5*/));
     public static Transform2d halfRobotCoralLeft =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(3.5),
