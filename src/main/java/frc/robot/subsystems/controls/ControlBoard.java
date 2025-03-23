@@ -127,13 +127,13 @@ public class ControlBoard {
             shift = !cb.getRawButton(4); // note inverted
 
             if (cb.getRawAxis(2) < -0.5) {
-                //selectedStation = Station.LEFT;
+                // selectedStation = Station.LEFT;
                 useFarStation = true;
             } else if (cb.getRawAxis(2) > 0.5) {
-                //selectedStation = Station.RIGHT;
+                // selectedStation = Station.RIGHT;
                 useFarStation = false;
             } else {
-                //selectedStation = Station.CLOSEST;
+                // selectedStation = Station.CLOSEST;
                 useFarStation = true;
             }
 

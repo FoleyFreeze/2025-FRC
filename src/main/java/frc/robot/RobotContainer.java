@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -333,7 +334,14 @@ public class RobotContainer {
                 .gatherBtn
                 .and(controlBoard.shiftT.negate())
                 .onFalse(hand.setVoltageCmd(ComplexCommands.holdPowerCoral));
-        controlBoard.gatherBtn.and(controlBoard.shiftT).onTrue(hand.setVoltageCmd(-2.5));
+        controlBoard
+                .gatherBtn
+                .and(controlBoard.shiftT)
+                .onTrue(
+                        new SequentialCommandGroup(
+                                hand.setVoltageCmd(-2.2),
+                                new WaitCommand(0.01),
+                                hand.setVoltageCmd(-1.8)));
         controlBoard.gatherBtn.and(controlBoard.shiftT).onFalse(hand.setVoltageCmd(0));
 
         // neutral switch

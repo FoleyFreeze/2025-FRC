@@ -25,10 +25,11 @@ public class NewPathFinder extends Command {
     private Command c;
 
     // vel, accel, rotvel, rotaccel
-    PathConstraints globalConstraints = new PathConstraints(3.5, 5.2, 6, 4);
+    PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 5.2, 6, 4);
+    PathConstraints algaeGlobalConstraints = new PathConstraints(3, 3, 4, 4);
     // PathConstraints globalConstraints = new PathConstraints(2, 2, 6, 4);
     PathConstraints finalConstraints = new PathConstraints(1.25, 1.5, 3, 2);
-    PathConstraints finalConstraintsAlgae = new PathConstraints(2, 2, 3, 2);
+    PathConstraints finalConstraintsAlgae = new PathConstraints(1.5, 1.5, 3, 2);
 
     public NewPathFinder(RobotContainer r, Supplier<Pose2d> poseSupplier, boolean isGather) {
         this.poseSupplier = poseSupplier;
@@ -65,10 +66,13 @@ public class NewPathFinder extends Command {
         }
 
         PathConstraints selectedConstraint;
+        PathConstraints globalConstraint;
         if (r.controlBoard.algaeModeT.getAsBoolean()) {
             selectedConstraint = finalConstraintsAlgae;
+            globalConstraint = algaeGlobalConstraints;
         } else {
             selectedConstraint = finalConstraints;
+            globalConstraint = coralGlobalConstraints;
         }
 
         ConstraintsZone cz =
@@ -85,7 +89,7 @@ public class NewPathFinder extends Command {
                         Collections.emptyList(),
                         isGather ? Collections.emptyList() : List.of(cz),
                         isGather ? Collections.emptyList() : List.of(em),
-                        globalConstraints,
+                        globalConstraint,
                         null,
                         new GoalEndState(0, flipPose.getRotation()),
                         false);
