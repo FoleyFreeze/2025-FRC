@@ -61,7 +61,7 @@ public class ControlBoard {
         letter.addOption("L", ReefSticks.L);
 
         station.addDefaultOption("Closest", Station.CLOSEST);
-        station.addDefaultOption("Left", Station.LEFT);
+        station.addOption("Left", Station.LEFT);
         station.addOption("Right", Station.RIGHT);
 
         stationDist.addDefaultOption("Far", true);
@@ -127,11 +127,14 @@ public class ControlBoard {
             shift = !cb.getRawButton(4); // note inverted
 
             if (cb.getRawAxis(2) < -0.5) {
-                selectedStation = Station.LEFT;
+                //selectedStation = Station.LEFT;
+                useFarStation = true;
             } else if (cb.getRawAxis(2) > 0.5) {
-                selectedStation = Station.RIGHT;
+                //selectedStation = Station.RIGHT;
+                useFarStation = false;
             } else {
-                selectedStation = Station.CLOSEST;
+                //selectedStation = Station.CLOSEST;
+                useFarStation = true;
             }
 
             if (cb.getPOV() == 270) {
@@ -207,12 +210,12 @@ public class ControlBoard {
         } else {
             selectedReefPos = letter.get();
             selectedLevel = level.get();
-            selectedStation = station.get();
             selectedClimbMode = climbMode.get();
             selectedAlgae = algaeMode.get();
+            useFarStation = stationDist.get();
         }
 
-        useFarStation = stationDist.get();
+        selectedStation = station.get();
 
         Logger.recordOutput("CB/SelectedReef", selectedReefPos);
         Logger.recordOutput("CB/SelectedLevel", selectedLevel);
@@ -225,14 +228,14 @@ public class ControlBoard {
     public Pose2d selectCoralStation() {
         switch (selectedStation) {
             case LEFT:
-                if(useFarStation) return Locations.getLeftGatherStationFar();
+                if (useFarStation) return Locations.getLeftGatherStationFar();
                 else return Locations.getLeftGatherStationClose();
             case RIGHT:
-                if(useFarStation) return Locations.getRightGatherStationFar();
+                if (useFarStation) return Locations.getRightGatherStationFar();
                 else return Locations.getRightGatherStationClose();
             case CLOSEST:
             default:
-                if(useFarStation) return selectClosestFarCoralStation();
+                if (useFarStation) return selectClosestFarCoralStation();
                 else return selectClosestCloseCoralStation();
         }
     }

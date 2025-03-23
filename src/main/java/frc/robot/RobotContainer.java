@@ -333,7 +333,7 @@ public class RobotContainer {
                 .gatherBtn
                 .and(controlBoard.shiftT.negate())
                 .onFalse(hand.setVoltageCmd(ComplexCommands.holdPowerCoral));
-        controlBoard.gatherBtn.and(controlBoard.shiftT).onTrue(hand.setVoltageCmd(-3));
+        controlBoard.gatherBtn.and(controlBoard.shiftT).onTrue(hand.setVoltageCmd(-2.5));
         controlBoard.gatherBtn.and(controlBoard.shiftT).onFalse(hand.setVoltageCmd(0));
 
         // neutral switch

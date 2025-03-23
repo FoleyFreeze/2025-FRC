@@ -27,7 +27,7 @@ public class ComplexCommands {
     static double releaseTimeCoral23 = 0.25;
     static double releaseTimeCoral4 = 0.05;
 
-    public static double intakePowerCoral = 2.0;
+    public static double intakePowerCoral = 3.0; // 2
     public static double intakeCurrentCoral = 15;
     static double intakeCoralTime = 0.8;
 
@@ -48,7 +48,7 @@ public class ComplexCommands {
 
     static double pulseGatherOn = 0.2;
     static double pulseGatherOff = 0.2;
-    static double pulseGatherOffPwr = -0.05;
+    static double pulseGatherOffPwr = -0.5; // 0.05
 
     public static RobotContainer r;
 
