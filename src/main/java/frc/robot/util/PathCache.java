@@ -19,7 +19,7 @@ public class PathCache {
     RobotContainer r;
     Pose2d[] waypointList;
 
-    double velocityThreshold = 5;
+    double velocityThreshold = 0.2;
 
     public PathCache(RobotContainer r) {
         this.r = r;
@@ -72,7 +72,7 @@ public class PathCache {
         ChassisSpeeds currentVel = r.drive.getVelocity();
 
         // if velocity is high, point the path along the direction of velocity
-        /*
+
         Translation2d travelVector;
         if (Math.hypot(currentVel.vxMetersPerSecond, currentVel.vyMetersPerSecond)
                 > velocityThreshold) {
@@ -84,9 +84,11 @@ public class PathCache {
                             .getTranslation()
                             .minus(currentLocation.getTranslation());
         }
-        */
+
+        /*
         Translation2d travelVector =
                 waypointList[closeStart].getTranslation().minus(currentLocation.getTranslation());
+        */
 
         Pose2d startPose = new Pose2d(currentLocation.getTranslation(), travelVector.getAngle());
 

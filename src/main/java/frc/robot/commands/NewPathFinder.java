@@ -82,6 +82,10 @@ public class NewPathFinder extends Command {
                 new EventMarker(
                         "InSlowDrivePhase", startMovingThingsPosition, waypoints.size() - 1);
 
+        // ChassisSpeeds botVel = r.drive.getVelocity();
+        // double speed = Math.hypot(botVel.vxMetersPerSecond, botVel.vyMetersPerSecond);
+        // Rotation2d angle = new Rotation2d(botVel.vxMetersPerSecond, botVel.vyMetersPerSecond);
+
         PathPlannerPath path =
                 new PathPlannerPath(
                         waypoints,
