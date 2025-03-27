@@ -64,12 +64,26 @@ public class Locations {
                     Units.inchesToMeters(-2.5),
                     Rotation2d.kZero);
 
-    // TODO: make code that uses this
-    public static Transform2d halfRobotCoralLevel1 =
+    public static Transform2d halfRobotLevel1Left =
             new Transform2d(
-                    robotLength / 2.0 + Units.inchesToMeters(7.5),
-                    Units.inchesToMeters(0),
-                    new Rotation2d());
+                    0,
+                    Units.inchesToMeters(-48),
+                    Rotation2d.fromDegrees(
+                            -82.37)); // not intentionally spefifc, just a gag (please laugh)
+
+    public static Transform2d halfRobotLevel1Right =
+            new Transform2d(
+                    0,
+                    Units.inchesToMeters(48),
+                    Rotation2d.fromDegrees(
+                            82.37)); // not intentionally spefifc, just a gag (please laugh);
+
+    // TODO: make code that uses this
+    // public static Transform2d halfRobotCoralLevel1 =
+    //         new Transform2d(
+    //                 robotLength / 2.0 + Units.inchesToMeters(7.5),
+    //                 Units.inchesToMeters(0),
+    //                 new Rotation2d());
 
     public static AprilTagFieldLayout tags =
             AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
@@ -129,6 +143,85 @@ public class Locations {
         }
 
         return front.getTranslation().plus(back.getTranslation()).times(0.5);
+    }
+
+    public static Pose2d getLevel1ReefLocation(ControlBoard.ReefSticks position) {
+        switch (position) {
+            case B:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(18).get().toPose2d().plus(halfRobotLevel1Right));
+                } else {
+                    return invert(tags.getTagPose(7).get().toPose2d().plus(halfRobotLevel1Right));
+                }
+            case A:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(18).get().toPose2d().plus(halfRobotLevel1Left));
+                } else {
+                    return invert(tags.getTagPose(7).get().toPose2d().plus(halfRobotLevel1Left));
+                }
+            case D:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(17).get().toPose2d().plus(halfRobotLevel1Right));
+                } else {
+                    return invert(tags.getTagPose(8).get().toPose2d().plus(halfRobotLevel1Right));
+                }
+            case C:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(17).get().toPose2d().plus(halfRobotLevel1Left));
+                } else {
+                    return invert(tags.getTagPose(8).get().toPose2d().plus(halfRobotLevel1Left));
+                }
+            case F:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(22).get().toPose2d().plus(halfRobotLevel1Right));
+                } else {
+                    return invert(tags.getTagPose(9).get().toPose2d().plus(halfRobotLevel1Right));
+                }
+            case E:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(22).get().toPose2d().plus(halfRobotLevel1Left));
+                } else {
+                    return invert(tags.getTagPose(9).get().toPose2d().plus(halfRobotLevel1Left));
+                }
+            case H:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(21).get().toPose2d().plus(halfRobotLevel1Right));
+                } else {
+                    return invert(tags.getTagPose(10).get().toPose2d().plus(halfRobotLevel1Right));
+                }
+            case G:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(21).get().toPose2d().plus(halfRobotLevel1Left));
+                } else {
+                    return invert(tags.getTagPose(10).get().toPose2d().plus(halfRobotLevel1Left));
+                }
+            case J:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(20).get().toPose2d().plus(halfRobotLevel1Right));
+                } else {
+                    return invert(tags.getTagPose(11).get().toPose2d().plus(halfRobotLevel1Right));
+                }
+            case I:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(20).get().toPose2d().plus(halfRobotLevel1Left));
+                } else {
+                    return invert(tags.getTagPose(11).get().toPose2d().plus(halfRobotLevel1Left));
+                }
+            case L:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(19).get().toPose2d().plus(halfRobotLevel1Right));
+                } else {
+                    return invert(tags.getTagPose(6).get().toPose2d().plus(halfRobotLevel1Right));
+                }
+            case K:
+                if (isBlue()) {
+                    return invert(tags.getTagPose(19).get().toPose2d().plus(halfRobotLevel1Left));
+                } else {
+                    return invert(tags.getTagPose(6).get().toPose2d().plus(halfRobotLevel1Left));
+                }
+            default:
+                return null;
+        }
     }
 
     // everyone hates this

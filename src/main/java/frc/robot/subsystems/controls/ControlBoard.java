@@ -245,7 +245,11 @@ public class ControlBoard {
     }
 
     public Pose2d getPathPose() {
-        return Locations.getReefLocation(selectedReefPos);
+        if (selectedLevel == 1) {
+            return Locations.getLevel1ReefLocation(selectedReefPos);
+        } else {
+            return Locations.getReefLocation(selectedReefPos);
+        }
     }
 
     public Pose2d getAlgaePathPose() {
