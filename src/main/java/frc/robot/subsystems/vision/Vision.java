@@ -61,7 +61,9 @@ public class Vision extends SubsystemBase {
                 v =
                         new Vision(
                                 r.drive::addVisionMeasurement,
-                                new VisionIOLimelight(camera0Name, r.drive::getRotation));
+                                new VisionIOLimelight(camera0Name, r.drive::getRotation),
+                                new VisionIOLimelight(camera1Name, r.drive::getRotation));
+                            
                 // vision disable
                 // v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {});
                 break;
@@ -139,6 +141,7 @@ public class Vision extends SubsystemBase {
         List<Pose3d> allRobotPosesRejected = new LinkedList<>();
 
         // Loop over cameras
+        boolean first = true;
         for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
             // Update disconnected alert
             disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
@@ -241,12 +244,13 @@ public class Vision extends SubsystemBase {
                 consumer.accept(
                         observation.pose().toPose2d(),
                         observation.timestamp(),
-                        VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+                        VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev),
+                        observation.tagId());
 
                 // find closest tag in shot to robot
 
                 Pose2d observationPose = observation.pose().toPose2d();
-                boolean first = true;
+                
                 for (int i = 0; i < inputs[cameraIndex].tagIds.length; i++) {
                     int id = inputs[cameraIndex].tagIds[i];
                     var tagPose = aprilTagLayout.getTagPose(id).orElse(defaultPose).toPose2d();
@@ -321,7 +325,8 @@ public class Vision extends SubsystemBase {
         public void accept(
                 Pose2d visionRobotPoseMeters,
                 double timestampSeconds,
-                Matrix<N3, N1> visionMeasurementStdDevs);
+                Matrix<N3, N1> visionMeasurementStdDevs,
+                int id);
     }
 
     double movingThreshold = 0.25; // m/s^2

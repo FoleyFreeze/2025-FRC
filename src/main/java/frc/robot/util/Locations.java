@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import java.util.List;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -9,6 +11,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.controls.ControlBoard;
 
 public class Locations {
@@ -450,6 +453,26 @@ public class Locations {
             return invert(tags.getTagPose(16).get().toPose2d().plus(halfRobotProc));
         } else {
             return invert(tags.getTagPose(3).get().toPose2d().plus(halfRobotProc));
+        }
+    }
+
+    public static int getCoralStationTag(RobotContainer r) {
+        switch (r.controlBoard.selectedStation) {
+            case LEFT:
+                if (isBlue()) {
+                    return 13;
+                } else {
+                    return 1;
+                }
+            case RIGHT:
+                if (isBlue()) {
+                    return 12;
+                } else {
+                    return 2;
+                }
+            case CLOSEST:
+            default:
+                return r.controlBoard.lastGatherStationTag;
         }
     }
 }

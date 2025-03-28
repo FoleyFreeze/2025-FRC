@@ -108,7 +108,7 @@ public class RobotContainer {
         ComplexCommands.r = this;
         AutonCommands.r = this;
 
-        drive = Drive.create();
+        drive = Drive.create(this);
         wrist = Wrist.create(this);
         arm = Arm.create();
         elevator = Elevator.create();

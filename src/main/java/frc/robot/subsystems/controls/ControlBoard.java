@@ -108,6 +108,8 @@ public class ControlBoard {
     public boolean shift = false;
     public boolean submerge = false;
 
+    public int lastGatherStationTag = 0;
+
     public Trigger climbModeT = new Trigger(() -> selectedClimbMode);
     public Trigger algaeModeT = new Trigger(() -> selectedAlgae);
     public Trigger shiftT = new Trigger(() -> shift);
@@ -222,6 +224,7 @@ public class ControlBoard {
         Logger.recordOutput("CB/SelectedStation", selectedStation);
         Logger.recordOutput("CB/SelectedClimb", selectedClimbMode);
         Logger.recordOutput("CB/SelectedAlgae", selectedAlgae);
+        Logger.recordOutput("CB/lastGatherStationTag", lastGatherStationTag);
     }
 
     // left means true
@@ -382,21 +385,41 @@ public class ControlBoard {
     }
 
     public Pose2d selectClosestFarCoralStation() {
-        return r.drive
+        Pose2d left = Locations.getLeftGatherStationFar();
+        Pose2d right = Locations.getRightGatherStationFar();
+        
+        Pose2d closest = r.drive
                 .getPose()
                 .nearest(
                         List.of(
-                                Locations.getLeftGatherStationFar(),
-                                Locations.getRightGatherStationFar()));
+                                left, right));
+
+        if(closest.equals(left)){
+            lastGatherStationTag = Locations.isBlue() ? 13 : 1;
+        } else {
+            lastGatherStationTag = Locations.isBlue() ? 12 : 2;
+        } 
+
+        return closest;
     }
 
     public Pose2d selectClosestCloseCoralStation() {
-        return r.drive
+        Pose2d left = Locations.getLeftGatherStationClose();
+        Pose2d right = Locations.getRightGatherStationClose();
+        
+        Pose2d closest = r.drive
                 .getPose()
                 .nearest(
                         List.of(
-                                Locations.getLeftGatherStationClose(),
-                                Locations.getRightGatherStationClose()));
+                                left, right));
+
+        if(closest.equals(left)){
+            lastGatherStationTag = Locations.isBlue() ? 13 : 1;
+        } else {
+            lastGatherStationTag = Locations.isBlue() ? 12 : 2;
+        } 
+
+        return closest;
     }
 
     public Pose2d selectApproachingStation() {

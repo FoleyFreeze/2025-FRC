@@ -40,6 +40,8 @@ public class VisionIOLimelight implements VisionIO {
     private final DoubleArraySubscriber megatag1Subscriber;
     private final DoubleArraySubscriber megatag2Subscriber;
 
+    String name;
+
     /**
      * Creates a new VisionIOLimelight.
      *
@@ -47,6 +49,7 @@ public class VisionIOLimelight implements VisionIO {
      * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
      */
     public VisionIOLimelight(String name, Supplier<Rotation2d> rotationSupplier) {
+        this.name = name;
         var table = NetworkTableInstance.getDefault().getTable(name);
         this.rotationSupplier = rotationSupplier;
         orientationPublisher = table.getDoubleArrayTopic("robot_orientation_set").publish();
@@ -66,9 +69,9 @@ public class VisionIOLimelight implements VisionIO {
                 ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
 
         if (DriverStation.isDisabled()) {
-            LimelightHelpers.setLimelightNTDouble("limelight", "throttle-set", 100);
+            LimelightHelpers.setLimelightNTDouble(name, "throttle-set", 100);
         } else {
-            LimelightHelpers.setLimelightNTDouble("limelight", "throttle-set", 1);
+            LimelightHelpers.setLimelightNTDouble(name, "throttle-set", 1);
         }
 
         // Update target observation
@@ -88,8 +91,10 @@ public class VisionIOLimelight implements VisionIO {
         List<PoseObservation> poseObservations = new LinkedList<>();
         for (var rawSample : megatag1Subscriber.readQueue()) {
             if (rawSample.value.length == 0) continue;
+            int lastTag = 0;
             for (int i = 11; i < rawSample.value.length; i += 7) {
                 tagIds.add((int) rawSample.value[i]);
+                lastTag = (int) rawSample.value[i];
             }
             poseObservations.add(
                     new PoseObservation(
@@ -110,12 +115,17 @@ public class VisionIOLimelight implements VisionIO {
                             rawSample.value[9],
 
                             // Observation type
-                            PoseObservationType.MEGATAG_1));
+                            PoseObservationType.MEGATAG_1,
+                            
+                            // what tag is it?
+                            lastTag));
         }
         for (var rawSample : megatag2Subscriber.readQueue()) {
             if (rawSample.value.length == 0) continue;
+            int lastTag = 0;
             for (int i = 11; i < rawSample.value.length; i += 7) {
                 tagIds.add((int) rawSample.value[i]);
+                lastTag = (int) rawSample.value[i];
             }
             poseObservations.add(
                     new PoseObservation(
@@ -135,7 +145,10 @@ public class VisionIOLimelight implements VisionIO {
                             rawSample.value[9],
 
                             // Observation type
-                            PoseObservationType.MEGATAG_2));
+                            PoseObservationType.MEGATAG_2,
+                            
+                            // what tag is it?
+                            lastTag));
         }
 
         // Save pose observations to inputs object

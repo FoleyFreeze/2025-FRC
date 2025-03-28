@@ -48,9 +48,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.Locations;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -119,9 +122,11 @@ public class Drive extends SubsystemBase {
                 new SwerveModulePosition(),
                 new SwerveModulePosition()
             };
-    private SwerveDrivePoseEstimator poseEstimator =
+    private SwerveDrivePoseEstimator globalPoseEstimator =
             new SwerveDrivePoseEstimator(
                     kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+
+    private SwerveDrivePoseEstimator localPoseEstimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
     private ChassisSpeeds robotVelocity = new ChassisSpeeds();
 
@@ -129,7 +134,9 @@ public class Drive extends SubsystemBase {
 
     public SwerveDriveSimulation driveSimulation;
 
-    public static Drive create() {
+    RobotContainer r;
+
+    public static Drive create(RobotContainer r) {
         Drive drive;
         switch (Constants.currentMode) {
             case REAL:
@@ -208,6 +215,7 @@ public class Drive extends SubsystemBase {
                                 (pose) -> {});
         }
 
+        drive.r = r;
         return drive;
     }
 
@@ -330,7 +338,7 @@ public class Drive extends SubsystemBase {
             }
 
             // Apply update
-            poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+            globalPoseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
         }
 
         robotVelocity.vxMetersPerSecond /= 0.02;
@@ -480,7 +488,7 @@ public class Drive extends SubsystemBase {
     /** Returns the current odometry pose. */
     @AutoLogOutput(key = "Odometry/Robot")
     public Pose2d getPose() {
-        return poseEstimator.getEstimatedPosition();
+        return globalPoseEstimator.getEstimatedPosition();
     }
 
     /** Returns the current odometry rotation. */
@@ -497,16 +505,43 @@ public class Drive extends SubsystemBase {
     /** Resets the current odometry pose. */
     public void setPose(Pose2d pose) {
         resetSimulationPoseCallBack.accept(pose);
-        poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+        globalPoseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
     }
 
     /** Adds a new timestamped vision measurement. */
     public void addVisionMeasurement(
             Pose2d visionRobotPoseMeters,
             double timestampSeconds,
-            Matrix<N3, N1> visionMeasurementStdDevs) {
-        poseEstimator.addVisionMeasurement(
+            Matrix<N3, N1> visionMeasurementStdDevs,
+            int id) {
+        globalPoseEstimator.addVisionMeasurement(
                 visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+
+        //only update local odo if its the tag we are going to
+        if(triggerAndId(id)){
+            localPoseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+        }
+    }
+
+    private boolean triggerAndId(int id){
+        if(r.flysky.rightTriggerSWG.getAsBoolean()) {
+            if(r.controlBoard.algaeModeT.getAsBoolean()){
+                return true;
+            } else {
+                if(Locations.getTagId(r.controlBoard.selectedReefPos) == id){
+                    return true;
+                }
+            }
+        } else if (r.flysky.leftTriggerSWE.getAsBoolean()) {
+            if(r.controlBoard.algaeModeT.getAsBoolean()){
+                if(Locations.getTagId(r.controlBoard.selectedReefPos) == id){
+                    return true;
+                }
+            } else if (Locations.getCoralStationTag(r) == id) {
+                return true;
+            }
+        } 
+        return false;
     }
 
     /** Returns the maximum linear speed in meters per sec. */
