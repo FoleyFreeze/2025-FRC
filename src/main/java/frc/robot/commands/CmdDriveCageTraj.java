@@ -62,7 +62,7 @@ public class CmdDriveCageTraj extends Command {
                 driveCommand.initialize();
             } else {
                 Translation2d distToGoal =
-                        pathEndLocation.minus(r.drive.getPose().getTranslation());
+                        pathEndLocation.minus(r.drive.getGlobalPose().getTranslation());
 
                 Translation2d cageError = pathEndLocation.minus(r.cvision.getCachedCageLocation());
                 Logger.recordOutput("Vision/CageError", cageError);
@@ -100,7 +100,7 @@ public class CmdDriveCageTraj extends Command {
 
     public Command createPathFollower() {
         pathEndLocation = r.cvision.getCachedCageLocation();
-        Translation2d pathStart = r.drive.getPose().getTranslation();
+        Translation2d pathStart = r.drive.getGlobalPose().getTranslation();
         Translation2d pathVector = pathEndLocation.minus(pathStart);
 
         // modify endLocation to be 6in further

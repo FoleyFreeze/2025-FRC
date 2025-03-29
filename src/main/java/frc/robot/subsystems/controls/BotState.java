@@ -14,6 +14,7 @@ public class BotState {
     public boolean hasStop = false;
     public boolean pathComplete = true; // default true when no path is running
     public boolean onTarget = false;
+    public boolean inLocalPosePhase = false;
 
     public Trigger hasCoralT = new Trigger(() -> hasCoral);
     public Trigger hasAlgaeT = new Trigger(() -> hasAlgae);
@@ -25,6 +26,7 @@ public class BotState {
                             onTarget
                                     && (r.flysky.topRightSWD.getAsBoolean()
                                             || DriverStation.isAutonomous()));
+    public Trigger inLocalPosePhaseT = new Trigger(() -> inLocalPosePhase);
 
     public BotState(RobotContainer r) {
         this.r = r;
@@ -46,10 +48,17 @@ public class BotState {
     }
 
     public void periodic() {
+        // the transition out is in DriveCommands.driveTo
+        if (r.startLocalPosePhase.getAsBoolean()) {
+            inLocalPosePhase = true;
+        }
+
         Logger.recordOutput("State/hasCoral", hasCoral);
         Logger.recordOutput("State/hasAlgae", hasAlgae);
         Logger.recordOutput("State/hasStop", hasStop);
         Logger.recordOutput("State/pathComplete", pathComplete);
         Logger.recordOutput("State/onTarget", onTarget);
+        Logger.recordOutput("State/inSlowDrivePhase", r.inSlowDrivePhase);
+        Logger.recordOutput("State/inLocalPosePhase", inLocalPosePhase);
     }
 }

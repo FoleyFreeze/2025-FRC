@@ -34,7 +34,7 @@ public class PathCommand extends Command {
     @Override
     public void initialize() {
         // compares the distance btwn current position and goal (coral station)
-        distToGoal = r.drive.getPose().minus(poseSupplier.get()).getTranslation().getNorm();
+        distToGoal = r.drive.getGlobalPose().minus(poseSupplier.get()).getTranslation().getNorm();
         if (distToGoal > closestDist) {
             // uses pathfinder to go around obstacles if long dist
             c = AutoBuilder.pathfindToPose(poseSupplier.get(), pathConstraints);
@@ -43,7 +43,7 @@ public class PathCommand extends Command {
             // uses pathplanner to just draw a straight path
             Pose2d targetPose = poseSupplier.get();
 
-            Pose2d currentLocation = r.drive.getPose();
+            Pose2d currentLocation = r.drive.getGlobalPose();
 
             List<Waypoint> waypoints =
                     PathPlannerPath.waypointsFromPoses(currentLocation, targetPose);

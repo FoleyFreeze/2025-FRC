@@ -50,7 +50,7 @@ public class CVision extends SubsystemBase {
 
     private void updatePoseBuffer() {
         TimestampedPose2d now = new TimestampedPose2d();
-        now.pose = r.drive.getPose();
+        now.pose = r.drive.getGlobalPose();
         now.time = inputs.now;
         robotPoseBuffer.addFirst(now);
     }

@@ -244,7 +244,7 @@ public class DriveCommands {
         return Commands.run(
                         () -> {
                             Pose2d target = supplier.get();
-                            Pose2d meas = r.drive.getPose();
+                            Pose2d meas = r.drive.getGlobalPose();
 
                             Translation2d pointErr =
                                     target.getTranslation().minus(meas.getTranslation());
@@ -446,12 +446,17 @@ public class DriveCommands {
             RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
         Command c;
         // NOTE: path complete is set to true in NewPathFinder.init()
-        if (isGather) {
+        if (isGather && false) {
             c = new NewPathFinder(r, destination, isGather);
         } else {
             c = new NewPathFinder(r, destination, isGather).andThen(driveToPoint(r, destination));
         }
-        c = c.finallyDo(() -> r.state.pathComplete = true);
+        c =
+                c.finallyDo(
+                        () -> {
+                            r.state.pathComplete = true;
+                            r.state.inLocalPosePhase = false;
+                        });
         c = c.alongWith(new InstantCommand(() -> r.state.onTarget = false));
         c.setName("DriveToAuto");
         return c;
@@ -478,7 +483,7 @@ public class DriveCommands {
                         new PathFollowingCommand(r, destination, isGather),
                         () ->
                                 r.drive
-                                                .getPose()
+                                                .getGlobalPose()
                                                 .getTranslation()
                                                 .getDistance(destination.get().getTranslation())
                                         > Units.feetToMeters(6))
@@ -500,13 +505,13 @@ public class DriveCommands {
                             () ->
                                     r.drive.setPose(
                                             new Pose2d(
-                                                    r.drive.getPose().getTranslation(),
+                                                    r.drive.getGlobalPose().getTranslation(),
                                                     new Rotation2d()))),
                     new InstantCommand(
                             () ->
                                     r.drive.setPose(
                                             new Pose2d(
-                                                    r.drive.getPose().getTranslation(),
+                                                    r.drive.getGlobalPose().getTranslation(),
                                                     Rotation2d.k180deg))),
                     () -> Locations.isBlue());
         }
@@ -518,13 +523,13 @@ public class DriveCommands {
                         () ->
                                 r.drive.setPose(
                                         new Pose2d(
-                                                r.drive.getPose().getTranslation(),
+                                                r.drive.getGlobalPose().getTranslation(),
                                                 new Rotation2d(Units.degreesToRadians(60))))),
                 new InstantCommand(
                         () ->
                                 r.drive.setPose(
                                         new Pose2d(
-                                                r.drive.getPose().getTranslation(),
+                                                r.drive.getGlobalPose().getTranslation(),
                                                 new Rotation2d(Units.degreesToRadians(240))))),
                 () -> Locations.isBlue());
     }

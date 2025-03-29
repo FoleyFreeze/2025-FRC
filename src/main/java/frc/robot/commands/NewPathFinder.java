@@ -81,6 +81,7 @@ public class NewPathFinder extends Command {
         EventMarker em =
                 new EventMarker(
                         "InSlowDrivePhase", startMovingThingsPosition, waypoints.size() - 1);
+        EventMarker em2 = new EventMarker("InLocalPosePhase", waypoints.size() - 2, -1);
 
         // ChassisSpeeds botVel = r.drive.getVelocity();
         // double speed = Math.hypot(botVel.vxMetersPerSecond, botVel.vyMetersPerSecond);
@@ -89,10 +90,10 @@ public class NewPathFinder extends Command {
         PathPlannerPath path =
                 new PathPlannerPath(
                         waypoints,
-                        isGather ? Collections.emptyList() : List.of(rt),
+                        List.of(rt),
                         Collections.emptyList(),
-                        isGather ? Collections.emptyList() : List.of(cz),
-                        isGather ? Collections.emptyList() : List.of(em),
+                        List.of(cz),
+                        List.of(em, em2),
                         globalConstraint,
                         null,
                         new GoalEndState(0, flipPose.getRotation()),

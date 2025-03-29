@@ -36,7 +36,7 @@ public class PathFollowingCommand extends Command {
         Pose2d targetPose = poseSupplier.get();
 
         // convert pose angle to desired drive direction insead of the angle the bot is facing
-        Pose2d currentLocation = r.drive.getPose();
+        Pose2d currentLocation = r.drive.getGlobalPose();
         Translation2d travelVector =
                 targetPose.getTranslation().minus(currentLocation.getTranslation());
         Pose2d startPose = new Pose2d(currentLocation.getTranslation(), travelVector.getAngle());

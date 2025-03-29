@@ -87,6 +87,7 @@ public class RobotContainer {
 
     // Pathplanner triggers
     public EventTrigger inSlowDrivePhase;
+    public EventTrigger startLocalPosePhase;
     public DigitalInput dio1 = new DigitalInput(9);
     public Trigger neutralSwitch = new Trigger(() -> !dio1.get() && DriverStation.isDisabled());
 
@@ -119,6 +120,7 @@ public class RobotContainer {
         leds = new LED(r);
 
         inSlowDrivePhase = new EventTrigger("InSlowDrivePhase");
+        startLocalPosePhase = new EventTrigger("InLocalPosePhase");
 
         // Set up auto routines
         // autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -366,7 +368,7 @@ public class RobotContainer {
                         r.wrist.getAngleRads().in(Degrees));
         SmartDashboard.putString("SuperPosition", s);
 
-        Pose2d botPose = drive.getPose();
+        Pose2d botPose = drive.getGlobalPose();
         s =
                 String.format(
                         "%.0f,%.0f",

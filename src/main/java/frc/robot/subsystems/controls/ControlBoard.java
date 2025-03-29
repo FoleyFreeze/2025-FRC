@@ -388,7 +388,7 @@ public class ControlBoard {
         Pose2d left = Locations.getLeftGatherStationFar();
         Pose2d right = Locations.getRightGatherStationFar();
 
-        Pose2d closest = r.drive.getPose().nearest(List.of(left, right));
+        Pose2d closest = r.drive.getGlobalPose().nearest(List.of(left, right));
 
         if (closest.equals(left)) {
             lastGatherStationTag = Locations.isBlue() ? 13 : 1;
@@ -403,7 +403,7 @@ public class ControlBoard {
         Pose2d left = Locations.getLeftGatherStationClose();
         Pose2d right = Locations.getRightGatherStationClose();
 
-        Pose2d closest = r.drive.getPose().nearest(List.of(left, right));
+        Pose2d closest = r.drive.getGlobalPose().nearest(List.of(left, right));
 
         if (closest.equals(left)) {
             lastGatherStationTag = Locations.isBlue() ? 13 : 1;
@@ -415,7 +415,7 @@ public class ControlBoard {
     }
 
     public Pose2d selectApproachingStation() {
-        Pose2d robotPos = r.drive.getPose();
+        Pose2d robotPos = r.drive.getGlobalPose();
         ChassisSpeeds robotVel = r.drive.getVelocity();
 
         Translation2d distL =

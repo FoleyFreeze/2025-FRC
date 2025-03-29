@@ -36,7 +36,7 @@ public class PathCache {
 
     public List<Waypoint> getPathTo(Pose2d dest, boolean isGather) {
         // find the waypoint closest to the start and dest
-        Pose2d start = r.drive.getPose();
+        Pose2d start = r.drive.getGlobalPose();
         int closeStart = 0;
         int closeDest = 0;
         double closestDistStart = getDist(waypointList[0], start);
@@ -68,7 +68,7 @@ public class PathCache {
         }
 
         // create a start pose with rotation indicating the direction to drive
-        Pose2d currentLocation = r.drive.getPose();
+        Pose2d currentLocation = r.drive.getGlobalPose();
         ChassisSpeeds currentVel = r.drive.getVelocity();
 
         // if velocity is high, point the path along the direction of velocity
@@ -110,7 +110,8 @@ public class PathCache {
             }
         }
 
-        if (!isGather) {
+        if (!isGather || true) {
+            // the final straight drive in
             poseList.add(
                     dest.transformBy(
                             new Transform2d(Units.inchesToMeters(-20), 0, Rotation2d.kZero)));
@@ -125,6 +126,6 @@ public class PathCache {
     }
 
     public Pose2d closestWaypoint() {
-        return r.drive.getPose().nearest(List.of(waypointList));
+        return r.drive.getGlobalPose().nearest(List.of(waypointList));
     }
 }

@@ -187,7 +187,7 @@ public class ComplexCommands {
 
     public static Command visionScoreAlgaeNet() {
         Command c =
-                DriveCommands.driveTo(r, () -> Locations.getNetPose(r.drive.getPose()), true)
+                DriveCommands.driveTo(r, () -> Locations.getNetPose(r.drive.getGlobalPose()), true)
                         .alongWith(new WaitCommand(0.25).andThen(scoreAlgaeNet()));
         c.setName("visionScoreAlgaeNet");
         return c;

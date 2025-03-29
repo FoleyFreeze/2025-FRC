@@ -74,7 +74,7 @@ public class Vision extends SubsystemBase {
                         new Vision(
                                 r.drive::addVisionMeasurement,
                                 new VisionIOPhotonVisionSim(
-                                        camera0Name, robotToCamera0, r.drive::getPose));
+                                        camera0Name, robotToCamera0, r.drive::getGlobalPose));
                 break;
 
             default:
@@ -212,7 +212,7 @@ public class Vision extends SubsystemBase {
                             observation
                                     .pose()
                                     .toPose2d()
-                                    .minus(r.drive.getPose())
+                                    .minus(r.drive.getGlobalPose())
                                     .getTranslation()
                                     .getNorm());
                     Logger.recordOutput(

@@ -243,7 +243,7 @@ public class Drive extends SubsystemBase {
 
         // Configure AutoBuilder for PathPlanner
         AutoBuilder.configure(
-                this::getPose,
+                this::chooseLocalPose,
                 this::setPose,
                 this::getChassisSpeeds,
                 this::runVelocityFF,
@@ -263,7 +263,8 @@ public class Drive extends SubsystemBase {
         PathPlannerLogging.setLogTargetPoseCallback(
                 (targetPose) -> {
                     Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
-                    double xyError = this.getPose().minus(targetPose).getTranslation().getNorm();
+                    double xyError =
+                            this.getGlobalPose().minus(targetPose).getTranslation().getNorm();
                     Logger.recordOutput("Odometry/TrajectoryError", xyError);
                 });
 
@@ -340,6 +341,8 @@ public class Drive extends SubsystemBase {
 
             // Apply update
             globalPoseEstimator.updateWithTime(
+                    sampleTimestamps[i], rawGyroRotation, modulePositions);
+            localPoseEstimator.updateWithTime(
                     sampleTimestamps[i], rawGyroRotation, modulePositions);
         }
 
@@ -489,13 +492,28 @@ public class Drive extends SubsystemBase {
 
     /** Returns the current odometry pose. */
     @AutoLogOutput(key = "Odometry/Robot")
-    public Pose2d getPose() {
+    public Pose2d getGlobalPose() {
         return globalPoseEstimator.getEstimatedPosition();
+    }
+
+    @AutoLogOutput(key = "Odometry/LocalRobot")
+    public Pose2d getLocalPose() {
+        return localPoseEstimator.getEstimatedPosition();
+    }
+
+    public Pose2d chooseLocalPose() {
+        if (r.state.inLocalPosePhase) {
+            return getLocalPose();
+        } else {
+            localPoseEstimator.resetPosition(
+                    rawGyroRotation, getModulePositions(), getGlobalPose());
+            return getGlobalPose();
+        }
     }
 
     /** Returns the current odometry rotation. */
     public Rotation2d getRotation() {
-        return getPose().getRotation();
+        return getGlobalPose().getRotation();
     }
 
     // field oriented speeds
@@ -508,6 +526,7 @@ public class Drive extends SubsystemBase {
     public void setPose(Pose2d pose) {
         resetSimulationPoseCallBack.accept(pose);
         globalPoseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+        localPoseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
     }
 
     /** Adds a new timestamped vision measurement. */
