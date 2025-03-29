@@ -30,7 +30,7 @@ public class LED extends SubsystemBase {
                 LEDPattern.solid(Color.kBlue).breathe(Seconds.of(3))
                 /*.scrollAtRelativeSpeed(Percent.per(Second).of(20))*/ ),
 
-        RAINBOW(LEDPattern.rainbow(200, 50).scrollAtRelativeSpeed(Seconds.of(5).asFrequency()));
+        RAINBOW(LEDPattern.rainbow(255, 127).scrollAtRelativeSpeed(Seconds.of(5).asFrequency()));
 
         public final LEDPattern pattern;
 
@@ -44,7 +44,7 @@ public class LED extends SubsystemBase {
 
     LEDIO io;
 
-    AddressableLEDBuffer buffer = new AddressableLEDBuffer(3);
+    AddressableLEDBuffer buffer = new AddressableLEDBuffer(85);
 
     public LED(RobotContainer r) {
         this.r = r;

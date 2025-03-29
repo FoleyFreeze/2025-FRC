@@ -176,7 +176,7 @@ public class RobotContainer {
         climb.setDefaultCommand(climb.setClimbVoltage(0));
 
         leds.setDefaultCommand(leds.setLEDMode(LED_MODES.RAINBOW).ignoringDisable(true));
-        flysky.topLeftSWA.whileTrue(leds.setLEDMode(LED_MODES.BLUE).ignoringDisable(true));
+        flysky.topLeftSWA.whileTrue(leds.setLEDMode(LED_MODES.BREATHE_BLUE).ignoringDisable(true));
         flysky.topRightSWD.whileTrue(leds.setLEDMode(LED_MODES.OFF).ignoringDisable(true));
 
         // Reset gyro to 0° when B button is pressed
