@@ -123,4 +123,8 @@ public class PathCache {
     public double getDist(Pose2d one, Pose2d two) {
         return one.getTranslation().getDistance(two.getTranslation());
     }
+
+    public Pose2d closestWaypoint() {
+        return r.drive.getPose().nearest(List.of(waypointList));
+    }
 }

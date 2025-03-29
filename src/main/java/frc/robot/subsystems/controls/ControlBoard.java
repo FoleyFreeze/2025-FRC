@@ -387,18 +387,14 @@ public class ControlBoard {
     public Pose2d selectClosestFarCoralStation() {
         Pose2d left = Locations.getLeftGatherStationFar();
         Pose2d right = Locations.getRightGatherStationFar();
-        
-        Pose2d closest = r.drive
-                .getPose()
-                .nearest(
-                        List.of(
-                                left, right));
 
-        if(closest.equals(left)){
+        Pose2d closest = r.drive.getPose().nearest(List.of(left, right));
+
+        if (closest.equals(left)) {
             lastGatherStationTag = Locations.isBlue() ? 13 : 1;
         } else {
             lastGatherStationTag = Locations.isBlue() ? 12 : 2;
-        } 
+        }
 
         return closest;
     }
@@ -406,18 +402,14 @@ public class ControlBoard {
     public Pose2d selectClosestCloseCoralStation() {
         Pose2d left = Locations.getLeftGatherStationClose();
         Pose2d right = Locations.getRightGatherStationClose();
-        
-        Pose2d closest = r.drive
-                .getPose()
-                .nearest(
-                        List.of(
-                                left, right));
 
-        if(closest.equals(left)){
+        Pose2d closest = r.drive.getPose().nearest(List.of(left, right));
+
+        if (closest.equals(left)) {
             lastGatherStationTag = Locations.isBlue() ? 13 : 1;
         } else {
             lastGatherStationTag = Locations.isBlue() ? 12 : 2;
-        } 
+        }
 
         return closest;
     }

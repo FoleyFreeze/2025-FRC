@@ -116,7 +116,7 @@ public class VisionIOLimelight implements VisionIO {
 
                             // Observation type
                             PoseObservationType.MEGATAG_1,
-                            
+
                             // what tag is it?
                             lastTag));
         }
@@ -146,7 +146,7 @@ public class VisionIOLimelight implements VisionIO {
 
                             // Observation type
                             PoseObservationType.MEGATAG_2,
-                            
+
                             // what tag is it?
                             lastTag));
         }

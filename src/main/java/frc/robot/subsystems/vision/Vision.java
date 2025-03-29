@@ -63,7 +63,7 @@ public class Vision extends SubsystemBase {
                                 r.drive::addVisionMeasurement,
                                 new VisionIOLimelight(camera0Name, r.drive::getRotation),
                                 new VisionIOLimelight(camera1Name, r.drive::getRotation));
-                            
+
                 // vision disable
                 // v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {});
                 break;
@@ -250,7 +250,7 @@ public class Vision extends SubsystemBase {
                 // find closest tag in shot to robot
 
                 Pose2d observationPose = observation.pose().toPose2d();
-                
+
                 for (int i = 0; i < inputs[cameraIndex].tagIds.length; i++) {
                     int id = inputs[cameraIndex].tagIds[i];
                     var tagPose = aprilTagLayout.getTagPose(id).orElse(defaultPose).toPose2d();

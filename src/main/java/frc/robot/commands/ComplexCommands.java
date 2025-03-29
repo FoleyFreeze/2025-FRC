@@ -55,25 +55,19 @@ public class ComplexCommands {
     // ALGAE COMMANDS
 
     public static Command stripAlgae() {
+        SequentialCommandGroup sq =
+                new SequentialCommandGroup(
+                        r.wrist
+                                .goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3)
+                                .alongWith(r.arm.goTo(() -> SuperstructureLocation.VERT_ALGAE)),
+                        r.elevator.goTo(r.controlBoard::getAlgaeReefDSHeight),
+                        r.arm.goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3));
+
         Command c =
                 // hand goes up
-                r.wrist
-                        .goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3)
-                        // robot slides over to center
-                        .andThen(DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose))
-                        // arm angles down
+                sq.alongWith(DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose))
                         .andThen(
-                                r.hand.setVoltageCmd(descoreAlgaePower)
-                                        // drops elevator on algae
-                                        .andThen(
-                                                r.elevator.goTo(
-                                                        r.controlBoard::getAlgaeReefDSHeight))
-                                        .andThen(
-                                                r.arm.goTo(
-                                                        () ->
-                                                                SuperstructureLocation
-                                                                        .ALGAE_DESCORE2_3))
-                                        .andThen(new WaitCommand(stripTime))
+                                new WaitCommand(stripTime)
                                         .andThen(
                                                 r.elevator.goTo(
                                                         r.controlBoard::getAlgaeReefDSHeightLower))
@@ -161,10 +155,13 @@ public class ComplexCommands {
 
     public static Command visionAlgaeGather() {
         Command c =
-                DriveCommands.driveTo(r, r.controlBoard::getAlgaePathPose, false)
+                DriveCommands.driveToAuto(r, r.controlBoard::getAlgaePathPose, false)
                         .raceWith(
-                                new WaitUntilCommand(r.inSlowDrivePhase)
-                                        .andThen(gatherAlgae(true)));
+                                new WaitUntilCommand(r.inSlowDrivePhase).andThen(gatherAlgae(true)))
+                        .andThen(new WaitCommand(0.1))
+                        .andThen(
+                                new PathFollowingCommand(
+                                        r, () -> r.pathCache.closestWaypoint(), false));
         c.setName("VisionAlgaeGather");
         return c;
     }
@@ -467,11 +464,13 @@ public class ComplexCommands {
                                         .goTo(p)
                                         .alongWith(r.arm.goTo(p).alongWith(r.wrist.goTo(p))));
 
-        Command toAlgaeFromAlgae =
+        Command toAlgaeFromAlgaeOld =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD_ALGAE)
                         .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD_ALGAE))
                         .andThen(r.elevator.goTo(p))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
+
+        Command toAlgaeFromAlgae = forceGoToLoc(p);
 
         Command c =
                 new ConditionalCommand(
