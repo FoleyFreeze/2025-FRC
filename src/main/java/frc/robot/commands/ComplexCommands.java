@@ -161,7 +161,7 @@ public class ComplexCommands {
                         .andThen(new WaitCommand(0.1))
                         .andThen(
                                 new PathFollowingCommand(
-                                        r, () -> r.pathCache.closestWaypoint(), false));
+                                        r, () -> r.pathCache.closestWaypoint(), true));
         c.setName("VisionAlgaeGather");
         return c;
     }
