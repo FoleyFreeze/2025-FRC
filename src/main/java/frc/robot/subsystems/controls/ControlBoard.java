@@ -77,10 +77,12 @@ public class ControlBoard {
         useShuffleboard.addDefaultOption("No", false);
         useShuffleboard.addOption("Yes", true);
 
+        // only allow temp algae when in coral mode
         algaeButtonT.onTrue(
                 new InstantCommand(
                                 () -> {
-                                    if (!tempScoreAlgae) tempGatherAlgae = !tempGatherAlgae;
+                                    if (!tempScoreAlgae && !selectedAlgae)
+                                        tempGatherAlgae = !tempGatherAlgae;
                                 })
                         .ignoringDisable(true));
         escBtn.onTrue(
@@ -232,66 +234,116 @@ public class ControlBoard {
                 tempGatherAlgae = false;
             }
 
-            if (tempGatherAlgae && selectedReefPos != ReefSticks.NONE) {
-                switch (selectedReefPos) {
-                    case A:
-                        r.leds.ledOutputSet(19, true);
-                        break;
-                    case B:
-                        r.leds.ledOutputSet(13, true);
-                        break;
-                    case C:
-                        r.leds.ledOutputSet(31, true);
-                        break;
-                    case D:
-                        r.leds.ledOutputSet(25, true);
-                        break;
-                    case E:
-                        r.leds.ledOutputSet(43, true);
-                        break;
-                    case F:
-                        r.leds.ledOutputSet(37, true);
-                        break;
-                    case G:
-                        r.leds.ledOutputSet(55, true);
-                        break;
-                    case H:
-                        r.leds.ledOutputSet(49, true);
-                        break;
-                    case I:
-                        r.leds.ledOutputSet(67, true);
-                        break;
-                    case J:
-                        r.leds.ledOutputSet(61, true);
-                        break;
-                    case K:
-                        r.leds.ledOutputSet(79, true);
-                        break;
-                    case L:
-                        r.leds.ledOutputSet(73, true);
-                        break;
-                    default:
-                }
-            } else {
-                r.leds.ledOutputSet(13, false);
-                r.leds.ledOutputSet(16, false);
-                r.leds.ledOutputSet(25, false);
-                r.leds.ledOutputSet(31, false);
-                r.leds.ledOutputSet(37, false);
-                r.leds.ledOutputSet(43, false);
-                r.leds.ledOutputSet(49, false);
-                r.leds.ledOutputSet(55, false);
-                r.leds.ledOutputSet(61, false);
-                r.leds.ledOutputSet(67, false);
-                r.leds.ledOutputSet(73, false);
-                r.leds.ledOutputSet(79, false);
-            }
-
             if (cb2.getRawButton(9)) {
                 selectedAlgae = true;
             } else {
                 selectedAlgae = false;
             }
+
+            if (selectedAlgae) {
+                switch (selectedReefPos) {
+                    case A:
+                    case B:
+                        r.leds.ledOutputSet(14, false);
+                        r.leds.ledOutputSet(20, false);
+                        r.leds.ledOutputSet(13, true);
+                        r.leds.ledOutputSet(19, true);
+                        break;
+                    case C:
+                    case D:
+                        r.leds.ledOutputSet(26, false);
+                        r.leds.ledOutputSet(32, false);
+                        r.leds.ledOutputSet(25, true);
+                        r.leds.ledOutputSet(31, true);
+                        break;
+                    case E:
+                    case F:
+                        r.leds.ledOutputSet(38, false);
+                        r.leds.ledOutputSet(44, false);
+                        r.leds.ledOutputSet(37, true);
+                        r.leds.ledOutputSet(43, true);
+                        break;
+                    case G:
+                    case H:
+                        r.leds.ledOutputSet(50, false);
+                        r.leds.ledOutputSet(56, false);
+                        r.leds.ledOutputSet(49, true);
+                        r.leds.ledOutputSet(55, true);
+                        break;
+                    case I:
+                    case J:
+                        r.leds.ledOutputSet(60, false);
+                        r.leds.ledOutputSet(66, false);
+                        r.leds.ledOutputSet(61, true);
+                        r.leds.ledOutputSet(67, true);
+                        break;
+                    case K:
+                    case L:
+                        r.leds.ledOutputSet(72, false);
+                        r.leds.ledOutputSet(78, false);
+                        r.leds.ledOutputSet(73, true);
+                        r.leds.ledOutputSet(79, true);
+                        break;
+                    default:
+                }
+            } else {
+                // coral mode
+                if (tempGatherAlgae && selectedReefPos != ReefSticks.NONE) {
+                    switch (selectedReefPos) {
+                        case A:
+                            r.leds.ledOutputSet(19, true);
+                            break;
+                        case B:
+                            r.leds.ledOutputSet(13, true);
+                            break;
+                        case C:
+                            r.leds.ledOutputSet(31, true);
+                            break;
+                        case D:
+                            r.leds.ledOutputSet(25, true);
+                            break;
+                        case E:
+                            r.leds.ledOutputSet(43, true);
+                            break;
+                        case F:
+                            r.leds.ledOutputSet(37, true);
+                            break;
+                        case G:
+                            r.leds.ledOutputSet(55, true);
+                            break;
+                        case H:
+                            r.leds.ledOutputSet(49, true);
+                            break;
+                        case I:
+                            r.leds.ledOutputSet(67, true);
+                            break;
+                        case J:
+                            r.leds.ledOutputSet(61, true);
+                            break;
+                        case K:
+                            r.leds.ledOutputSet(79, true);
+                            break;
+                        case L:
+                            r.leds.ledOutputSet(73, true);
+                            break;
+                        default:
+                    }
+                } else {
+                    r.leds.ledOutputSet(13, false);
+                    r.leds.ledOutputSet(16, false);
+                    r.leds.ledOutputSet(25, false);
+                    r.leds.ledOutputSet(31, false);
+                    r.leds.ledOutputSet(37, false);
+                    r.leds.ledOutputSet(43, false);
+                    r.leds.ledOutputSet(49, false);
+                    r.leds.ledOutputSet(55, false);
+                    r.leds.ledOutputSet(61, false);
+                    r.leds.ledOutputSet(67, false);
+                    r.leds.ledOutputSet(73, false);
+                    r.leds.ledOutputSet(79, false);
+                }
+            }
+
         } else {
             selectedReefPos = letter.get();
             selectedLevel = level.get();
