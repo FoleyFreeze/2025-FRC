@@ -27,6 +27,7 @@ public class ControlBoard {
     public LoggedDashboardChooser<Boolean> algaeMode;
     public LoggedDashboardChooser<Boolean> useShuffleboard;
     public LoggedDashboardChooser<Boolean> stationDist;
+    public LoggedDashboardChooser<CageLocation> cageLocation;
 
     RobotContainer r;
 
@@ -42,6 +43,11 @@ public class ControlBoard {
         algaeMode = new LoggedDashboardChooser<>("AlgaeMode");
         useShuffleboard = new LoggedDashboardChooser<>("UseShuffleboard");
         stationDist = new LoggedDashboardChooser<>("StationDist");
+        cageLocation = new LoggedDashboardChooser<>("CageLoction");
+
+        cageLocation.addDefaultOption("Left", CageLocation.LEFT);
+        cageLocation.addOption("Middle", CageLocation.MIDDLE);
+        cageLocation.addOption("Right", CageLocation.RIGHT);
 
         level.addDefaultOption("1", 1);
         level.addOption("2", 2);
@@ -115,6 +121,12 @@ public class ControlBoard {
         RIGHT,
         CLOSEST
     }
+    
+    public static enum CageLocation{
+        LEFT,
+        MIDDLE,
+        RIGHT
+    }
 
     public ReefSticks selectedReefPos = ReefSticks.A;
     public int selectedLevel = 2;
@@ -126,6 +138,7 @@ public class ControlBoard {
     public boolean submerge = false;
     public boolean tempGatherAlgae = false;
     public boolean tempScoreAlgae = false;
+    public CageLocation selectedCage = CageLocation.LEFT;
 
     public int lastGatherStationTag = 0;
 
@@ -353,6 +366,7 @@ public class ControlBoard {
         }
 
         selectedStation = station.get();
+        selectedCage = cageLocation.get();
 
         Logger.recordOutput("CB/SelectedReef", selectedReefPos);
         Logger.recordOutput("CB/SelectedLevel", selectedLevel);
@@ -360,6 +374,7 @@ public class ControlBoard {
         Logger.recordOutput("CB/SelectedClimb", selectedClimbMode);
         Logger.recordOutput("CB/SelectedAlgae", selectedAlgae);
         Logger.recordOutput("CB/lastGatherStationTag", lastGatherStationTag);
+        Logger.recordOutput("CB/SelectedCage", selectedCage);
 
         Logger.recordOutput("CB/tempGatherAlgae", tempGatherAlgae);
         Logger.recordOutput("CB/tempScoreAlgae", tempScoreAlgae);

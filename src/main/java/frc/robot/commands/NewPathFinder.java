@@ -9,6 +9,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.RotationTarget;
 import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
@@ -20,6 +22,7 @@ import java.util.function.Supplier;
 public class NewPathFinder extends Command {
     RobotContainer r;
     boolean isGather;
+    boolean isClimb;
 
     private Supplier<Pose2d> poseSupplier;
     private Command c;
@@ -31,10 +34,18 @@ public class NewPathFinder extends Command {
     PathConstraints finalConstraints = new PathConstraints(1.25, 1.5, 3, 2);
     PathConstraints finalConstraintsAlgae = new PathConstraints(1.5, 1.5, 3, 2);
 
+    public NewPathFinder(RobotContainer r, Supplier<Pose2d> poseSupplier, boolean isGather, boolean isClimb){
+        this.poseSupplier = poseSupplier;
+        this.r = r;
+        this.isGather = isGather;
+        this.isClimb = isClimb;
+    }
+
     public NewPathFinder(RobotContainer r, Supplier<Pose2d> poseSupplier, boolean isGather) {
         this.poseSupplier = poseSupplier;
         this.r = r;
         this.isGather = isGather;
+        this.isClimb = false;
     }
 
     @Override
@@ -48,6 +59,11 @@ public class NewPathFinder extends Command {
             flipPose = Locations.invert(targetPose);
         } else {
             flipPose = targetPose;
+        }
+
+        //rotate 90deg right for climb align
+        if(isClimb){
+            flipPose = targetPose.plus(new Transform2d(0, 0, Rotation2d.kCW_90deg));
         }
 
         double startMovingThingsPosition;

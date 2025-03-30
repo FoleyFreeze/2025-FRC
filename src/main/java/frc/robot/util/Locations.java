@@ -481,4 +481,28 @@ public class Locations {
     public static Supplier<Pose2d> supercycleOffset(Supplier<Pose2d> pose) {
         return (() -> pose.get().plus(supercycleBackup));
     }
+
+    public static Pose2d getCageLocation(RobotContainer r){
+        if(isBlue()){
+            switch(r.controlBoard.selectedCage){
+                case LEFT:
+                return new Pose2d();
+                case MIDDLE:
+                return new Pose2d();
+                case RIGHT:
+                return new Pose2d();
+            }
+        } else {
+            switch(r.controlBoard.selectedCage){
+                case LEFT:
+                return new Pose2d();
+                case MIDDLE:
+                return new Pose2d();
+                case RIGHT:
+                return new Pose2d();
+            }
+        }
+
+        return new Pose2d();
+    }
 }
