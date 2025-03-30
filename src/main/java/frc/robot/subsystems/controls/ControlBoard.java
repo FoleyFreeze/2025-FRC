@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
 import frc.robot.commands.SuperstructureLocation;
@@ -75,6 +76,20 @@ public class ControlBoard {
 
         useShuffleboard.addDefaultOption("No", false);
         useShuffleboard.addOption("Yes", true);
+
+        algaeButtonT.onTrue(
+                new InstantCommand(
+                                () -> {
+                                    if (!tempScoreAlgae) tempGatherAlgae = !tempGatherAlgae;
+                                })
+                        .ignoringDisable(true));
+        escBtn.onTrue(
+                new InstantCommand(
+                                () -> {
+                                    tempGatherAlgae = false;
+                                    tempScoreAlgae = false;
+                                })
+                        .ignoringDisable(true));
     }
 
     public static enum ReefSticks {
@@ -107,6 +122,8 @@ public class ControlBoard {
     public boolean selectedAlgae = false;
     public boolean shift = false;
     public boolean submerge = false;
+    public boolean tempGatherAlgae = false;
+    public boolean tempScoreAlgae = false;
 
     public int lastGatherStationTag = 0;
 
@@ -114,6 +131,8 @@ public class ControlBoard {
     public Trigger algaeModeT = new Trigger(() -> selectedAlgae);
     public Trigger shiftT = new Trigger(() -> shift);
     public Trigger submergeT = new Trigger(() -> submerge);
+    public Trigger tempGatherAlgaeT = new Trigger(() -> tempGatherAlgae);
+    public Trigger tempScoreAlgaeT = new Trigger(() -> tempScoreAlgae);
 
     public Trigger jogA = new Trigger(() -> cb.getRawButton(7) && !useShuffleboard.get());
     public Trigger jogB = new Trigger(() -> cb.getRawButton(8) && !useShuffleboard.get());
@@ -121,6 +140,7 @@ public class ControlBoard {
     public Trigger jog2 = new Trigger(() -> cb.getRawButton(10) && !useShuffleboard.get());
     public Trigger gatherBtn = new Trigger(() -> cb.getRawButton(6) && !useShuffleboard.get());
     public Trigger escBtn = new Trigger(() -> cb.getRawButton(3) && !useShuffleboard.get());
+    public Trigger algaeButtonT = new Trigger(() -> cb.getRawButton(5) && !useShuffleboard.get());
 
     public void periodic() {
         if (!useShuffleboard.get()) {
@@ -153,55 +173,118 @@ public class ControlBoard {
                 selectedReefPos = ReefSticks.A;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(14, true);
-                // r.leds.localLedVal[2]++;
-                // r.leds.ledValue.set(r.leds.localLedVal);
+                tempGatherAlgae = false;
             } else if (cb2.getRawButton(2)) {
                 selectedReefPos = ReefSticks.B;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(20, true);
-                // r.leds.localLedVal[2]--;
-                // r.leds.ledValue.set(r.leds.localLedVal);
-                // r.leds.ledOutputSet(11, true);
+                tempGatherAlgae = false;
             } else if (cb2.getRawButton(3)) {
                 selectedReefPos = ReefSticks.C;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(26, true);
+                tempGatherAlgae = false;
             } else if (cb2.getRawButton(4)) {
                 selectedReefPos = ReefSticks.D;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(32, true);
+                tempGatherAlgae = false;
             } else if (cb2.getRawButton(5)) {
                 selectedReefPos = ReefSticks.E;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(38, true);
+                tempGatherAlgae = false;
             } else if (cb2.getRawButton(6)) {
                 selectedReefPos = ReefSticks.F;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(44, true);
+                tempGatherAlgae = false;
             } else if (cb2.getRawButton(7)) {
                 selectedReefPos = ReefSticks.G;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(50, true);
+                tempGatherAlgae = false;
             } else if (cb2.getRawButton(8)) {
                 selectedReefPos = ReefSticks.H;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(56, true);
+                tempGatherAlgae = false;
             } else if (cb2.getPOV() == 270) {
                 selectedReefPos = ReefSticks.I;
                 r.leds.ledsOff();
+                // starting here LEDs are BGR instead of RGB
                 r.leds.ledOutputSet(60, true);
+                tempGatherAlgae = false;
             } else if (cb2.getPOV() == 0) {
                 selectedReefPos = ReefSticks.J;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(66, true);
+                tempGatherAlgae = false;
             } else if (cb2.getPOV() == 90) {
                 selectedReefPos = ReefSticks.K;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(72, true);
+                tempGatherAlgae = false;
             } else if (cb2.getPOV() == 180) {
                 selectedReefPos = ReefSticks.L;
                 r.leds.ledsOff();
                 r.leds.ledOutputSet(78, true);
+                tempGatherAlgae = false;
+            }
+
+            if (tempGatherAlgae && selectedReefPos != ReefSticks.NONE) {
+                switch (selectedReefPos) {
+                    case A:
+                        r.leds.ledOutputSet(19, true);
+                        break;
+                    case B:
+                        r.leds.ledOutputSet(13, true);
+                        break;
+                    case C:
+                        r.leds.ledOutputSet(31, true);
+                        break;
+                    case D:
+                        r.leds.ledOutputSet(25, true);
+                        break;
+                    case E:
+                        r.leds.ledOutputSet(43, true);
+                        break;
+                    case F:
+                        r.leds.ledOutputSet(37, true);
+                        break;
+                    case G:
+                        r.leds.ledOutputSet(55, true);
+                        break;
+                    case H:
+                        r.leds.ledOutputSet(49, true);
+                        break;
+                    case I:
+                        r.leds.ledOutputSet(67, true);
+                        break;
+                    case J:
+                        r.leds.ledOutputSet(61, true);
+                        break;
+                    case K:
+                        r.leds.ledOutputSet(79, true);
+                        break;
+                    case L:
+                        r.leds.ledOutputSet(73, true);
+                        break;
+                    default:
+                }
+            } else {
+                r.leds.ledOutputSet(13, false);
+                r.leds.ledOutputSet(16, false);
+                r.leds.ledOutputSet(25, false);
+                r.leds.ledOutputSet(31, false);
+                r.leds.ledOutputSet(37, false);
+                r.leds.ledOutputSet(43, false);
+                r.leds.ledOutputSet(49, false);
+                r.leds.ledOutputSet(55, false);
+                r.leds.ledOutputSet(61, false);
+                r.leds.ledOutputSet(67, false);
+                r.leds.ledOutputSet(73, false);
+                r.leds.ledOutputSet(79, false);
             }
 
             if (cb2.getRawButton(9)) {
@@ -225,6 +308,9 @@ public class ControlBoard {
         Logger.recordOutput("CB/SelectedClimb", selectedClimbMode);
         Logger.recordOutput("CB/SelectedAlgae", selectedAlgae);
         Logger.recordOutput("CB/lastGatherStationTag", lastGatherStationTag);
+
+        Logger.recordOutput("CB/tempGatherAlgae", tempGatherAlgae);
+        Logger.recordOutput("CB/tempScoreAlgae", tempScoreAlgae);
     }
 
     // left means true

@@ -52,7 +52,7 @@ public class NewPathFinder extends Command {
 
         double startMovingThingsPosition;
         if (r.controlBoard.algaeModeT.getAsBoolean()) {
-            startMovingThingsPosition = 0.25;
+            startMovingThingsPosition = 0.0;
         } else {
             // coral
             if (r.controlBoard.selectedLevel == 4) {

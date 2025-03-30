@@ -41,9 +41,9 @@ public class WristIOSim implements WristIO {
                         24.3,
                         inertia,
                         Units.inchesToMeters(k.wristLength),
-                        -pi2,
-                        pi2,
-                        true,
+                        -pi2 * 4,
+                        pi2 * 4,
+                        false,
                         0,
                         0.001,
                         0);

@@ -40,9 +40,9 @@ public class ArmIOSim implements ArmIO {
                         22.29,
                         inertia,
                         Units.inchesToMeters(k.armLength),
-                        0,
-                        Math.PI,
-                        true,
+                        -Math.PI,
+                        Math.PI * 2,
+                        false,
                         pi2,
                         0.001,
                         0);

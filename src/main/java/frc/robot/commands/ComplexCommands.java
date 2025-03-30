@@ -78,6 +78,37 @@ public class ComplexCommands {
         return c;
     }
 
+    public static Command supercycleGather() {
+        final boolean[] hasGathered = new boolean[1];
+
+        SequentialCommandGroup moveArmlol =
+                new SequentialCommandGroup(
+                        r.arm.goTo(() -> SuperstructureLocation.HOLD)
+                                .alongWith(r.elevator.goTo(r.controlBoard::getAlgaeReefHeight)),
+                        r.wrist
+                                .goTo(() -> SuperstructureLocation.ALGAE_LEVEL_2_3)
+                                .alongWith(
+                                        r.arm.goTo(() -> SuperstructureLocation.ALGAE_LEVEL_2_3)));
+
+        SequentialCommandGroup mainSQ =
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> hasGathered[0] = false),
+                        DriveCommands.driveToPoint(
+                                        r,
+                                        Locations.supercycleOffset(
+                                                r.controlBoard::getAlgaePathPose))
+                                .alongWith(moveArmlol),
+                        DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose),
+                        new InstantCommand(() -> hasGathered[0] = true),
+                        new WaitCommand(0.1),
+                        new PathFollowingCommand(r, () -> r.pathCache.closestWaypoint(), true));
+
+        Command c = mainSQ.finallyDo(() -> r.controlBoard.tempScoreAlgae = hasGathered[0]);
+
+        c.setName("SupercycleGather");
+        return c;
+    }
+
     public static Command releaseAlgae() {
         Command c =
                 r.hand.setVoltageCmd(releasePowerAlgae)
@@ -328,7 +359,22 @@ public class ComplexCommands {
     }
 
     public static Command noDriveGather() {
-        Command c = goToGather().andThen(gatherCoral2());
+        Command fixTempAlgae =
+                new ConditionalCommand(
+                                r.hand.setVoltageCmd(0),
+                                new InstantCommand(),
+                                r.controlBoard.tempGatherAlgaeT.or(r.controlBoard.tempScoreAlgaeT))
+                        .andThen(
+                                new InstantCommand(
+                                        () -> {
+                                            r.controlBoard.tempGatherAlgae = false;
+                                            r.controlBoard.tempScoreAlgae = false;
+                                        }));
+
+        Command c = goToGather().alongWith(fixTempAlgae).andThen(gatherCoral2());
+        // if we were in algae mode, make sure we drop the algae before getting to
+        // coral intake position
+
         c.setName("NoDriveGather");
         return c;
     }
@@ -391,6 +437,11 @@ public class ComplexCommands {
                                                                                                         .onTargetT)
                                                                                         .getAsBoolean())))
                                         .andThen(releaseCoral()))
+                        .andThen(
+                                new ConditionalCommand(
+                                        supercycleGather(),
+                                        new InstantCommand(),
+                                        r.controlBoard.tempGatherAlgaeT))
                         .andThen(
                                 new ConditionalCommand(
                                         stripAlgae(),

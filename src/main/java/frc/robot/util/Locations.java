@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.controls.ControlBoard;
+import java.util.function.Supplier;
 
 public class Locations {
 
@@ -78,6 +79,9 @@ public class Locations {
                     Units.inchesToMeters(48),
                     Rotation2d.fromDegrees(
                             82.37)); // not intentionally spefifc, just a gag (please laugh);
+
+    public static Transform2d supercycleBackup =
+            new Transform2d(Units.inchesToMeters(-8), 0, Rotation2d.kZero);
 
     // TODO: make code that uses this
     // public static Transform2d halfRobotCoralLevel1 =
@@ -472,5 +476,9 @@ public class Locations {
             default:
                 return r.controlBoard.lastGatherStationTag;
         }
+    }
+
+    public static Supplier<Pose2d> supercycleOffset(Supplier<Pose2d> pose) {
+        return (() -> pose.get().plus(supercycleBackup));
     }
 }
