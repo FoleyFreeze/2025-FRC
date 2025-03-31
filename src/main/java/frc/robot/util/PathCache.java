@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.controls.ControlBoard.ReefSticks;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class PathCache {
     RobotContainer r;
     Pose2d[] waypointList;
 
-    double velocityThreshold = 0.2;
+    double velocityThreshold = 0.4;
 
     public PathCache(RobotContainer r) {
         this.r = r;
@@ -79,10 +80,17 @@ public class PathCache {
             travelVector =
                     new Translation2d(currentVel.vxMetersPerSecond, currentVel.vyMetersPerSecond);
         } else {
-            travelVector =
-                    waypointList[closeStart]
-                            .getTranslation()
-                            .minus(currentLocation.getTranslation());
+            if (count != 0) {
+                // point the travel vector at the next waypoint
+                int inc = count / Math.abs(count);
+                travelVector =
+                        waypointList[Math.floorMod(closeStart + inc, 6)]
+                                .getTranslation()
+                                .minus(currentLocation.getTranslation());
+            } else {
+                // or if there isnt one, at the destination
+                travelVector = dest.getTranslation().minus(currentLocation.getTranslation());
+            }
         }
 
         /*

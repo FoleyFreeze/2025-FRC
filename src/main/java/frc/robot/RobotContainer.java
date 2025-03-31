@@ -36,7 +36,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auton.AutonCommands;
-import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.CmdDriveCageTraj;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
@@ -256,7 +255,7 @@ public class RobotContainer {
                 .and(controlBoard.climbModeT) // climb sw
                 .and(flysky.botLeftSWFLo.negate())
                 .whileTrue(new CmdDriveCageTraj(r));
-                //.whileTrue(ClimbCommands.autoDriveClimb(this));
+        // .whileTrue(ClimbCommands.autoDriveClimb(this));
 
         // right trigger commands
         // score coral camera
