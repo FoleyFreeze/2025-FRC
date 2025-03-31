@@ -66,7 +66,7 @@ public class DriveCommands {
     private static final double POS_TOL = Units.inchesToMeters(0.5);
     private static final double POS_MAX_DIST =
             Units.inchesToMeters(10); // dont drive if more than 10in away
-    private static final double POS_MAX_TIME = 0.5;
+    private static final double POS_MAX_TIME = 0.75;
 
     private DriveCommands() {}
 
@@ -244,7 +244,7 @@ public class DriveCommands {
         return Commands.run(
                         () -> {
                             Pose2d target = supplier.get();
-                            Pose2d meas = r.drive.getGlobalPose();
+                            Pose2d meas = r.drive.chooseLocalPose();
 
                             Translation2d pointErr =
                                     target.getTranslation().minus(meas.getTranslation());

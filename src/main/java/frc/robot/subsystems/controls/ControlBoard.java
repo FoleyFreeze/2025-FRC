@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
 import frc.robot.commands.SuperstructureLocation;
 import frc.robot.util.Locations;
-import java.util.List;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -26,7 +25,7 @@ public class ControlBoard {
     public LoggedDashboardChooser<Boolean> climbMode;
     public LoggedDashboardChooser<Boolean> algaeMode;
     public LoggedDashboardChooser<Boolean> useShuffleboard;
-    public LoggedDashboardChooser<Boolean> stationDist;
+    public LoggedDashboardChooser<GatherDist> stationDist;
     public LoggedDashboardChooser<CageLocation> cageLocation;
 
     RobotContainer r;
@@ -71,8 +70,9 @@ public class ControlBoard {
         station.addOption("Left", Station.LEFT);
         station.addOption("Right", Station.RIGHT);
 
-        stationDist.addDefaultOption("Far", true);
-        stationDist.addOption("Close", false);
+        stationDist.addDefaultOption("Far", GatherDist.FAR);
+        stationDist.addOption("Center", GatherDist.CENTER);
+        stationDist.addOption("Close", GatherDist.CLOSE);
 
         climbMode.addDefaultOption("Off", false);
         climbMode.addOption("On", true);
@@ -128,10 +128,16 @@ public class ControlBoard {
         RIGHT
     }
 
+    public static enum GatherDist {
+        CLOSE,
+        CENTER,
+        FAR
+    }
+
     public ReefSticks selectedReefPos = ReefSticks.A;
     public int selectedLevel = 2;
     public Station selectedStation = Station.CLOSEST;
-    public boolean useFarStation = true;
+    public GatherDist useFarStation = GatherDist.FAR;
     public boolean selectedClimbMode = false;
     public boolean selectedAlgae = false;
     public boolean shift = false;
@@ -165,13 +171,13 @@ public class ControlBoard {
 
             if (cb.getRawAxis(2) < -0.5) {
                 // selectedStation = Station.LEFT;
-                useFarStation = true;
+                useFarStation = GatherDist.FAR;
             } else if (cb.getRawAxis(2) > 0.5) {
                 // selectedStation = Station.RIGHT;
-                useFarStation = false;
+                useFarStation = GatherDist.CLOSE;
             } else {
                 // selectedStation = Station.CLOSEST;
-                useFarStation = true;
+                useFarStation = GatherDist.CENTER;
             }
 
             if (cb.getPOV() == 270) {
@@ -423,15 +429,36 @@ public class ControlBoard {
     public Pose2d selectCoralStation() {
         switch (selectedStation) {
             case LEFT:
-                if (useFarStation) return Locations.getLeftGatherStationFar();
-                else return Locations.getLeftGatherStationClose();
+                switch (useFarStation) {
+                    case FAR:
+                    default:
+                        return Locations.getLeftGatherStationFar();
+                    case CENTER:
+                        return Locations.getLeftGatherStationCenter();
+                    case CLOSE:
+                        return Locations.getLeftGatherStationClose();
+                }
             case RIGHT:
-                if (useFarStation) return Locations.getRightGatherStationFar();
-                else return Locations.getRightGatherStationClose();
+                switch (useFarStation) {
+                    case FAR:
+                    default:
+                        return Locations.getRightGatherStationFar();
+                    case CENTER:
+                        return Locations.getRightGatherStationCenter();
+                    case CLOSE:
+                        return Locations.getRightGatherStationClose();
+                }
             case CLOSEST:
             default:
-                if (useFarStation) return selectClosestFarCoralStation();
-                else return selectClosestCloseCoralStation();
+                switch (useFarStation) {
+                    case FAR:
+                    default:
+                        return selectClosestFarCoralStation();
+                    case CENTER:
+                        return selectClosestCenterCoralStation();
+                    case CLOSE:
+                        return selectClosestCloseCoralStation();
+                }
         }
     }
 
@@ -580,30 +607,55 @@ public class ControlBoard {
         Pose2d left = Locations.getLeftGatherStationFar();
         Pose2d right = Locations.getRightGatherStationFar();
 
-        Pose2d closest = r.drive.getGlobalPose().nearest(List.of(left, right));
+        Pose2d bot = r.drive.getGlobalPose();
 
-        if (closest.equals(left)) {
+        boolean leftCloser = getDistFromPoses(left, bot) < getDistFromPoses(right, bot);
+
+        if (leftCloser) {
             lastGatherStationTag = Locations.isBlue() ? 13 : 1;
+            return left;
         } else {
             lastGatherStationTag = Locations.isBlue() ? 12 : 2;
+            return right;
         }
-
-        return closest;
     }
 
     public Pose2d selectClosestCloseCoralStation() {
         Pose2d left = Locations.getLeftGatherStationClose();
         Pose2d right = Locations.getRightGatherStationClose();
 
-        Pose2d closest = r.drive.getGlobalPose().nearest(List.of(left, right));
+        Pose2d bot = r.drive.getGlobalPose();
 
-        if (closest.equals(left)) {
+        boolean leftCloser = getDistFromPoses(left, bot) < getDistFromPoses(right, bot);
+
+        if (leftCloser) {
             lastGatherStationTag = Locations.isBlue() ? 13 : 1;
+            return left;
         } else {
             lastGatherStationTag = Locations.isBlue() ? 12 : 2;
+            return right;
         }
+    }
 
-        return closest;
+    public Pose2d selectClosestCenterCoralStation() {
+        Pose2d left = Locations.getLeftGatherStationCenter();
+        Pose2d right = Locations.getRightGatherStationCenter();
+
+        Pose2d bot = r.drive.getGlobalPose();
+
+        boolean leftCloser = getDistFromPoses(left, bot) < getDistFromPoses(right, bot);
+
+        if (leftCloser) {
+            lastGatherStationTag = Locations.isBlue() ? 13 : 1;
+            return left;
+        } else {
+            lastGatherStationTag = Locations.isBlue() ? 12 : 2;
+            return right;
+        }
+    }
+
+    public double getDistFromPoses(Pose2d p1, Pose2d p2) {
+        return p1.getTranslation().getDistance(p2.getTranslation());
     }
 
     public Pose2d selectApproachingStation() {

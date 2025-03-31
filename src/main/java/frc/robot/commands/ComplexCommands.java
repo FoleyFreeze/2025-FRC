@@ -20,14 +20,14 @@ import java.util.function.Supplier;
 public class ComplexCommands {
 
     public static double holdPowerCoral = 0.4;
-    static double releasePowerCoral23 = -2 - 1;
-    static double releasePowerCoral4 = -4 - 1;
-    public static double releasePowerCoral1 = -1.0 - 1;
+    static double releasePowerCoral23 = -2 - 2;
+    static double releasePowerCoral4 = -4 - 2;
+    public static double releasePowerCoral1 = -5;
     static double releaseTimeCoral1 = 0.3;
     static double releaseTimeCoral23 = 0.25;
     static double releaseTimeCoral4 = 0.04 + 0.06;
 
-    public static double intakePowerCoral = 3.0; // 2
+    public static double intakePowerCoral = 4.0; // 2
     public static double intakeCurrentCoral = 15;
     static double intakeCoralTime = 0.8;
 
@@ -46,8 +46,8 @@ public class ComplexCommands {
 
     static double gatherPosition = 0;
 
-    static double pulseGatherOn = 0.2;
-    static double pulseGatherOff = 0.2;
+    static double pulseGatherOn = 0.25;
+    static double pulseGatherOff = 0.15;
     static double pulseGatherOffPwr = -0.2; // 0.05
 
     public static RobotContainer r;
@@ -66,6 +66,7 @@ public class ComplexCommands {
         Command c =
                 // hand goes up
                 sq.alongWith(DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose))
+                        .andThen(r.hand.setVoltageCmd(descoreAlgaePower))
                         .andThen(
                                 new WaitCommand(stripTime)
                                         .andThen(

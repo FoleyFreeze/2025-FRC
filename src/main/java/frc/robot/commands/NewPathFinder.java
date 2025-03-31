@@ -29,7 +29,7 @@ public class NewPathFinder extends Command {
 
     // vel, accel, rotvel, rotaccel
     // PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 5.0, 6, 4);
-    PathConstraints coralGlobalConstraints = new PathConstraints(2, 2, 6, 4);
+    PathConstraints coralGlobalConstraints = new PathConstraints(1, 1, 6, 4);
     PathConstraints algaeGlobalConstraints = new PathConstraints(3, 3, 4, 4);
     PathConstraints finalConstraints = new PathConstraints(1.25, 1.5, 3, 2);
     PathConstraints finalConstraintsAlgae = new PathConstraints(1.5, 1.5, 3, 2);
@@ -74,6 +74,8 @@ public class NewPathFinder extends Command {
             // coral
             if (r.controlBoard.selectedLevel == 4) {
                 startMovingThingsPosition = waypoints.size() - 2.8;
+            } else if (r.controlBoard.selectedLevel == 1) {
+                startMovingThingsPosition = waypoints.size() - 2.8;
             } else {
                 startMovingThingsPosition = waypoints.size() - 2.2;
             }
@@ -98,7 +100,9 @@ public class NewPathFinder extends Command {
         EventMarker em =
                 new EventMarker(
                         "InSlowDrivePhase", startMovingThingsPosition, waypoints.size() - 1);
-        EventMarker em2 = new EventMarker("InLocalPosePhase", waypoints.size() - 2, -1);
+        int minWaypoints = waypoints.size() - 3;
+        if (minWaypoints < 0) minWaypoints = 0;
+        EventMarker em2 = new EventMarker("InLocalPosePhase", minWaypoints, -1);
 
         // ChassisSpeeds botVel = r.drive.getVelocity();
         // double speed = Math.hypot(botVel.vxMetersPerSecond, botVel.vyMetersPerSecond);

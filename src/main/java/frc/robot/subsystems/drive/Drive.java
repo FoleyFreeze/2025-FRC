@@ -505,10 +505,14 @@ public class Drive extends SubsystemBase {
         if (r.state.inLocalPosePhase) {
             return getLocalPose();
         } else {
-            localPoseEstimator.resetPosition(
-                    rawGyroRotation, getModulePositions(), getGlobalPose());
+            /*localPoseEstimator.resetPosition(
+            rawGyroRotation, getModulePositions(), getGlobalPose());*/
             return getGlobalPose();
         }
+    }
+
+    public void resetLocalPose() {
+        localPoseEstimator.resetPosition(rawGyroRotation, getModulePositions(), getGlobalPose());
     }
 
     /** Returns the current odometry rotation. */
@@ -550,8 +554,16 @@ public class Drive extends SubsystemBase {
             if (r.controlBoard.algaeModeT.getAsBoolean()) {
                 return true;
             } else {
+                // in coral mode
                 if (Locations.getTagId(r.controlBoard.selectedReefPos) == id) {
                     return true;
+                } else if (r.controlBoard.selectedLevel == 1) {
+                    // use all reef tags for level 1
+                    if (Locations.isBlue()) {
+                        return id <= 22 && id >= 17;
+                    } else {
+                        return id <= 11 && id >= 6;
+                    }
                 }
             }
         } else if (r.flysky.leftTriggerSWE.getAsBoolean()) {

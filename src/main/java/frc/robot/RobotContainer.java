@@ -36,6 +36,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auton.AutonCommands;
+import frc.robot.commands.ClimbCommands;
+import frc.robot.commands.CmdDriveCageTraj;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SuperstructureLocation;
@@ -181,6 +183,8 @@ public class RobotContainer {
         flysky.topLeftSWA.whileTrue(leds.setLEDMode(LED_MODES.BREATHE_BLUE).ignoringDisable(true));
         flysky.topRightSWD.whileTrue(leds.setLEDMode(LED_MODES.OFF).ignoringDisable(true));
 
+        state.inLocalPosePhaseT.onTrue(new InstantCommand(drive::resetLocalPose));
+
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(DriveCommands.zeroDrive(this).ignoringDisable(true));
         flysky.downLTRIM.onTrue(DriveCommands.zeroDrive60(this).ignoringDisable(true));
@@ -244,7 +248,15 @@ public class RobotContainer {
 
         flysky.leftTriggerSWE // gather sw
                 .and(controlBoard.climbModeT) // climb sw
+                .and(flysky.botLeftSWFLo)
                 .whileTrue(r.climb.setClimbVoltage(-12));
+
+        // camera climb
+        flysky.leftTriggerSWE // score sw
+                .and(controlBoard.climbModeT) // climb sw
+                .and(flysky.botLeftSWFLo.negate())
+                .whileTrue(new CmdDriveCageTraj(r));
+                //.whileTrue(ClimbCommands.autoDriveClimb(this));
 
         // right trigger commands
         // score coral camera
@@ -292,11 +304,6 @@ public class RobotContainer {
         flysky.rightTriggerSWG // score sw
                 .and(controlBoard.climbModeT) // climb sw
                 .whileTrue(r.climb.setClimbVoltage(12));
-
-        // camera climb
-        // flysky.rightTriggerSWG // score sw
-        //        .and(controlBoard.climbModeT) // climb sw
-        //        .whileTrue(new CmdDriveCageTraj(r));
 
         // get safely into climb mode
         controlBoard

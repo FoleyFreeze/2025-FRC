@@ -27,7 +27,7 @@ public class Locations {
                     robotLength / 2.0 + Units.inchesToMeters(1.25 + 1), 0, new Rotation2d());
 
     // TODO: remove extra before comp
-    static double extraGatherX = 8; // 12
+    static double extraGatherX = 0; // 12
     static double extraGatherY = 20 - 4;
     public static Transform2d halfRobotGatherLeftFar =
             new Transform2d(
@@ -49,6 +49,16 @@ public class Locations {
                     robotLength / 2.0 + Units.inchesToMeters(2.5 + extraGatherX),
                     Units.inchesToMeters(extraGatherY),
                     Rotation2d.kZero);
+    public static Transform2d halfRobotGatherLeftCenter =
+            new Transform2d(
+                    robotLength / 2.0 + Units.inchesToMeters(2.5 + extraGatherX),
+                    Units.inchesToMeters(0),
+                    Rotation2d.kZero);
+    public static Transform2d halfRobotGatherRightCenter =
+            new Transform2d(
+                    robotLength / 2.0 + Units.inchesToMeters(2.5 + extraGatherX),
+                    Units.inchesToMeters(0),
+                    Rotation2d.kZero);
 
     public static Transform2d halfRobotCoralRight =
             new Transform2d(
@@ -68,17 +78,15 @@ public class Locations {
 
     public static Transform2d halfRobotLevel1Left =
             new Transform2d(
-                    0,
-                    Units.inchesToMeters(-48),
-                    Rotation2d.fromDegrees(
-                            -82.37)); // not intentionally spefifc, just a gag (please laugh)
+                    Units.inchesToMeters(0),
+                    Units.inchesToMeters(-52),
+                    Rotation2d.fromDegrees(-83.5));
 
     public static Transform2d halfRobotLevel1Right =
             new Transform2d(
-                    0,
-                    Units.inchesToMeters(48),
-                    Rotation2d.fromDegrees(
-                            82.37)); // not intentionally spefifc, just a gag (please laugh);
+                    Units.inchesToMeters(0),
+                    Units.inchesToMeters(52),
+                    Rotation2d.fromDegrees(83.5));
 
     public static Transform2d supercycleBackup =
             new Transform2d(Units.inchesToMeters(-8), 0, Rotation2d.kZero);
@@ -434,6 +442,22 @@ public class Locations {
             return invert(tags.getTagPose(2).get().toPose2d().plus(halfRobotGatherRightClose));
         } else {
             return invert(tags.getTagPose(12).get().toPose2d().plus(halfRobotGatherRightClose));
+        }
+    }
+
+    public static Pose2d getLeftGatherStationCenter() {
+        if (!isBlue()) {
+            return invert(tags.getTagPose(2).get().toPose2d().plus(halfRobotGatherLeftCenter));
+        } else {
+            return invert(tags.getTagPose(12).get().toPose2d().plus(halfRobotGatherLeftCenter));
+        }
+    }
+
+    public static Pose2d getRightGatherStationCenter() {
+        if (!isBlue()) {
+            return invert(tags.getTagPose(2).get().toPose2d().plus(halfRobotGatherRightCenter));
+        } else {
+            return invert(tags.getTagPose(12).get().toPose2d().plus(halfRobotGatherRightCenter));
         }
     }
 

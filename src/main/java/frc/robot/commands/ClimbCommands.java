@@ -36,10 +36,12 @@ public class ClimbCommands {
     }
 
     public static boolean checkIfPathfindNeeded(RobotContainer r) {
-        Pose2d bot = r.drive.getGlobalPose();
-        Pose2d target = Locations.getCageLocation(r);
+        return false;
 
-        // only do the pathfind step
-        return bot.minus(target).getTranslation().getNorm() > Units.inchesToMeters(40);
+        // Pose2d bot = r.drive.getGlobalPose();
+        // Pose2d target = Locations.getCageLocation(r);
+
+        // // only do the pathfind step
+        // return bot.minus(target).getTranslation().getNorm() > Units.inchesToMeters(40);
     }
 }
