@@ -121,8 +121,8 @@ public class ControlBoard {
         RIGHT,
         CLOSEST
     }
-    
-    public static enum CageLocation{
+
+    public static enum CageLocation {
         LEFT,
         MIDDLE,
         RIGHT
@@ -343,7 +343,7 @@ public class ControlBoard {
                     }
                 } else {
                     r.leds.ledOutputSet(13, false);
-                    r.leds.ledOutputSet(16, false);
+                    r.leds.ledOutputSet(19, false);
                     r.leds.ledOutputSet(25, false);
                     r.leds.ledOutputSet(31, false);
                     r.leds.ledOutputSet(37, false);
@@ -354,6 +354,45 @@ public class ControlBoard {
                     r.leds.ledOutputSet(67, false);
                     r.leds.ledOutputSet(73, false);
                     r.leds.ledOutputSet(79, false);
+                    switch (selectedReefPos) {
+                        case A:
+                            r.leds.ledOutputSet(14, true);
+                            break;
+                        case B:
+                            r.leds.ledOutputSet(20, true);
+                            break;
+                        case C:
+                            r.leds.ledOutputSet(26, true);
+                            break;
+                        case D:
+                            r.leds.ledOutputSet(32, true);
+                            break;
+                        case E:
+                            r.leds.ledOutputSet(38, true);
+                            break;
+                        case F:
+                            r.leds.ledOutputSet(44, true);
+                            break;
+                        case G:
+                            r.leds.ledOutputSet(50, true);
+                            break;
+                        case H:
+                            r.leds.ledOutputSet(56, true);
+                            break;
+                        case I:
+                            r.leds.ledOutputSet(60, true);
+                            break;
+                        case J:
+                            r.leds.ledOutputSet(66, true);
+                            break;
+                        case K:
+                            r.leds.ledOutputSet(72, true);
+                            break;
+                        case L:
+                            r.leds.ledOutputSet(78, true);
+                            break;
+                        default:
+                    }
                 }
             }
 

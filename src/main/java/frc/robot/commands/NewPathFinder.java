@@ -28,13 +28,14 @@ public class NewPathFinder extends Command {
     private Command c;
 
     // vel, accel, rotvel, rotaccel
-    PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 5.2, 6, 4);
+    // PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 5.0, 6, 4);
+    PathConstraints coralGlobalConstraints = new PathConstraints(2, 2, 6, 4);
     PathConstraints algaeGlobalConstraints = new PathConstraints(3, 3, 4, 4);
-    // PathConstraints globalConstraints = new PathConstraints(2, 2, 6, 4);
     PathConstraints finalConstraints = new PathConstraints(1.25, 1.5, 3, 2);
     PathConstraints finalConstraintsAlgae = new PathConstraints(1.5, 1.5, 3, 2);
 
-    public NewPathFinder(RobotContainer r, Supplier<Pose2d> poseSupplier, boolean isGather, boolean isClimb){
+    public NewPathFinder(
+            RobotContainer r, Supplier<Pose2d> poseSupplier, boolean isGather, boolean isClimb) {
         this.poseSupplier = poseSupplier;
         this.r = r;
         this.isGather = isGather;
@@ -61,8 +62,8 @@ public class NewPathFinder extends Command {
             flipPose = targetPose;
         }
 
-        //rotate 90deg right for climb align
-        if(isClimb){
+        // rotate 90deg right for climb align
+        if (isClimb) {
             flipPose = targetPose.plus(new Transform2d(0, 0, Rotation2d.kCW_90deg));
         }
 
