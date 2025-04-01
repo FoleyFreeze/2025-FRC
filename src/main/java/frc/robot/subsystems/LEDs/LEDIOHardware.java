@@ -5,14 +5,21 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public class LEDIOHardware implements LEDIO {
 
-    AddressableLED leds = new AddressableLED(0);
+    AddressableLED leds;
 
     public LEDIOHardware(AddressableLEDBuffer buffer) {
+        leds = new AddressableLED(0);
         leds.setLength(buffer.getLength());
-        // leds.setBitTiming(500, 2000, 1200, 1300); // WS2811 "slow" mode?
-        // leds.setBitTiming(250, 1000, 600, 650); // WS2811 "fast" mode?
-        // leds.setSyncTime(200);
+        leds.setData(buffer);
+        leds.start();
+    }
 
+    @Override
+    public void reInit(AddressableLEDBuffer buffer) {
+        leds.close();
+        leds = new AddressableLED(1);
+        leds.setLength(buffer.getLength());
+        leds.setData(buffer);
         leds.start();
     }
 

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -29,6 +30,7 @@ public class LED extends SubsystemBase {
         BREATHE_BLUE(
                 LEDPattern.solid(Color.kBlue).breathe(Seconds.of(3))
                 /*.scrollAtRelativeSpeed(Percent.per(Second).of(20))*/ ),
+        WHITE(LEDPattern.solid(Color.kWhite)),
 
         RAINBOW(LEDPattern.rainbow(255, 127).scrollAtRelativeSpeed(Seconds.of(5).asFrequency()));
 
@@ -44,14 +46,19 @@ public class LED extends SubsystemBase {
 
     LEDIO io;
 
-    AddressableLEDBuffer buffer = new AddressableLEDBuffer(85);
+    Timer startTimer = new Timer();
+    boolean hasRestarted = false;
+    AddressableLEDBuffer startBuffer = new AddressableLEDBuffer(18);
+    AddressableLEDBuffer buffer = new AddressableLEDBuffer(18);
 
     public LED(RobotContainer r) {
         this.r = r;
 
+        LED_MODES.WHITE.pattern.applyTo(startBuffer);
+
         switch (Constants.currentMode) {
             case REAL:
-                io = new LEDIOHardware(buffer);
+                io = new LEDIOHardware(startBuffer);
                 break;
             case SIM:
                 io = new LEDIO() {};
@@ -61,13 +68,22 @@ public class LED extends SubsystemBase {
                 io = new LEDIO() {};
                 break;
         }
+
+        startTimer.restart();
     }
 
     @Override
     public void periodic() {
         ledEnable.set(true);
 
-        io.setData(buffer);
+        if (startTimer.hasElapsed(3)) {
+            if (!hasRestarted) {
+                io.reInit(buffer);
+                hasRestarted = true;
+                System.out.println("LEDS reinit!");
+            }
+            io.setData(buffer);
+        }
 
         // only underglow on the field or enabled
         if (DriverStation.isFMSAttached() || DriverStation.isEnabled()) {
