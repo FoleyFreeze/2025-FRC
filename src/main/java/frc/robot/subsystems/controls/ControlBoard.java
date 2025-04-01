@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -134,6 +135,12 @@ public class ControlBoard {
         FAR
     }
 
+    public static enum DestAlgae {
+        NET,
+        PROC,
+        CLOSEST
+    }
+
     public ReefSticks selectedReefPos = ReefSticks.A;
     public int selectedLevel = 2;
     public Station selectedStation = Station.CLOSEST;
@@ -145,6 +152,11 @@ public class ControlBoard {
     public boolean tempGatherAlgae = false;
     public boolean tempScoreAlgae = false;
     public CageLocation selectedCage = CageLocation.LEFT;
+    public DestAlgae selectedAlgaeTarget = DestAlgae.CLOSEST;
+
+    public boolean autonGather = false;
+    public boolean autonScore = false;
+    public int autonTag = 0;
 
     public int lastGatherStationTag = 0;
 
@@ -410,6 +422,14 @@ public class ControlBoard {
             useFarStation = stationDist.get();
         }
 
+        if (r.flysky.topLeftSWBHi.getAsBoolean()) {
+            selectedAlgaeTarget = DestAlgae.NET;
+        } else if (r.flysky.topLeftSWBLo.getAsBoolean()) {
+            selectedAlgaeTarget = DestAlgae.PROC;
+        } else {
+            selectedAlgaeTarget = DestAlgae.CLOSEST;
+        }
+
         selectedStation = station.get();
         selectedCage = cageLocation.get();
 
@@ -420,6 +440,11 @@ public class ControlBoard {
         Logger.recordOutput("CB/SelectedAlgae", selectedAlgae);
         Logger.recordOutput("CB/lastGatherStationTag", lastGatherStationTag);
         Logger.recordOutput("CB/SelectedCage", selectedCage);
+        Logger.recordOutput("CB/SelectedAlgaeTarget", selectedAlgaeTarget);
+
+        Logger.recordOutput("CB/FakeAuto/Gather", autonGather);
+        Logger.recordOutput("CB/FakeAuto/Score", autonScore);
+        Logger.recordOutput("CB/FakeAuto/Tag", autonTag);
 
         Logger.recordOutput("CB/tempGatherAlgae", tempGatherAlgae);
         Logger.recordOutput("CB/tempScoreAlgae", tempScoreAlgae);
@@ -692,6 +717,22 @@ public class ControlBoard {
 
     public double dotProduct(Translation2d a, ChassisSpeeds b) {
         return a.getX() * b.vyMetersPerSecond + a.getY() * b.vxMetersPerSecond;
+    }
+
+    public boolean getAlgaeScoreLoc() {
+        switch (selectedAlgaeTarget) {
+            case NET:
+                return true;
+            case PROC:
+                return false;
+            case CLOSEST:
+            default:
+                // score at net if not within 6ft of proc
+                return Locations.getProcLoc()
+                                .getTranslation()
+                                .getDistance(r.drive.getGlobalPose().getTranslation())
+                        > Units.inchesToMeters(72);
+        }
     }
 
     public SuperstructureLocation getAlgaeReefDSHeight() {

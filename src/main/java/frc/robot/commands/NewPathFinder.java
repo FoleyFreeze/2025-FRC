@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.util.Locations;
@@ -28,11 +29,12 @@ public class NewPathFinder extends Command {
     private Command c;
 
     // vel, accel, rotvel, rotaccel
-    // PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 5.0, 6, 4);
-    PathConstraints coralGlobalConstraints = new PathConstraints(1, 1, 6, 4);
-    PathConstraints algaeGlobalConstraints = new PathConstraints(3, 3, 4, 4);
+    PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 5.0, 6, 4);
+    // PathConstraints coralGlobalConstraints = new PathConstraints(1, 1, 6, 4);
+    PathConstraints algaeGlobalConstraints = new PathConstraints(3, 4, 4, 4);
     PathConstraints finalConstraints = new PathConstraints(1.25, 1.5, 3, 2);
     PathConstraints finalConstraintsAlgae = new PathConstraints(1.5, 1.5, 3, 2);
+    PathConstraints finalGatherConstraints = new PathConstraints(2, 3, 6, 4);
 
     public NewPathFinder(
             RobotContainer r, Supplier<Pose2d> poseSupplier, boolean isGather, boolean isClimb) {
@@ -86,11 +88,15 @@ public class NewPathFinder extends Command {
 
         PathConstraints selectedConstraint;
         PathConstraints globalConstraint;
-        if (r.controlBoard.algaeModeT.getAsBoolean()) {
+        if (r.controlBoard.algaeModeT.getAsBoolean() && !DriverStation.isAutonomous()) {
             selectedConstraint = finalConstraintsAlgae;
             globalConstraint = algaeGlobalConstraints;
         } else {
-            selectedConstraint = finalConstraints;
+            if (isGather) {
+                selectedConstraint = finalGatherConstraints;
+            } else {
+                selectedConstraint = finalConstraints;
+            }
             globalConstraint = coralGlobalConstraints;
         }
 

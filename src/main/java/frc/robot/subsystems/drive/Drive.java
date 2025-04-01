@@ -550,6 +550,13 @@ public class Drive extends SubsystemBase {
     }
 
     private boolean triggerAndId(int id) {
+        // first handle auton
+        if (r.controlBoard.autonGather) {
+            return id == r.controlBoard.autonTag;
+        } else if (r.controlBoard.autonScore) {
+            return id == r.controlBoard.autonTag;
+        }
+
         if (r.flysky.rightTriggerSWG.getAsBoolean()) {
             if (r.controlBoard.algaeModeT.getAsBoolean()) {
                 return true;

@@ -147,7 +147,6 @@ public class AutonSelection {
 
     public Command buildAuton() {
         SequentialCommandGroup c = new SequentialCommandGroup();
-        c.setName("Auton");
 
         // start location
 
@@ -172,7 +171,7 @@ public class AutonSelection {
         if (gatherLoc == null) {
             return c; // we done
         }
-        c.addCommands(AutonCommands.coralStationGather(gatherLoc));
+        c.addCommands(AutonCommands.coralStationGather(gatherLoc, gatherChoose1.get()));
 
         // score 2
         stick = scoreLoc2.get();
@@ -187,7 +186,7 @@ public class AutonSelection {
         if (gatherLoc == null) {
             return c; // we done
         }
-        c.addCommands(AutonCommands.coralStationGather(gatherLoc));
+        c.addCommands(AutonCommands.coralStationGather(gatherLoc, gatherChoose2.get()));
 
         // score 3
         stick = scoreLoc3.get();
@@ -202,7 +201,7 @@ public class AutonSelection {
         if (gatherLoc == null) {
             return c; // we done
         }
-        c.addCommands(AutonCommands.coralStationGather(gatherLoc));
+        c.addCommands(AutonCommands.coralStationGather(gatherLoc, gatherChoose3.get()));
 
         // score 4
         stick = scoreLoc4.get();
@@ -212,7 +211,14 @@ public class AutonSelection {
         }
         c.addCommands(AutonCommands.scoreCoral(scoreLoc4.get(), scoreLevel4.get()));
 
-        return c;
+        Command cmd =
+                c.finallyDo(
+                        () -> {
+                            r.controlBoard.autonGather = false;
+                            r.controlBoard.autonScore = false;
+                        });
+        cmd.setName("Auton");
+        return cmd;
     }
 
     private void fillScoreLoc(SettableLoggableChooser<ReefSticks> in) {

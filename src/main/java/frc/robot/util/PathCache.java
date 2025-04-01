@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.controls.ControlBoard.ReefSticks;
 import java.util.ArrayList;
@@ -133,7 +132,9 @@ public class PathCache {
         return one.getTranslation().getDistance(two.getTranslation());
     }
 
+    Transform2d extraBackup = new Transform2d(Units.inchesToMeters(12), 0, Rotation2d.kZero);
+
     public Pose2d closestWaypoint() {
-        return r.drive.getGlobalPose().nearest(List.of(waypointList));
+        return r.drive.getGlobalPose().nearest(List.of(waypointList)).plus(extraBackup);
     }
 }

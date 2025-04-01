@@ -10,6 +10,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.RobotContainer;
+import frc.robot.auton.AutonSelection.GatherType;
 import frc.robot.subsystems.controls.ControlBoard;
 import java.util.function.Supplier;
 
@@ -89,7 +90,7 @@ public class Locations {
                     Rotation2d.fromDegrees(83.5));
 
     public static Transform2d supercycleBackup =
-            new Transform2d(Units.inchesToMeters(-8), 0, Rotation2d.kZero);
+            new Transform2d(Units.inchesToMeters(-11), 0, Rotation2d.kZero);
 
     // TODO: make code that uses this
     // public static Transform2d halfRobotCoralLevel1 =
@@ -447,9 +448,9 @@ public class Locations {
 
     public static Pose2d getLeftGatherStationCenter() {
         if (!isBlue()) {
-            return invert(tags.getTagPose(2).get().toPose2d().plus(halfRobotGatherLeftCenter));
+            return invert(tags.getTagPose(1).get().toPose2d().plus(halfRobotGatherLeftCenter));
         } else {
-            return invert(tags.getTagPose(12).get().toPose2d().plus(halfRobotGatherLeftCenter));
+            return invert(tags.getTagPose(13).get().toPose2d().plus(halfRobotGatherLeftCenter));
         }
     }
 
@@ -499,6 +500,19 @@ public class Locations {
             case CLOSEST:
             default:
                 return r.controlBoard.lastGatherStationTag;
+        }
+    }
+
+    public static int getCoralStationTag(GatherType station) {
+        switch (station) {
+            case LEFT_CLOSE:
+            case LEFT_FAR:
+                return isBlue() ? 13 : 1;
+            case RIGHT_CLOSE:
+            case RIGHT_FAR:
+                return isBlue() ? 12 : 2;
+            default:
+                return 0;
         }
     }
 

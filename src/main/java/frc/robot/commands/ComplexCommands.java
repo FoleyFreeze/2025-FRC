@@ -94,6 +94,7 @@ public class ComplexCommands {
         SequentialCommandGroup mainSQ =
                 new SequentialCommandGroup(
                         new InstantCommand(() -> hasGathered[0] = false),
+                        r.hand.setVoltageCmd(intakeAlgaePower),
                         DriveCommands.driveToPoint(
                                         r,
                                         Locations.supercycleOffset(
@@ -201,7 +202,7 @@ public class ComplexCommands {
     public static Command blindAlgaeScore() {
         Command c =
                 new ConditionalCommand(
-                        scoreAlgaeNet(), scoreAlgaeProc(), () -> r.controlBoard.selectedLevel == 4);
+                        scoreAlgaeNet(), scoreAlgaeProc(), r.controlBoard::getAlgaeScoreLoc);
         c.setName("BlindAlgaeScore");
         return c;
     }
@@ -211,7 +212,8 @@ public class ComplexCommands {
                 new ConditionalCommand(
                         visionScoreAlgaeNet(),
                         visionScoreAlgaeProc(),
-                        () -> r.controlBoard.selectedLevel == 4);
+                        // () -> r.controlBoard.selectedLevel == 4);
+                        r.controlBoard::getAlgaeScoreLoc);
 
         c.setName("VisionAlgaeScore");
         return c;
@@ -447,7 +449,9 @@ public class ComplexCommands {
                                 new ConditionalCommand(
                                         stripAlgae(),
                                         new InstantCommand(),
-                                        r.flysky.botRightSWHLo.negate()));
+                                        () ->
+                                                !r.flysky.botRightSWHLo.getAsBoolean()
+                                                        && r.controlBoard.selectedLevel != 1));
         c.setName("VisionCoralScore");
         return c;
     }
