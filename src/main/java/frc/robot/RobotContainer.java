@@ -114,7 +114,7 @@ public class RobotContainer {
         wrist = Wrist.create(this);
         arm = Arm.create();
         elevator = Elevator.create();
-        hand = Hand.create();
+        hand = Hand.create(this);
         climb = Climb.create();
         vision = Vision.create(this);
         cvision = new CVision(r, new CVisionCals());

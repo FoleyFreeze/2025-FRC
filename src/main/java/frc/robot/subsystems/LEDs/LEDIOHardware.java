@@ -8,7 +8,7 @@ public class LEDIOHardware implements LEDIO {
     AddressableLED leds;
 
     public LEDIOHardware(AddressableLEDBuffer buffer) {
-        leds = new AddressableLED(0);
+        leds = new AddressableLED(1);
         leds.setLength(buffer.getLength());
         leds.setData(buffer);
         leds.start();
@@ -17,7 +17,7 @@ public class LEDIOHardware implements LEDIO {
     @Override
     public void reInit(AddressableLEDBuffer buffer) {
         leds.close();
-        leds = new AddressableLED(1);
+        leds = new AddressableLED(0);
         leds.setLength(buffer.getLength());
         leds.setData(buffer);
         leds.start();

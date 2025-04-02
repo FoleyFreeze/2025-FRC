@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
+import frc.robot.commands.SuperstructureLocation;
 import org.littletonrobotics.junction.Logger;
 
 public class Hand extends SubsystemBase {
@@ -16,9 +18,11 @@ public class Hand extends SubsystemBase {
 
     private final Alert handDisconnectedAlert = new Alert("Hand Disconnected", AlertType.kError);
 
-    public double coralGatheredDist = 170;
+    public double coralGatheredDist = 200;
 
-    public static Hand create() {
+    RobotContainer r;
+
+    public static Hand create(RobotContainer r) {
         Hand hand;
         switch (Constants.currentMode) {
             case REAL:
@@ -33,6 +37,8 @@ public class Hand extends SubsystemBase {
                 hand = new Hand(new HandIO() {});
                 break;
         }
+
+        hand.r = r;
         return hand;
     }
 
@@ -72,6 +78,15 @@ public class Hand extends SubsystemBase {
     }
 
     public Command hasCoralInBucket() {
-        return new WaitUntilCommand(() -> inputs.laserDistmm < coralGatheredDist);
+        return new WaitUntilCommand(
+                () ->
+                        inputs.laserDistmm < coralGatheredDist
+                                && r.arm.atTarget(() -> SuperstructureLocation.INTAKE)
+                                && r.elevator.atTarget(() -> SuperstructureLocation.INTAKE)
+                                && r.wrist.atTarget(() -> SuperstructureLocation.INTAKE));
+    }
+
+    public boolean checkForCoral() {
+        return inputs.laserDistmm < coralGatheredDist;
     }
 }

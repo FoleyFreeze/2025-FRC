@@ -22,8 +22,10 @@ public class AutonSelection {
     public enum GatherType {
         NONE,
         LEFT_FAR,
+        LEFT_CENTER,
         LEFT_CLOSE,
         RIGHT_FAR,
+        RIGHT_CENTER,
         RIGHT_CLOSE,
         REEF,
         ZONE1,
@@ -59,6 +61,7 @@ public class AutonSelection {
         startLocation.addDefaultOption("Left", 0);
         startLocation.addOption("Mid", 1);
         startLocation.addOption("Right", 2);
+        startLocation.addOption("School", 3);
 
         scoreLoc1 = new SettableLoggableChooser<>("Score1Loc", tab, 0, 1);
         fillScoreLoc(scoreLoc1);
@@ -247,8 +250,10 @@ public class AutonSelection {
     private void fillGatherLoc(SettableLoggableChooser<GatherType> in) {
         in.addDefaultOption("None", GatherType.NONE);
         in.addOption("Left_Far", GatherType.LEFT_FAR);
+        in.addOption("Left_Center", GatherType.LEFT_CENTER);
         in.addOption("Left_Close", GatherType.LEFT_CLOSE);
         in.addOption("Right_Far", GatherType.RIGHT_FAR);
+        in.addOption("Right_Center", GatherType.RIGHT_CENTER);
         in.addOption("Right_Close", GatherType.RIGHT_CLOSE);
         in.addOption("Reef", GatherType.REEF);
         in.addOption("Zone1", GatherType.ZONE1);
@@ -262,11 +267,17 @@ public class AutonSelection {
             case LEFT_CLOSE:
                 gatherLoc = Locations.getLeftGatherStationClose();
                 break;
+            case LEFT_CENTER:
+                gatherLoc = Locations.getLeftGatherStationCenter();
+                break;
             case LEFT_FAR:
                 gatherLoc = Locations.getLeftGatherStationFar();
                 break;
             case RIGHT_CLOSE:
                 gatherLoc = Locations.getRightGatherStationClose();
+                break;
+            case RIGHT_CENTER:
+                gatherLoc = Locations.getRightGatherStationCenter();
                 break;
             case RIGHT_FAR:
                 gatherLoc = Locations.getRightGatherStationFar();

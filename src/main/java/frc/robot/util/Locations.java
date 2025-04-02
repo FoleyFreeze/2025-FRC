@@ -105,13 +105,15 @@ public class Locations {
     static Pose2d[] blueStarts = {
         new Pose2d(6, 3, Rotation2d.k180deg),
         new Pose2d(6, 3, Rotation2d.k180deg),
-        new Pose2d(6, 3, Rotation2d.k180deg)
+        new Pose2d(6, 3, Rotation2d.k180deg),
+        new Pose2d(3, 3, Rotation2d.fromDegrees(60)) // school position, not a legal start
     };
 
     static Pose2d[] redStarts = {
         new Pose2d(12, 3, Rotation2d.kZero),
         new Pose2d(12, 3, Rotation2d.kZero),
-        new Pose2d(12, 3, Rotation2d.kZero)
+        new Pose2d(12, 3, Rotation2d.kZero),
+        new Pose2d(15, 3, Rotation2d.fromDegrees(240)) // school position, not a legal start
     };
 
     public static Pose2d getStartLoc(int idx) {
@@ -506,9 +508,11 @@ public class Locations {
     public static int getCoralStationTag(GatherType station) {
         switch (station) {
             case LEFT_CLOSE:
+            case LEFT_CENTER:
             case LEFT_FAR:
                 return isBlue() ? 13 : 1;
             case RIGHT_CLOSE:
+            case RIGHT_CENTER:
             case RIGHT_FAR:
                 return isBlue() ? 12 : 2;
             default:

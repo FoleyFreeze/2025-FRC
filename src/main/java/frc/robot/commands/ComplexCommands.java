@@ -26,7 +26,7 @@ public class ComplexCommands {
     static double releaseTimeCoral23 = 0.25;
     static double releaseTimeCoral4 = 0.04 + 0.06;
 
-    public static double intakePowerCoral = 4.0; // 2
+    public static double intakePowerCoral = 3.0; // 4
     public static double intakeCurrentCoral = 15;
     static double intakeCoralTime = 0.8;
 
@@ -54,6 +54,34 @@ public class ComplexCommands {
     // ALGAE COMMANDS
 
     public static Command stripAlgae() {
+        SequentialCommandGroup sq =
+                new SequentialCommandGroup(
+                        r.wrist
+                                .goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3)
+                                .alongWith(r.arm.goTo(() -> SuperstructureLocation.VERT_ALGAE)),
+                        r.elevator.goTo(r.controlBoard::getAlgaeReefDSHeight),
+                        r.arm.goTo(() -> SuperstructureLocation.ALGAE_DESCORE2_3));
+
+        Command c =
+                // hand goes up
+                sq.alongWith(DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose, false))
+                        .andThen(r.hand.setVoltageCmd(descoreAlgaePower))
+                        .andThen(
+                                r.elevator
+                                        .goTo(r.controlBoard::getAlgaeReefDSHeightLower)
+                                        .alongWith(
+                                                DriveCommands.driveToPoint(
+                                                        r,
+                                                        Locations.supercycleOffset(
+                                                                r.controlBoard::getAlgaePathPose),
+                                                        false)))
+                        .finallyDo(() -> r.hand.setVoltage(0));
+
+        c.setName("StripAlgae");
+        return c;
+    }
+
+    public static Command oldStripAlgae() {
         SequentialCommandGroup sq =
                 new SequentialCommandGroup(
                         r.wrist

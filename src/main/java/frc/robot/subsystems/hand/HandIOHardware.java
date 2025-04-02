@@ -77,7 +77,7 @@ public class HandIOHardware implements HandIO {
 
         try {
             laserCan.setRangingMode(LaserCan.RangingMode.SHORT);
-            laserCan.setRegionOfInterest(new LaserCan.RegionOfInterest(0, 0, 6, 6));
+            laserCan.setRegionOfInterest(new LaserCan.RegionOfInterest(3, 3, 6, 6));
             laserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
         } catch (ConfigurationFailedException e) {
             System.out.println("LaserCan Configuration failed! " + e);
