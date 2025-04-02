@@ -59,7 +59,7 @@ public class DriveCommands {
     private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
     private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
-    private static final double POS_KP = 5;
+    private static final double POS_KP = 8;
     private static final double POS_KI = 0;
     private static final double POS_KD = 0;
     private static final double POS_MAX_VEL = 1; // m/s

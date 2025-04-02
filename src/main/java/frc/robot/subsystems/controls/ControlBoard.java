@@ -727,11 +727,11 @@ public class ControlBoard {
                 return false;
             case CLOSEST:
             default:
-                // score at net if not within 6ft of proc
+                // score at net if not within 9ft of proc
                 return Locations.getProcLoc()
                                 .getTranslation()
                                 .getDistance(r.drive.getGlobalPose().getTranslation())
-                        > Units.inchesToMeters(72);
+                        > Units.feetToMeters(9);
         }
     }
 

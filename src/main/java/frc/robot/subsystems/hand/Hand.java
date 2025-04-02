@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
@@ -14,6 +15,8 @@ public class Hand extends SubsystemBase {
     private final HandIOInputsAutoLogged inputs = new HandIOInputsAutoLogged();
 
     private final Alert handDisconnectedAlert = new Alert("Hand Disconnected", AlertType.kError);
+
+    public double coralGatheredDist = 170;
 
     public static Hand create() {
         Hand hand;
@@ -66,5 +69,9 @@ public class Hand extends SubsystemBase {
 
     public Command stop() {
         return new InstantCommand(() -> io.setHandVolts(0), this);
+    }
+
+    public Command hasCoralInBucket(){
+        return new WaitUntilCommand(() -> inputs.laserDistmm < coralGatheredDist);
     }
 }

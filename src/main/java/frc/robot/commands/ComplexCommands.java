@@ -460,6 +460,8 @@ public class ComplexCommands {
 
     // moves elevator to a height with arm tucked up, then deploys arm
     public static Command goToLoc(Supplier<SuperstructureLocation> p) {
+        final boolean[] midGather = new boolean[1];
+
         Command notInGather =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                         .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
@@ -482,13 +484,14 @@ public class ComplexCommands {
         Command inGather =
                 r.elevator
                         .goTo(() -> SuperstructureLocation.PRE_INTAKE)
-                        .andThen(new PrintCommand("starting lift"))
-                        .andThen(r.wrist.setVoltage(0.5).alongWith(r.arm.setVoltage(2)))
+                        //.andThen(new PrintCommand("starting lift"))
+                        .andThen(r.wrist.setVoltage(0.5).alongWith(r.arm.setVoltage(2)).alongWith(new InstantCommand(()-> midGather[0] = true)))
                         .andThen(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -15))
-                        .andThen(new PrintCommand("lift complete"))
+                        //.andThen(new PrintCommand("lift complete"))
                         .andThen(
                                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
-                                        .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD)))
+                                        .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
+                                        .alongWith(new InstantCommand(() -> midGather[0] = false)))
                         .andThen(r.elevator.goTo(p))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
 
@@ -498,7 +501,11 @@ public class ComplexCommands {
                         notInGather,
                         () -> atLocation(SuperstructureLocation.INTAKE, true));
 
-        // arm to 0, elevator move, arm out
+        // make sure we stop driving the arm/wrist with voltage
+        c = c.finallyDo(() -> {if(midGather[0]){
+                r.wrist.goTo(() -> SuperstructureLocation.HOLD).execute();
+                r.arm.goTo(() -> SuperstructureLocation.HOLD).execute();
+        } });
         c.setName("GoToLoc");
         return c;
     }
@@ -665,6 +672,28 @@ public class ComplexCommands {
                             r.wrist.zero();
                         });
         c.setName("ZeroSuperstructure");
+        return c;
+    }
+
+    public static Command freeBird() {
+        SequentialCommandGroup liftArm = new SequentialCommandGroup();
+        liftArm.addCommands(r.wrist.setVoltage(-1));
+        liftArm.addCommands(r.elevator.goTo(() -> SuperstructureLocation.HOLD));
+        liftArm.addCommands(new WaitCommand(1.5));
+        liftArm.addCommands(r.arm.setVoltage(2));
+        liftArm.addCommands(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -10));
+
+        SequentialCommandGroup c = new SequentialCommandGroup();
+        c.addCommands(r.wrist.setVoltage(0.01));
+        c.addCommands(
+                new ConditionalCommand(
+                        liftArm, new InstantCommand(), () -> r.arm.getAngle().in(Degrees) < -10));
+        c.addCommands(r.arm.goTo(() -> SuperstructureLocation.HOLD)
+                        .alongWith(r.elevator.goTo(() -> SuperstructureLocation.HOLD))
+                        .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD)));
+        c.addCommands(r.hand.stop());
+
+        c.setName("FreeBird");
         return c;
     }
 
