@@ -1,8 +1,8 @@
 package frc.robot.subsystems.hand;
 
-import static edu.wpi.first.units.Units.*;
-
 import org.littletonrobotics.junction.AutoLog;
+
+import au.grapplerobotics.LaserCan;
 
 public interface HandIO {
     @AutoLog
@@ -11,6 +11,8 @@ public interface HandIO {
         public double handAppliedVolts = 0;
         public double handCurrent = 0;
         public double handTempF = 0;
+        public int laserStatus = 0;
+        public double laserDistmm = 0;
     }
 
     public default void updateInputs(HandIOInputs inputs) {}

@@ -14,6 +14,9 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import au.grapplerobotics.ConfigurationFailedException;
+import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -32,6 +35,8 @@ public class HandIOHardware implements HandIO {
     private final TalonFX handTalon;
 
     HandCals k;
+
+    LaserCan laserCan;
 
     // velocity control requests
     private final VoltageOut voltageRequest = new VoltageOut(0);
@@ -68,6 +73,16 @@ public class HandIOHardware implements HandIO {
         handAppliedVolts = handTalon.getMotorVoltage();
         handCurrent = handTalon.getStatorCurrent();
         handTemp = handTalon.getDeviceTemp();
+
+        laserCan = new LaserCan(21);
+
+        try {
+            laserCan.setRangingMode(LaserCan.RangingMode.SHORT);
+            laserCan.setRegionOfInterest(new LaserCan.RegionOfInterest(0, 0, 6, 6));
+            laserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+        } catch (ConfigurationFailedException e) {
+            System.out.println("LaserCan Configuration failed! " + e);
+        }
     }
 
     @Override
@@ -79,6 +94,10 @@ public class HandIOHardware implements HandIO {
         inputs.handAppliedVolts = handAppliedVolts.getValue().in(Volts);
         inputs.handCurrent = handCurrent.getValue().in(Amps);
         inputs.handTempF = handTemp.getValue().in(Fahrenheit);
+
+        LaserCan.Measurement measurement = laserCan.getMeasurement();
+        inputs.laserStatus = measurement.status;
+        inputs.laserDistmm = measurement.distance_mm;
     }
 
     @Override
