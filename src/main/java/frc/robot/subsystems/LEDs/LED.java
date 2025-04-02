@@ -1,5 +1,6 @@
 package frc.robot.subsystems.LEDs;
 
+import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.networktables.BooleanPublisher;
@@ -28,9 +29,8 @@ public class LED extends SubsystemBase {
         RED(LEDPattern.solid(Color.kRed)),
         BLINK_BLUE(LEDPattern.solid(Color.kBlue).blink(Seconds.of(1), Seconds.of(1))),
         BREATHE_BLUE(
-                LEDPattern.solid(Color.kBlue).breathe(Seconds.of(3))
-                /*.scrollAtRelativeSpeed(Percent.per(Second).of(20))*/ ),
-        WHITE(LEDPattern.solid(Color.kWhite)),
+                LEDPattern.solid(Color.kBlue).breathe(Seconds.of(3))),
+        WHITE(LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(50))),
 
         RAINBOW(LEDPattern.rainbow(255, 127).scrollAtRelativeSpeed(Seconds.of(5).asFrequency()));
 
