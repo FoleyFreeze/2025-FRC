@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -65,7 +64,7 @@ public class ComplexCommands {
 
         Command c =
                 // hand goes up
-                sq.alongWith(DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose))
+                sq.alongWith(DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose, false))
                         .andThen(r.hand.setVoltageCmd(descoreAlgaePower))
                         .andThen(
                                 new WaitCommand(stripTime)
@@ -98,9 +97,10 @@ public class ComplexCommands {
                         DriveCommands.driveToPoint(
                                         r,
                                         Locations.supercycleOffset(
-                                                r.controlBoard::getAlgaePathPose))
+                                                r.controlBoard::getAlgaePathPose),
+                                        false)
                                 .alongWith(moveArmlol),
-                        DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose),
+                        DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose, false),
                         new InstantCommand(() -> hasGathered[0] = true),
                         new WaitCommand(0.1),
                         new PathFollowingCommand(r, () -> r.pathCache.closestWaypoint(), true));
@@ -484,10 +484,14 @@ public class ComplexCommands {
         Command inGather =
                 r.elevator
                         .goTo(() -> SuperstructureLocation.PRE_INTAKE)
-                        //.andThen(new PrintCommand("starting lift"))
-                        .andThen(r.wrist.setVoltage(0.5).alongWith(r.arm.setVoltage(2)).alongWith(new InstantCommand(()-> midGather[0] = true)))
+                        // .andThen(new PrintCommand("starting lift"))
+                        .andThen(
+                                r.wrist
+                                        .setVoltage(0.5)
+                                        .alongWith(r.arm.setVoltage(2))
+                                        .alongWith(new InstantCommand(() -> midGather[0] = true)))
                         .andThen(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -15))
-                        //.andThen(new PrintCommand("lift complete"))
+                        // .andThen(new PrintCommand("lift complete"))
                         .andThen(
                                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                                         .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
@@ -502,10 +506,14 @@ public class ComplexCommands {
                         () -> atLocation(SuperstructureLocation.INTAKE, true));
 
         // make sure we stop driving the arm/wrist with voltage
-        c = c.finallyDo(() -> {if(midGather[0]){
-                r.wrist.goTo(() -> SuperstructureLocation.HOLD).execute();
-                r.arm.goTo(() -> SuperstructureLocation.HOLD).execute();
-        } });
+        c =
+                c.finallyDo(
+                        () -> {
+                            if (midGather[0]) {
+                                r.wrist.goTo(() -> SuperstructureLocation.HOLD).execute();
+                                r.arm.goTo(() -> SuperstructureLocation.HOLD).execute();
+                            }
+                        });
         c.setName("GoToLoc");
         return c;
     }
@@ -688,7 +696,8 @@ public class ComplexCommands {
         c.addCommands(
                 new ConditionalCommand(
                         liftArm, new InstantCommand(), () -> r.arm.getAngle().in(Degrees) < -10));
-        c.addCommands(r.arm.goTo(() -> SuperstructureLocation.HOLD)
+        c.addCommands(
+                r.arm.goTo(() -> SuperstructureLocation.HOLD)
                         .alongWith(r.elevator.goTo(() -> SuperstructureLocation.HOLD))
                         .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD)));
         c.addCommands(r.hand.stop());

@@ -67,6 +67,8 @@ public class DriveCommands {
     private static final double POS_MAX_DIST =
             Units.inchesToMeters(10); // dont drive if more than 10in away
     private static final double POS_MAX_TIME = 0.75;
+    private static final double POS_TOL_GATHER = Units.inchesToMeters(2.0);
+    private static final double POS_TOL_SCORE = Units.inchesToMeters(0.5);
 
     private DriveCommands() {}
 
@@ -232,11 +234,18 @@ public class DriveCommands {
                 .beforeStarting(() -> angleController.reset(r.drive.getRotation().getRadians()));
     }
 
-    public static Command driveToPoint(RobotContainer r, Supplier<Pose2d> supplier) {
+    public static Command driveToPoint(
+            RobotContainer r, Supplier<Pose2d> supplier, boolean isGather) {
         PIDController pidX = new PIDController(POS_KP, POS_KI, POS_KD);
         PIDController pidY = new PIDController(POS_KP, POS_KI, POS_KD);
-        pidX.setTolerance(POS_TOL);
-        pidY.setTolerance(POS_TOL);
+        final double POS_TOL;
+        if (isGather) {
+            POS_TOL = POS_TOL_GATHER;
+        } else {
+            POS_TOL = POS_TOL_SCORE;
+        }
+        // pidX.setTolerance(POS_TOL);
+        // pidY.setTolerance(POS_TOL);
 
         double[] error = new double[1];
         Timer timer = new Timer();
@@ -449,7 +458,9 @@ public class DriveCommands {
         if (isGather && false) {
             c = new NewPathFinder(r, destination, isGather);
         } else {
-            c = new NewPathFinder(r, destination, isGather).andThen(driveToPoint(r, destination));
+            c =
+                    new NewPathFinder(r, destination, isGather)
+                            .andThen(driveToPoint(r, destination, isGather));
         }
         c =
                 c.finallyDo(
@@ -487,7 +498,7 @@ public class DriveCommands {
                                                 .getTranslation()
                                                 .getDistance(destination.get().getTranslation())
                                         > Units.feetToMeters(6))
-                .andThen(driveToPoint(r, destination));
+                .andThen(driveToPoint(r, destination, isGather));
     }
 
     public static Command leaveReef(RobotContainer r) {

@@ -63,7 +63,7 @@ public class AutonCommands {
         return DriveCommands.driveToAuto(r, () -> station, true)
                 .andThen(new WaitCommand(gatherStationWait))
                 .deadlineFor(ComplexCommands.goToGather().andThen(ComplexCommands.pulseGather()))
-                .raceWith(r.hand.hasCoralInBucket())//abort early once the coral is there
+                .raceWith(r.hand.hasCoralInBucket()) // abort early once the coral is there
                 .alongWith(registerAutonCoralGather(stationId));
     }
 

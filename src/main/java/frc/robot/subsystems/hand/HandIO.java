@@ -2,8 +2,6 @@ package frc.robot.subsystems.hand;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import au.grapplerobotics.LaserCan;
-
 public interface HandIO {
     @AutoLog
     public static class HandIOInputs {

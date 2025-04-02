@@ -71,7 +71,7 @@ public class Hand extends SubsystemBase {
         return new InstantCommand(() -> io.setHandVolts(0), this);
     }
 
-    public Command hasCoralInBucket(){
+    public Command hasCoralInBucket() {
         return new WaitUntilCommand(() -> inputs.laserDistmm < coralGatheredDist);
     }
 }
