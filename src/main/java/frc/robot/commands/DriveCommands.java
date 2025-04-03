@@ -561,6 +561,23 @@ public class DriveCommands {
                 () -> Locations.isBlue());
     }
 
+    public static Command zeroDriven60(RobotContainer r) {
+        return new ConditionalCommand(
+                new InstantCommand(
+                        () ->
+                                r.drive.setPose(
+                                        new Pose2d(
+                                                r.drive.getGlobalPose().getTranslation(),
+                                                new Rotation2d(Units.degreesToRadians(-60))))),
+                new InstantCommand(
+                        () ->
+                                r.drive.setPose(
+                                        new Pose2d(
+                                                r.drive.getGlobalPose().getTranslation(),
+                                                new Rotation2d(Units.degreesToRadians(-240))))),
+                () -> Locations.isBlue());
+    }
+
     public static Command waitUntilClose(RobotContainer r, Supplier<Pose2d> target, double dist) {
         return new WaitUntilCommand(
                 () ->

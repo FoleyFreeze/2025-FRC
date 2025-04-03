@@ -187,6 +187,7 @@ public class RobotContainer {
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(DriveCommands.zeroDrive(this).ignoringDisable(true));
         flysky.downLTRIM.onTrue(DriveCommands.zeroDrive60(this).ignoringDisable(true));
+        flysky.leftLTRIM.onTrue(DriveCommands.zeroDriven60(this).ignoringDisable(true));
 
         flysky.downLTRIM.onTrue(new InstantCommand(() -> resetSimulation()));
 

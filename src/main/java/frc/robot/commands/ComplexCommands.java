@@ -21,7 +21,7 @@ public class ComplexCommands {
     public static double holdPowerCoral = 0.4;
     static double releasePowerCoral23 = -2 - 2;
     static double releasePowerCoral4 = -4 - 2;
-    public static double releasePowerCoral1 = -5;
+    public static double releasePowerCoral1 = -5 + 1.5;
     static double releaseTimeCoral1 = 0.3;
     static double releaseTimeCoral23 = 0.25;
     static double releaseTimeCoral4 = 0.04 + 0.06;
