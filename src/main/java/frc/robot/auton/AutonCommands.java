@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
 import frc.robot.auton.AutonSelection.GatherType;
 import frc.robot.commands.ComplexCommands;
@@ -38,6 +39,15 @@ public class AutonCommands {
     }
 
     public static Command scoreCoral(ReefSticks reefSticks, int level) {
+        Command waitUntilPathCompleteThenScore =
+                new WaitUntilCommand(r.state.pathCompleteT)
+                        .andThen(
+                                new ConditionalCommand(
+                                        ComplexCommands.goToLoc(
+                                                () -> r.controlBoard.getLevelLocation(level)),
+                                        r.hand.setVoltageCmd(-5),
+                                        () -> r.hand.checkForCoral()));
+
         Command c =
                 DriveCommands.driveToAuto(r, () -> Locations.getReefLocation(reefSticks), false)
                         .alongWith(
@@ -50,7 +60,7 @@ public class AutonCommands {
                                                                         r.controlBoard
                                                                                 .getLevelLocation(
                                                                                         level)),
-                                                        r.hand.setVoltageCmd(-5),
+                                                        waitUntilPathCompleteThenScore,
                                                         () -> r.hand.checkForCoral())))
                         .andThen(ComplexCommands.releaseCoralAuton(level))
                         .alongWith(registerAutonCoralScore(reefSticks, level));
@@ -66,7 +76,8 @@ public class AutonCommands {
 
     public static Command coralStationGather(Pose2d station, GatherType stationId) {
         return DriveCommands.driveToAuto(r, () -> station, true)
-                .andThen(new WaitCommand(gatherStationWait))
+                // only abort the wait early if there is coral
+                .andThen(new WaitCommand(gatherStationWait).raceWith(r.hand.hasCoralInBucket()))
                 .deadlineFor(ComplexCommands.goToGather().andThen(ComplexCommands.pulseGather()))
                 // .raceWith(r.hand.hasCoralInBucket()) // abort early once the coral is there
                 .alongWith(registerAutonCoralGather(stationId));
