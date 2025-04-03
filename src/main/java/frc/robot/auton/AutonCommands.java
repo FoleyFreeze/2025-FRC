@@ -10,6 +10,7 @@ import frc.robot.RobotContainer;
 import frc.robot.auton.AutonSelection.GatherType;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.LEDs.LED.LED_MODES;
 import frc.robot.subsystems.controls.ControlBoard.ReefSticks;
 import frc.robot.util.Locations;
 
@@ -63,7 +64,8 @@ public class AutonCommands {
                                                         waitUntilPathCompleteThenScore,
                                                         () -> r.hand.checkForCoral())))
                         .andThen(ComplexCommands.releaseCoralAuton(level))
-                        .alongWith(registerAutonCoralScore(reefSticks, level));
+                        .alongWith(registerAutonCoralScore(reefSticks, level))
+                        .raceWith(r.leds.setLEDMode(LED_MODES.BLUE));
         c.setName("scoreCoral");
         return c;
     }
@@ -76,6 +78,9 @@ public class AutonCommands {
 
     public static Command coralStationGather(Pose2d station, GatherType stationId) {
         return DriveCommands.driveToAuto(r, () -> station, true)
+                .deadlineFor(
+                        DriveCommands.waitUntilClose(r, () -> station, 30)
+                                .andThen(r.leds.setLEDMode(LED_MODES.BLINK_GREEN)))
                 // only abort the wait early if there is coral
                 .andThen(new WaitCommand(gatherStationWait).raceWith(r.hand.hasCoralInBucket()))
                 .deadlineFor(ComplexCommands.goToGather().andThen(ComplexCommands.pulseGather()))

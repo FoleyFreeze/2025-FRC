@@ -180,7 +180,7 @@ public class RobotContainer {
 
         leds.setDefaultCommand(leds.setLEDMode(LED_MODES.RAINBOW).ignoringDisable(true));
         flysky.topLeftSWA.whileTrue(leds.setLEDMode(LED_MODES.BREATHE_BLUE).ignoringDisable(true));
-        flysky.topRightSWD.whileTrue(leds.setLEDMode(LED_MODES.OFF).ignoringDisable(true));
+        flysky.topRightSWD.whileTrue(leds.setLEDMode(LED_MODES.BREATHE_BLUE).ignoringDisable(true));
 
         state.inLocalPosePhaseT.onTrue(new InstantCommand(drive::resetLocalPose));
 

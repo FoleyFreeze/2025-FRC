@@ -20,11 +20,10 @@ import frc.robot.util.Locations;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.Logger;
 
 public class NewPathFinder extends Command {
-    
+
     static int repaths = 0;
 
     RobotContainer r;
@@ -141,8 +140,8 @@ public class NewPathFinder extends Command {
     public void execute() {
         c.execute();
 
-        //reinit if we are failing to follow the path
-        if(r.drive.lastPathError > Units.inchesToMeters(24)){
+        // reinit if we are failing to follow the path
+        if (r.drive.lastPathError > Units.inchesToMeters(24)) {
             initialize();
             Logger.recordOutput("Odometry/Repaths", ++repaths);
         }

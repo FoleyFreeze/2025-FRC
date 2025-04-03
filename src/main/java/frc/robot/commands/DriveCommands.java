@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.RobotContainer;
@@ -476,15 +477,20 @@ public class DriveCommands {
     public static Command driveTo(
             RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
         Command driveTo = driveToAuto(r, destination, isGather).andThen(joystickDriveFlysky(r));
-        
-        if(isGather){
-                //if close to the gather station, dont repath to it
-                return new ConditionalCommand(joystickDriveFlysky(r), 
-                        driveTo, 
-                        () -> r.drive.chooseLocalPose().getTranslation().getDistance(destination.get().getTranslation())
-                          < Units.inchesToMeters(36));
+
+        if (isGather) {
+            // if close to the gather station, dont repath to it
+            return new ConditionalCommand(
+                    joystickDriveFlysky(r),
+                    driveTo,
+                    () ->
+                            r.drive
+                                            .chooseLocalPose()
+                                            .getTranslation()
+                                            .getDistance(destination.get().getTranslation())
+                                    < Units.inchesToMeters(36));
         } else {
-                return driveTo;
+            return driveTo;
         }
     }
 
@@ -553,5 +559,15 @@ public class DriveCommands {
                                                 r.drive.getGlobalPose().getTranslation(),
                                                 new Rotation2d(Units.degreesToRadians(240))))),
                 () -> Locations.isBlue());
+    }
+
+    public static Command waitUntilClose(RobotContainer r, Supplier<Pose2d> target, double dist) {
+        return new WaitUntilCommand(
+                () ->
+                        r.drive
+                                        .chooseLocalPose()
+                                        .getTranslation()
+                                        .getDistance(target.get().getTranslation())
+                                < Units.inchesToMeters(dist));
     }
 }

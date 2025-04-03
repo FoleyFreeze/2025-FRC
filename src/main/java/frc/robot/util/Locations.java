@@ -27,7 +27,6 @@ public class Locations {
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(1.25 + 1), 0, new Rotation2d());
 
-    // TODO: remove extra before comp
     static double extraGatherX = 0.5; // 12
     static double extraGatherY = 20 - 4;
     public static Transform2d halfRobotGatherLeftFar =
