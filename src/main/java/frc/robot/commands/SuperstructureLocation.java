@@ -27,7 +27,7 @@ public enum SuperstructureLocation {
     ALGAE_DESCORE3_4_LOW(39.4 - 3.5, 115 - 22, 42),
 
     PRENET(18, 90, 228),
-    NET(34, 22, 165),
+    NET(34 + 1, 22 - 5, 165),
 
     ALGAE_LEVEL_2_3(20.3, 114, 228), // -2 for UDM
     ALGAE_LEVEL_3_4(34.9, 114, 228),
