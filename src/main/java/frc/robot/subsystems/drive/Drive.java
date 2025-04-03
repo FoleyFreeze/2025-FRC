@@ -135,6 +135,9 @@ public class Drive extends SubsystemBase {
 
     public SwerveDriveSimulation driveSimulation;
 
+    public Pose2d lastPathTarget = new Pose2d();
+    public double lastPathError = 0;
+
     RobotContainer r;
 
     public static Drive create(RobotContainer r) {
@@ -263,8 +266,10 @@ public class Drive extends SubsystemBase {
         PathPlannerLogging.setLogTargetPoseCallback(
                 (targetPose) -> {
                     Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+                    lastPathTarget = targetPose;
                     double xyError =
-                            this.getGlobalPose().minus(targetPose).getTranslation().getNorm();
+                            this.chooseLocalPose().minus(targetPose).getTranslation().getNorm();
+                    lastPathError = xyError;
                     Logger.recordOutput("Odometry/TrajectoryError", xyError);
                 });
 

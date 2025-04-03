@@ -475,7 +475,17 @@ public class DriveCommands {
 
     public static Command driveTo(
             RobotContainer r, Supplier<Pose2d> destination, boolean isGather) {
-        return driveToAuto(r, destination, isGather).andThen(joystickDriveFlysky(r));
+        Command driveTo = driveToAuto(r, destination, isGather).andThen(joystickDriveFlysky(r));
+        
+        if(isGather){
+                //if close to the gather station, dont repath to it
+                return new ConditionalCommand(joystickDriveFlysky(r), 
+                        driveTo, 
+                        () -> r.drive.chooseLocalPose().getTranslation().getDistance(destination.get().getTranslation())
+                          < Units.inchesToMeters(36));
+        } else {
+                return driveTo;
+        }
     }
 
     public static Command oldDriveTo(

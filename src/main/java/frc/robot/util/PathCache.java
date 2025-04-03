@@ -36,7 +36,7 @@ public class PathCache {
 
     public List<Waypoint> getPathTo(Pose2d dest, boolean isGather) {
         // find the waypoint closest to the start and dest
-        Pose2d start = r.drive.getGlobalPose();
+        Pose2d start = r.drive.chooseLocalPose();
         int closeStart = 0;
         int closeDest = 0;
         double closestDistStart = getDist(waypointList[0], start);
