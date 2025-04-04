@@ -30,7 +30,7 @@ public class LED extends SubsystemBase {
         RED(LEDPattern.solid(Color.kRed)),
         BLINK_BLUE(LEDPattern.solid(Color.kBlue).blink(Seconds.of(1), Seconds.of(1))),
         BREATHE_BLUE(LEDPattern.solid(Color.kBlue).breathe(Seconds.of(3))),
-        WHITE(LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(25))),
+        WHITE(LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(100))),
 
         RAINBOW(LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Seconds.of(5).asFrequency()));
 
