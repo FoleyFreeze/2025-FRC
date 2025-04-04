@@ -48,7 +48,7 @@ public class LED extends SubsystemBase {
 
     Timer startTimer = new Timer();
     boolean hasRestarted = false;
-    AddressableLEDBuffer startBuffer = new AddressableLEDBuffer(18);
+    AddressableLEDBuffer startBuffer = new AddressableLEDBuffer(78);
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(75);
 
     public LED(RobotContainer r) {
