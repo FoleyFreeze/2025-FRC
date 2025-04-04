@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 public class ComplexCommands {
 
     public static double holdPowerCoral = 0.4;
-    static double releasePowerCoral23 = -2 - 2;
+    static double releasePowerCoral23 = -2 - 1.5;
     static double releasePowerCoral4 = -4 - 2;
     public static double releasePowerCoral1 = -5 + 1.5;
     static double releaseTimeCoral1 = 0.3;
@@ -32,7 +32,7 @@ public class ComplexCommands {
 
     static double intakeAlgaeTime = 0.2;
     static double intakeCurrentAlgae = 50;
-    static double intakeAlgaePower = 3;
+    static double intakeAlgaePower = 5;
     static double holdAlgaePower = 2;
     static double releasePowerAlgae = -12;
     static double releaseTimeAlgae = 0.5;

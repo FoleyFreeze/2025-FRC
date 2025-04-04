@@ -353,8 +353,8 @@ public class RobotContainer {
         controlBoard.gatherBtn.and(controlBoard.shiftT).onFalse(hand.setVoltageCmd(0));
 
         // jogs ew cardio
-        controlBoard.jogA.onTrue(new InstantCommand(wrist::jogUp));
-        controlBoard.jogB.onTrue(new InstantCommand(wrist::jogDown));
+        controlBoard.jogA.onTrue(new InstantCommand(wrist::jogDown).ignoringDisable(true));
+        controlBoard.jogB.onTrue(new InstantCommand(wrist::jogUp).ignoringDisable(true));
 
         // neutral switch
         neutralSwitch.onTrue(ComplexCommands.setBrakeSuperStructure(false).ignoringDisable(true));

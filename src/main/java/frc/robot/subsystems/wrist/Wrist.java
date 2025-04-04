@@ -30,7 +30,7 @@ public class Wrist extends SubsystemBase {
     double level1Jog = 0;
     double level2_3Jog = 0;
     double level4Jog = 0;
-    double jogAmount = Math.toRadians(1);
+    double jogAmount = Math.toRadians(2);
 
     public static Wrist create(RobotContainer r) {
         Wrist wrist;
@@ -78,6 +78,14 @@ public class Wrist extends SubsystemBase {
         SmartDashboard.putNumber("WristAbs", inputs.absEncAngleRaw);
 
         wristDisconnectedAlert.set(!inputs.wristConnected);
+
+        String s =
+                Math.toDegrees(level1Jog)
+                        + ", "
+                        + Math.toDegrees(level2_3Jog)
+                        + ", "
+                        + Math.toDegrees(level4Jog);
+        SmartDashboard.putString("WristJog", s);
     }
 
     public double getVoltage() {
@@ -148,8 +156,11 @@ public class Wrist extends SubsystemBase {
     public boolean atTarget(Supplier<SuperstructureLocation> loc, boolean extraTol) {
         // for determining position treat the wrist as always there
         if (extraTol) return true;
+
+        double jog = getJog(loc.get());
+
         double tol = k.closeEnough;
-        return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad) < tol;
+        return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad - jog) < tol;
     }
 
     public boolean atTarget(Supplier<SuperstructureLocation> loc) {
@@ -235,5 +246,25 @@ public class Wrist extends SubsystemBase {
         Logger.recordOutput("Wrist/Jog1", level1Jog);
         Logger.recordOutput("Wrist/Jog2_3", level2_3Jog);
         Logger.recordOutput("Wrist/Jog4", level4Jog);
+    }
+
+    private double getJog(SuperstructureLocation position) {
+        double jog;
+        switch (position) {
+            case LEVEL1:
+                jog = level1Jog;
+                break;
+            case LEVEL2:
+            case LEVEL3:
+                jog = level2_3Jog;
+                break;
+            case LEVEL4:
+                jog = level4Jog;
+                break;
+            default:
+                jog = 0;
+        }
+
+        return jog;
     }
 }
