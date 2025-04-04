@@ -80,11 +80,11 @@ public class Wrist extends SubsystemBase {
         wristDisconnectedAlert.set(!inputs.wristConnected);
 
         String s =
-                Math.toDegrees(level1Jog)
-                        + ", "
-                        + Math.toDegrees(level2_3Jog)
-                        + ", "
-                        + Math.toDegrees(level4Jog);
+                String.format(
+                        "%.0f, %.0f, %.0f",
+                        Math.toDegrees(level1Jog),
+                        Math.toDegrees(level2_3Jog),
+                        Math.toDegrees(level4Jog));
         SmartDashboard.putString("WristJog", s);
     }
 
@@ -160,7 +160,7 @@ public class Wrist extends SubsystemBase {
         double jog = getJog(loc.get());
 
         double tol = k.closeEnough;
-        return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad - jog) < tol;
+        return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad + jog) < tol;
     }
 
     public boolean atTarget(Supplier<SuperstructureLocation> loc) {

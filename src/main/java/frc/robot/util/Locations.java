@@ -22,7 +22,7 @@ public class Locations {
     public static Transform2d halfRobotProc =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(6 + 6 - 3 /*12 */),
-                    Units.inchesToMeters(10.5),
+                    Units.inchesToMeters(7.5),
                     Rotation2d.fromDegrees(15));
 
     public static Transform2d halfRobotNet =
