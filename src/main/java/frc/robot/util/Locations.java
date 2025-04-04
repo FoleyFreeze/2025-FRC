@@ -21,7 +21,9 @@ public class Locations {
     public static Transform2d halfRobot = new Transform2d(robotLength / 2.0, 0, new Rotation2d());
     public static Transform2d halfRobotProc =
             new Transform2d(
-                    robotLength / 2.0 + Units.inchesToMeters(6 + 6 /*12 */), 0, Rotation2d.fromDegrees(20));
+                    robotLength / 2.0 + Units.inchesToMeters(6 + 6 /*12 */), 
+                    Units.inchesToMeters(10.5), 
+                    Rotation2d.fromDegrees(15));
 
     public static Transform2d halfRobotNet =
             new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-4), 0, new Rotation2d());
