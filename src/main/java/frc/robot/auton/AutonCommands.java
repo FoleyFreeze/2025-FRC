@@ -80,7 +80,7 @@ public class AutonCommands {
         return DriveCommands.driveToAuto(r, () -> station, true)
                 .deadlineFor(
                         DriveCommands.waitUntilClose(r, () -> station, 30)
-                                .andThen(r.leds.setLEDMode(LED_MODES.BLINK_GREEN)))
+                                .andThen(r.leds.setLEDMode(LED_MODES.GREEN)))
                 // only abort the wait early if there is coral
                 .andThen(new WaitCommand(gatherStationWait).raceWith(r.hand.hasCoralInBucket()))
                 .deadlineFor(ComplexCommands.goToGather().andThen(ComplexCommands.pulseGather()))

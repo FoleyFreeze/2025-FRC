@@ -34,7 +34,7 @@ public class NewPathFinder extends Command {
     private Command c;
 
     // vel, accel, rotvel, rotaccel
-    PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 4.25, 6, 4);
+    PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 4.4, 6, 4);
     // PathConstraints coralGlobalConstraints = new PathConstraints(1, 1, 6, 4);
     PathConstraints algaeGlobalConstraints = new PathConstraints(3, 4, 4, 4);
     PathConstraints finalConstraints = new PathConstraints(1.25, 1.5, 3, 2);
