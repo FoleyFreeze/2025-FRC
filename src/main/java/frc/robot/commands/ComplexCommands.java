@@ -25,6 +25,7 @@ public class ComplexCommands {
     static double releaseTimeCoral1 = 0.3;
     static double releaseTimeCoral23 = 0.25;
     static double releaseTimeCoral4 = 0.04 + 0.06;
+    public static double releasePowerCoralClimb = -3;
 
     public static double intakePowerCoral = 3.0; // 4
     public static double intakeCurrentCoral = 15;
@@ -540,6 +541,7 @@ public class ComplexCommands {
                             if (midGather[0]) {
                                 r.wrist.goTo(() -> SuperstructureLocation.HOLD).execute();
                                 r.arm.goTo(() -> SuperstructureLocation.HOLD).execute();
+                                midGather[0] = false;
                             }
                         });
         c.setName("GoToLoc");
@@ -658,7 +660,7 @@ public class ComplexCommands {
     public static Command goToClimb() {
         SequentialCommandGroup c = new SequentialCommandGroup();
         c.addCommands(goToLoc(() -> SuperstructureLocation.HOLD));
-        c.addCommands(r.hand.setVoltageCmd(releasePowerCoral1));
+        c.addCommands(r.hand.setVoltageCmd(releasePowerCoralClimb));
         c.addCommands(r.wrist.setVoltage(-1.5));
         c.addCommands(new WaitCommand(0.75));
         c.addCommands(r.wrist.setVoltage(-0.6));
