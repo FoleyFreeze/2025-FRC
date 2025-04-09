@@ -120,4 +120,8 @@ public class Elevator extends SubsystemBase {
     public void setBrake(boolean on) {
         io.setBrake(on);
     }
+
+    public void setVoltage(double volts){
+        io.setElevatorVolts(volts);
+    }
 }
