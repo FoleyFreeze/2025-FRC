@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -156,6 +157,8 @@ public class ComplexCommands {
     }
 
     public static Command scoreAlgaeNet() {
+        //lots of horizontal vel, lauches from PRENET
+
         SequentialCommandGroup launch = new SequentialCommandGroup();
         launch.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
         launch.addCommands(r.hand.setVoltageCmd(superSuckAlgae));
@@ -183,6 +186,39 @@ public class ComplexCommands {
                                 });
 
         c.setName("ScoreAlgaeNet");
+        return c;
+    }
+
+    public static Command scoreAlgaeNet2(){
+        //less horizontal vel, launches from HOLD_ALGAE_IN
+        boolean[] midElevator = new boolean[1];
+
+        SequentialCommandGroup launch = new SequentialCommandGroup();
+        launch.addCommands(goToAlgaeHold());
+        launch.addCommands(new WaitUntilCommand(r.flysky.leftTriggerSWE.and(r.state.pathCompleteT)));
+        launch.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
+        launch.addCommands(r.hand.setVoltageCmd(superSuckAlgae));
+        launch.addCommands(new WaitCommand(0.1));
+        launch.addCommands(new InstantCommand(() -> midElevator[0] = true));
+        launch.addCommands(new InstantCommand(() -> r.elevator.setVoltage(6)));
+        launch.addCommands(new WaitUntilCommand(() -> r.elevator.getHeight().in(Inches) > 32).raceWith(new WaitCommand(0.5)));
+        launch.addCommands(r.hand.setVoltageCmd(releasePowerAlgae));
+        launch.addCommands(new WaitCommand(0.5));
+        launch.addCommands(new InstantCommand(() -> r.elevator.setVoltage(0)));
+        launch.addCommands(new InstantCommand(() -> midElevator[0] = false));
+
+        Command c = launch.finallyDo(() -> {
+                if(midElevator[0]){
+                        r.elevator.setVoltage(0);
+                        midElevator[0] = false;
+                }
+
+                r.hand.setVoltage(0);
+                r.hand.setCurrentLim(algaeLowLim);
+                //r.elevator.goTo(() -> SuperstructureLocation.HOLD_ALGAE_IN);
+        });
+        
+        c.setName("launch");
         return c;
     }
 
@@ -222,7 +258,8 @@ public class ComplexCommands {
                         .andThen(new WaitCommand(0.1))
                         .andThen(
                                 new PathFollowingCommand(
-                                        r, () -> r.pathCache.closestWaypoint(), true));
+                                        r, () -> r.pathCache.closestWaypoint(), true))
+                        .andThen(goToAlgaeHold());
         c.setName("VisionAlgaeGather");
         return c;
     }
@@ -230,7 +267,7 @@ public class ComplexCommands {
     public static Command blindAlgaeScore() {
         Command c =
                 new ConditionalCommand(
-                        scoreAlgaeNet(), scoreAlgaeProc(), r.controlBoard::getAlgaeScoreLoc);
+                        scoreAlgaeNet2(), scoreAlgaeProc(), r.controlBoard::getAlgaeScoreLoc);
         c.setName("BlindAlgaeScore");
         return c;
     }
@@ -250,7 +287,7 @@ public class ComplexCommands {
     public static Command visionScoreAlgaeNet() {
         Command c =
                 DriveCommands.driveTo(r, () -> Locations.getNetPose(r.drive.getGlobalPose()), true)
-                        .alongWith(new WaitCommand(0.25).andThen(scoreAlgaeNet()));
+                        .alongWith(new WaitCommand(0.25).andThen(scoreAlgaeNet2()));
         c.setName("visionScoreAlgaeNet");
         return c;
     }
@@ -554,30 +591,52 @@ public class ComplexCommands {
     }
 
     public static Command goToLocAlgae(Supplier<SuperstructureLocation> p) {
-        Command toAlgaeFromCoral =
+        //no longer matters as we are out of coral gather when the switch is flipped
+        Command toAlgaeFromCoralOld =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                         .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
-                        .andThen(r.elevator.goTo(() -> SuperstructureLocation.HOLD_ALGAE))
+                        .andThen(r.elevator.goTo(() -> SuperstructureLocation.HOLD_ALGAE_OUT))
                         .andThen(
                                 r.elevator
                                         .goTo(p)
                                         .alongWith(r.arm.goTo(p).alongWith(r.wrist.goTo(p))));
 
-        Command toAlgaeFromAlgaeOld =
-                r.arm.goTo(() -> SuperstructureLocation.HOLD_ALGAE)
-                        .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD_ALGAE))
-                        .andThen(r.elevator.goTo(p))
-                        .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
+        //safely get to algae gather position from center position
+        Command toAlgaeFromCenter =
+                r.arm.goTo(() -> SuperstructureLocation.HOLD_ALGAE_OUT)
+                        .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD_ALGAE_OUT))
+                        .andThen(r.elevator.goTo(p).alongWith(r.arm.goTo(p)).alongWith(r.wrist.goTo(p)));
 
         Command toAlgaeFromAlgae = forceGoToLoc(p);
 
         Command c =
                 new ConditionalCommand(
-                        toAlgaeFromCoral,
+                        toAlgaeFromCenter,
                         toAlgaeFromAlgae,
-                        () -> r.arm.getAngle().in(Degrees) < -10);
+                        () -> r.arm.getAngle().in(Degrees) < 50);
         c.setName("goToLocAlgae");
         return c;
+    }
+
+    //safely get to algae hold position from algae gather positions
+    public static Command goToAlgaeHold(){
+        final SuperstructureLocation hold = SuperstructureLocation.HOLD_ALGAE_IN;
+
+        SequentialCommandGroup scg = new SequentialCommandGroup();
+
+        //go up first
+        scg.addCommands(r.elevator.goTo(() -> hold));
+        scg.addCommands(r.arm.goTo(() -> hold)
+                .alongWith(r.wrist.goTo(() -> hold)));
+        scg.addCommands(r.elevator.goTo(() -> hold));
+
+        scg.setName("goToHoldAlgae");
+
+        //dont move if already there
+        return new ConditionalCommand(
+                new InstantCommand(), 
+                scg, 
+                () -> r.elevator.atTarget(() -> hold, true) && r.arm.atTarget(() -> hold, true));
     }
 
     // lines up with target field element
