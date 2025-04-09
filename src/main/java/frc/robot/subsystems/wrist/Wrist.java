@@ -27,6 +27,11 @@ public class Wrist extends SubsystemBase {
     WristCals k;
     RobotContainer r;
 
+    double level1Jog = 0;
+    double level2_3Jog = 0;
+    double level4Jog = 0;
+    double jogAmount = Math.toRadians(2);
+
     public static Wrist create(RobotContainer r) {
         Wrist wrist;
         WristCals cals = new WristCals();
@@ -73,6 +78,14 @@ public class Wrist extends SubsystemBase {
         SmartDashboard.putNumber("WristAbs", inputs.absEncAngleRaw);
 
         wristDisconnectedAlert.set(!inputs.wristConnected);
+
+        String s =
+                String.format(
+                        "%.0f, %.0f, %.0f",
+                        Math.toDegrees(level1Jog),
+                        Math.toDegrees(level2_3Jog),
+                        Math.toDegrees(level4Jog));
+        SmartDashboard.putString("WristJog", s);
     }
 
     public double getVoltage() {
@@ -95,8 +108,7 @@ public class Wrist extends SubsystemBase {
     public Command goToReally(Supplier<SuperstructureLocation> loc) {
         return new RunCommand(
                         () -> {
-                            io.setWristPosition(loc.get().wristAngle.in(Radians));
-                            this.target = loc.get();
+                            setAngle(loc.get());
                         },
                         this)
                 .until(() -> atTarget(loc))
@@ -115,37 +127,23 @@ public class Wrist extends SubsystemBase {
         this.target = target;
         double angleTarget = target.wristAngle.in(Radians);
 
-        // TODO: do we still need this?
-        /*
-        // if the funnel is in the way, go to -90 degrees local
-        if (target.armAngle.in(Degrees) < -30 && !r.controlBoard.algaeModeT.getAsBoolean()) {
-            // we are going toward the funnel
-            angleTarget =
-                    cvrtLocalToEnc(Units.degreesToRadians(-110), r.arm.getAngle().in(Radians));
-        } else if (r.arm.getAngle().in(Degrees) < -35
-                && !r.controlBoard.algaeModeT.getAsBoolean()) {
-            // we are going away from the funnel, but we are not there yet
-            angleTarget = cvrtLocalToEnc(Units.degreesToRadians(-90), r.arm.getAngle().in(Radians));
-        }
-        Logger.recordOutput("Wrist/ArmAngle", r.arm.getAngle().in(Radians));
-        double minAngle, maxAngle;
-        if (r.controlBoard.algaeModeT.getAsBoolean()) { // Coral Algae sw
-            minAngle =
-                    cvrtLocalToEnc(k.minLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians));
-            maxAngle =
-                    cvrtLocalToEnc(k.maxLocalWristAngle.in(Radians), r.arm.getAngle().in(Radians));
-        } else {
-            minAngle =
-                    cvrtLocalToEnc(
-                            k.minLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));
-            maxAngle =
-                    cvrtLocalToEnc(
-                            k.maxLocalWristAngleCoral.in(Radians), r.arm.getAngle().in(Radians));
+        double jog;
+        switch (target) {
+            case LEVEL1:
+                jog = level1Jog;
+                break;
+            case LEVEL2:
+            case LEVEL3:
+                jog = level2_3Jog;
+                break;
+            case LEVEL4:
+                jog = level4Jog;
+                break;
+            default:
+                jog = 0;
         }
 
-        double newAngleTarget = MathUtil.clamp(angleTarget, minAngle, maxAngle);
-        */
-        double newAngleTarget = angleTarget;
+        double newAngleTarget = angleTarget + jog;
 
         Logger.recordOutput("Wrist/SetpointBounded", newAngleTarget);
         io.setWristPosition(newAngleTarget);
@@ -158,8 +156,11 @@ public class Wrist extends SubsystemBase {
     public boolean atTarget(Supplier<SuperstructureLocation> loc, boolean extraTol) {
         // for determining position treat the wrist as always there
         if (extraTol) return true;
+
+        double jog = getJog(loc.get());
+
         double tol = k.closeEnough;
-        return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad) < tol;
+        return Math.abs(loc.get().wristAngle.in(Radians) - inputs.wristPositionRad + jog) < tol;
     }
 
     public boolean atTarget(Supplier<SuperstructureLocation> loc) {
@@ -206,5 +207,64 @@ public class Wrist extends SubsystemBase {
 
     public void setBrake(boolean on) {
         io.setBrake(on);
+    }
+
+    public void jogUp() {
+        switch (r.controlBoard.selectedLevel) {
+            case 1:
+                level1Jog += jogAmount;
+                break;
+            case 2:
+            case 3:
+                level2_3Jog += jogAmount;
+                break;
+            case 4:
+                level4Jog += jogAmount;
+                break;
+            default:
+        }
+
+        Logger.recordOutput("Wrist/Jog1", level1Jog);
+        Logger.recordOutput("Wrist/Jog2_3", level2_3Jog);
+        Logger.recordOutput("Wrist/Jog4", level4Jog);
+    }
+
+    public void jogDown() {
+        switch (r.controlBoard.selectedLevel) {
+            case 1:
+                level1Jog -= jogAmount;
+                break;
+            case 2:
+            case 3:
+                level2_3Jog -= jogAmount;
+                break;
+            case 4:
+                level4Jog -= jogAmount;
+                break;
+            default:
+        }
+        Logger.recordOutput("Wrist/Jog1", level1Jog);
+        Logger.recordOutput("Wrist/Jog2_3", level2_3Jog);
+        Logger.recordOutput("Wrist/Jog4", level4Jog);
+    }
+
+    private double getJog(SuperstructureLocation position) {
+        double jog;
+        switch (position) {
+            case LEVEL1:
+                jog = level1Jog;
+                break;
+            case LEVEL2:
+            case LEVEL3:
+                jog = level2_3Jog;
+                break;
+            case LEVEL4:
+                jog = level4Jog;
+                break;
+            default:
+                jog = 0;
+        }
+
+        return jog;
     }
 }

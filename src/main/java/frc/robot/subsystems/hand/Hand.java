@@ -18,7 +18,7 @@ public class Hand extends SubsystemBase {
 
     private final Alert handDisconnectedAlert = new Alert("Hand Disconnected", AlertType.kError);
 
-    public double coralGatheredDist = 200;
+    public double coralGatheredDist = 160;
 
     RobotContainer r;
 

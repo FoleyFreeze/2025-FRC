@@ -26,12 +26,13 @@ public class LED extends SubsystemBase {
         OFF(LEDPattern.solid(Color.kBlack)),
         BLUE(LEDPattern.solid(Color.kBlue)),
         GREEN(LEDPattern.solid(Color.kGreen)),
+        BLINK_GREEN(LEDPattern.solid(Color.kGreen).blink(Seconds.of(0.4), Seconds.of(0.1))),
         RED(LEDPattern.solid(Color.kRed)),
         BLINK_BLUE(LEDPattern.solid(Color.kBlue).blink(Seconds.of(1), Seconds.of(1))),
         BREATHE_BLUE(LEDPattern.solid(Color.kBlue).breathe(Seconds.of(3))),
-        WHITE(LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(25))),
+        WHITE(LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(100))),
 
-        RAINBOW(LEDPattern.rainbow(255, 127).scrollAtRelativeSpeed(Seconds.of(5).asFrequency()));
+        RAINBOW(LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Seconds.of(5).asFrequency()));
 
         public final LEDPattern pattern;
 
@@ -47,8 +48,8 @@ public class LED extends SubsystemBase {
 
     Timer startTimer = new Timer();
     boolean hasRestarted = false;
-    AddressableLEDBuffer startBuffer = new AddressableLEDBuffer(18);
-    AddressableLEDBuffer buffer = new AddressableLEDBuffer(18);
+    AddressableLEDBuffer startBuffer = new AddressableLEDBuffer(78);
+    AddressableLEDBuffer buffer = new AddressableLEDBuffer(75);
 
     public LED(RobotContainer r) {
         this.r = r;

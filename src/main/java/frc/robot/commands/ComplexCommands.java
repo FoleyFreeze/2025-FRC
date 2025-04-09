@@ -20,12 +20,13 @@ import java.util.function.Supplier;
 public class ComplexCommands {
 
     public static double holdPowerCoral = 0.4;
-    static double releasePowerCoral23 = -2 - 2;
-    static double releasePowerCoral4 = -4 - 2;
-    public static double releasePowerCoral1 = -5;
+    static double releasePowerCoral23 = -1.75;
+    static double releasePowerCoral4 = -4 - 1;
+    public static double releasePowerCoral1 = -2.5;
     static double releaseTimeCoral1 = 0.3;
     static double releaseTimeCoral23 = 0.25;
     static double releaseTimeCoral4 = 0.04 + 0.06;
+    public static double releasePowerCoralClimb = -1.25;
 
     public static double intakePowerCoral = 3.0; // 4
     public static double intakeCurrentCoral = 15;
@@ -33,7 +34,7 @@ public class ComplexCommands {
 
     static double intakeAlgaeTime = 0.2;
     static double intakeCurrentAlgae = 50;
-    static double intakeAlgaePower = 3;
+    static double intakeAlgaePower = 10;
     static double holdAlgaePower = 2;
     static double releasePowerAlgae = -12;
     static double releaseTimeAlgae = 0.5;
@@ -577,6 +578,7 @@ public class ComplexCommands {
                             if (midGather[0]) {
                                 r.wrist.goTo(() -> SuperstructureLocation.HOLD).execute();
                                 r.arm.goTo(() -> SuperstructureLocation.HOLD).execute();
+                                midGather[0] = false;
                             }
                         });
         c.setName("GoToLoc");
@@ -717,7 +719,7 @@ public class ComplexCommands {
     public static Command goToClimb() {
         SequentialCommandGroup c = new SequentialCommandGroup();
         c.addCommands(goToLoc(() -> SuperstructureLocation.HOLD));
-        c.addCommands(r.hand.setVoltageCmd(releasePowerCoral1));
+        c.addCommands(r.hand.setVoltageCmd(releasePowerCoralClimb));
         c.addCommands(r.wrist.setVoltage(-1.5));
         c.addCommands(new WaitCommand(0.75));
         c.addCommands(r.wrist.setVoltage(-0.6));

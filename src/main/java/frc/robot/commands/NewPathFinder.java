@@ -20,11 +20,10 @@ import frc.robot.util.Locations;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.Logger;
 
 public class NewPathFinder extends Command {
-    
+
     static int repaths = 0;
 
     RobotContainer r;
@@ -35,7 +34,7 @@ public class NewPathFinder extends Command {
     private Command c;
 
     // vel, accel, rotvel, rotaccel
-    PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 4.25, 6, 4);
+    PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 4.4, 6, 4);
     // PathConstraints coralGlobalConstraints = new PathConstraints(1, 1, 6, 4);
     PathConstraints algaeGlobalConstraints = new PathConstraints(3, 4, 4, 4);
     PathConstraints finalConstraints = new PathConstraints(1.25, 1.5, 3, 2);
@@ -141,8 +140,8 @@ public class NewPathFinder extends Command {
     public void execute() {
         c.execute();
 
-        //reinit if we are failing to follow the path
-        if(r.drive.lastPathError > Units.inchesToMeters(24)){
+        // reinit if we are failing to follow the path
+        if (r.drive.lastPathError > Units.inchesToMeters(24)) {
             initialize();
             Logger.recordOutput("Odometry/Repaths", ++repaths);
         }

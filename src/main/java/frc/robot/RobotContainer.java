@@ -180,13 +180,14 @@ public class RobotContainer {
 
         leds.setDefaultCommand(leds.setLEDMode(LED_MODES.RAINBOW).ignoringDisable(true));
         flysky.topLeftSWA.whileTrue(leds.setLEDMode(LED_MODES.BREATHE_BLUE).ignoringDisable(true));
-        flysky.topRightSWD.whileTrue(leds.setLEDMode(LED_MODES.OFF).ignoringDisable(true));
+        flysky.topRightSWD.whileTrue(leds.setLEDMode(LED_MODES.BREATHE_BLUE).ignoringDisable(true));
 
         state.inLocalPosePhaseT.onTrue(new InstantCommand(drive::resetLocalPose));
 
         // Reset gyro to 0° when B button is pressed
         flysky.upLTRIM.onTrue(DriveCommands.zeroDrive(this).ignoringDisable(true));
         flysky.downLTRIM.onTrue(DriveCommands.zeroDrive60(this).ignoringDisable(true));
+        flysky.leftLTRIM.onTrue(DriveCommands.zeroDriven60(this).ignoringDisable(true));
 
         flysky.downLTRIM.onTrue(new InstantCommand(() -> resetSimulation()));
 
@@ -350,6 +351,10 @@ public class RobotContainer {
                                 new WaitCommand(0.01),
                                 hand.setVoltageCmd(-1.8)));
         controlBoard.gatherBtn.and(controlBoard.shiftT).onFalse(hand.setVoltageCmd(0));
+
+        // jogs ew cardio
+        controlBoard.jogA.onTrue(new InstantCommand(wrist::jogDown).ignoringDisable(true));
+        controlBoard.jogB.onTrue(new InstantCommand(wrist::jogUp).ignoringDisable(true));
 
         // neutral switch
         neutralSwitch.onTrue(ComplexCommands.setBrakeSuperStructure(false).ignoringDisable(true));

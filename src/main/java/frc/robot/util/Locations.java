@@ -21,43 +21,43 @@ public class Locations {
     public static Transform2d halfRobot = new Transform2d(robotLength / 2.0, 0, new Rotation2d());
     public static Transform2d halfRobotProc =
             new Transform2d(
-                    robotLength / 2.0 + Units.inchesToMeters(6 + 6 /*12 */), 0, new Rotation2d());
+                    robotLength / 2.0 + Units.inchesToMeters(6 + 6 - 3 /*12 */),
+                    Units.inchesToMeters(5.5),
+                    Rotation2d.fromDegrees(15));
 
     public static Transform2d halfRobotNet =
-            new Transform2d(
-                    robotLength / 2.0 + Units.inchesToMeters(1.25 + 1), 0, new Rotation2d());
+            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-1), 0, new Rotation2d());
 
-    // TODO: remove extra before comp
-    static double extraGatherX = 0; // 12
+    static double extraGatherX = 0.5; // 12
     static double extraGatherY = 20 - 4;
     public static Transform2d halfRobotGatherLeftFar =
             new Transform2d(
-                    robotLength / 2.0 + Units.inchesToMeters(2.5 + extraGatherX),
+                    robotLength / 2.0 + Units.inchesToMeters(extraGatherX),
                     Units.inchesToMeters(extraGatherY),
                     Rotation2d.kZero);
     public static Transform2d halfRobotGatherLeftClose =
             new Transform2d(
-                    robotLength / 2.0 + Units.inchesToMeters(2.5 + extraGatherX),
+                    robotLength / 2.0 + Units.inchesToMeters(extraGatherX),
                     Units.inchesToMeters(-extraGatherY),
                     Rotation2d.kZero);
     public static Transform2d halfRobotGatherRightFar =
             new Transform2d(
-                    robotLength / 2.0 + Units.inchesToMeters(2.5 + extraGatherX),
+                    robotLength / 2.0 + Units.inchesToMeters(extraGatherX),
                     Units.inchesToMeters(-extraGatherY),
                     Rotation2d.kZero);
     public static Transform2d halfRobotGatherRightClose =
             new Transform2d(
-                    robotLength / 2.0 + Units.inchesToMeters(2.5 + extraGatherX),
+                    robotLength / 2.0 + Units.inchesToMeters(extraGatherX),
                     Units.inchesToMeters(extraGatherY),
                     Rotation2d.kZero);
     public static Transform2d halfRobotGatherLeftCenter =
             new Transform2d(
-                    robotLength / 2.0 + Units.inchesToMeters(2.5 + extraGatherX),
+                    robotLength / 2.0 + Units.inchesToMeters(extraGatherX),
                     Units.inchesToMeters(0),
                     Rotation2d.kZero);
     public static Transform2d halfRobotGatherRightCenter =
             new Transform2d(
-                    robotLength / 2.0 + Units.inchesToMeters(2.5 + extraGatherX),
+                    robotLength / 2.0 + Units.inchesToMeters(extraGatherX),
                     Units.inchesToMeters(0),
                     Rotation2d.kZero);
 

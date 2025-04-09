@@ -9,7 +9,7 @@ import edu.wpi.first.units.measure.Distance;
 public enum SuperstructureLocation {
     // elevator, arm, wrist
     // inches, degress, degrees
-    HOLD(0.25, 5, -25 + 65),
+    HOLD(0.25, 5 + 7, -25 + 65),
     HOLD_GATHER(0.25, 5, -55), // 70
     HOLD_ALGAE_XFER(16, 5, 140),
 
@@ -18,17 +18,17 @@ public enum SuperstructureLocation {
     HOLD_ALGAE_IN(28, 10, 193),
 
     // LEVEL1(0.25, 66, 15),
-    LEVEL1(0.25, 65, 46),
-    LEVEL2(5.25, 14, 75 + 10), // -3 for UDM
-    LEVEL3(18.5, 14, 75 + 10),
-    LEVEL4(40.7 + 1.75 + 0.5, 20, 92.5 + 11),
+    LEVEL1(0.25, 65, 40),
+    LEVEL2(5.25, 27, 74),
+    LEVEL3(18.5, 27, 74),
+    LEVEL4(43.45, 33, 95),
     ALGAE_DESCORE2_3(28.5 - 4.5, 115 - 22, 42),
     ALGAE_DESCORE3_4(41.4 - 3.5, 115 - 22, 42),
     ALGAE_DESCORE2_3_LOW(26.5 - 4.5, 115 - 22, 42),
     ALGAE_DESCORE3_4_LOW(39.4 - 3.5, 115 - 22, 42),
 
-    PRENET(18, 90, 228),
-    NET(34, 22, 165),
+    PRENET(19 + 3, 90, 228),
+    NET(36 - 4, 22 - 3, 165),
 
     ALGAE_LEVEL_2_3(20.3, 114, 228), // -2 for UDM
     ALGAE_LEVEL_3_4(34.9, 114, 228),

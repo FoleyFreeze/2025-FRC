@@ -80,7 +80,7 @@ public class Vision extends SubsystemBase {
             default:
                 // Replayed robot, disable IO implementations
                 // (Use same number of dummy implementations as the real robot)
-                v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {});
+                v = new Vision(r.drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
                 break;
         }
 
