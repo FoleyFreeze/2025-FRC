@@ -60,7 +60,8 @@ public class NewPathFinder extends Command {
     public void initialize() {
         Pose2d targetPose = poseSupplier.get();
 
-        List<Waypoint> waypoints = r.pathCache.getPathTo(targetPose, isGather);
+        List<Waypoint> waypoints =
+                PathPlannerPath.waypointsFromPoses(r.pathCache.getPathTo(targetPose, isGather));
 
         Pose2d flipPose;
         if (isGather) {

@@ -113,7 +113,7 @@ public class Arm extends SubsystemBase {
         io.superZero();
     }
 
-    public Command setVoltage(double volts) {
+    public Command setVoltageCmd(double volts) {
         Command c =
                 new InstantCommand(
                         () -> {
@@ -122,6 +122,11 @@ public class Arm extends SubsystemBase {
                         },
                         this);
         return c;
+    }
+
+    public void setVoltage(double volts) {
+        io.setArmVolts(volts);
+        target = null;
     }
 
     public void setPIDSlot(ClosedLoopSlot slot) {

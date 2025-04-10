@@ -87,8 +87,10 @@ public class RobotContainer {
     public final BotState state = new BotState(this);
 
     // Pathplanner triggers
+    public Command activePath; // stores a reference to an inprogress path
     public EventTrigger inSlowDrivePhase;
     public EventTrigger startLocalPosePhase;
+    public EventTrigger shootForNet;
     public DigitalInput dio1 = new DigitalInput(9);
     public Trigger neutralSwitch = new Trigger(() -> !dio1.get() && DriverStation.isDisabled());
 
@@ -122,6 +124,7 @@ public class RobotContainer {
 
         inSlowDrivePhase = new EventTrigger("InSlowDrivePhase");
         startLocalPosePhase = new EventTrigger("InLocalPosePhase");
+        shootForNet = new EventTrigger("ShootForNet");
 
         // Set up auto routines
         // autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -281,6 +284,8 @@ public class RobotContainer {
                 .and(controlBoard.algaeModeT.or(controlBoard.tempScoreAlgaeT)) // algae sw
                 .and(flysky.topRightSWD) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
+                .and(state.algaeNetStage2T.negate())
+                .and(state.hasAlgaeT)
                 .whileTrue(
                         ComplexCommands.visionAlgaeScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
@@ -289,9 +294,18 @@ public class RobotContainer {
                 .and(controlBoard.algaeModeT.or(controlBoard.tempScoreAlgaeT)) // algae sw
                 .and(flysky.topRightSWD.negate()) // cam sw
                 .and(controlBoard.climbModeT.negate()) // climb sw
+                .and(state.algaeNetStage2T.negate())
+                .and(state.hasAlgaeT)
                 .whileTrue(
                         ComplexCommands.blindAlgaeScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
+
+        flysky.rightTriggerSWG // score sw
+                .and(controlBoard.algaeModeT.or(controlBoard.tempScoreAlgaeT)) // algae sw
+                // .and(flysky.topRightSWD.negate()) // no cam sw as behavior is the same
+                .and(controlBoard.climbModeT.negate()) // climb sw
+                .and(state.algaeNetStage2T)
+                .onTrue(ComplexCommands.netLaunch());
 
         // CLIMB THINGS
 

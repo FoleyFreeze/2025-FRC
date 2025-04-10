@@ -28,6 +28,9 @@ public class BotState {
                                             || DriverStation.isAutonomous()));
     public Trigger inLocalPosePhaseT = new Trigger(() -> inLocalPosePhase);
 
+    public boolean algaeNetStage2 = false;
+    public Trigger algaeNetStage2T = new Trigger(() -> algaeNetStage2);
+
     public BotState(RobotContainer r) {
         this.r = r;
     }
@@ -60,5 +63,7 @@ public class BotState {
         Logger.recordOutput("State/onTarget", onTarget);
         Logger.recordOutput("State/inSlowDrivePhase", r.inSlowDrivePhase);
         Logger.recordOutput("State/inLocalPosePhase", inLocalPosePhase);
+        Logger.recordOutput("State/AlgaeStage2", algaeNetStage2);
+        Logger.recordOutput("State/ShootForNet", r.shootForNet);
     }
 }

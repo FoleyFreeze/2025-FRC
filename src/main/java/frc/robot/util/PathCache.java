@@ -1,7 +1,5 @@
 package frc.robot.util;
 
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -34,7 +32,7 @@ public class PathCache {
         waypointList[5] = Locations.getAlgaeReefLocation(ReefSticks.K).plus(offset);
     }
 
-    public List<Waypoint> getPathTo(Pose2d dest, boolean isGather) {
+    public List<Pose2d> getPathTo(Pose2d dest, boolean isGather) {
         // find the waypoint closest to the start and dest
         Pose2d start = r.drive.chooseLocalPose();
         int closeStart = 0;
@@ -125,7 +123,7 @@ public class PathCache {
         }
         poseList.add(dest);
 
-        return PathPlannerPath.waypointsFromPoses(poseList);
+        return poseList;
     }
 
     public double getDist(Pose2d one, Pose2d two) {

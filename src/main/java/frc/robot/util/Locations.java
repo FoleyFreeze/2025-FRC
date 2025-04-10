@@ -27,6 +27,8 @@ public class Locations {
 
     public static Transform2d halfRobotNet =
             new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-1), 0, new Rotation2d());
+    public static Transform2d halfRobotNet2 =
+            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-7), 0, new Rotation2d());
 
     static double extraGatherX = 0.5; // 12
     static double extraGatherY = 20 - 4;
@@ -134,6 +136,22 @@ public class Locations {
         }
     }
 
+    public static double getNetX2() {
+        if (isBlue()) {
+            return tags.getTagPose(14).get().toPose2d().plus(halfRobotNet2).getX();
+        } else {
+            return tags.getTagPose(5).get().toPose2d().plus(halfRobotNet2).getX();
+        }
+    }
+
+    public static Pose2d getNetTag() {
+        if (isBlue()) {
+            return tags.getTagPose(14).get().toPose2d();
+        } else {
+            return tags.getTagPose(5).get().toPose2d();
+        }
+    }
+
     public static Pose2d getNetPose(Pose2d robotPose) {
         if (isBlue()) {
             double minY = 4.8;
@@ -145,6 +163,32 @@ public class Locations {
             double maxY = 3.2;
             double y = Math.max(minY, Math.min(robotPose.getY(), maxY));
             return new Pose2d(getNetX(), y, Rotation2d.k180deg);
+        }
+    }
+
+    static double distOffset = Units.inchesToMeters(24);
+    static double distOffsetY = Math.sin(Math.toRadians(20)) * distOffset;
+    static double distOffsetX = Math.cos(Math.toRadians(20)) * distOffset;
+
+    public static Translation2d getDriveToNetOffset() {
+        if (isBlue()) {
+            return new Translation2d(distOffsetX, distOffsetY);
+        } else {
+            return new Translation2d(-distOffsetX, -distOffsetY);
+        }
+    }
+
+    public static Pose2d getDriveToNetPose(Pose2d robotPose) {
+        if (isBlue()) {
+            double minY = 4.8 - distOffsetY;
+            double maxY = 7.5 - distOffsetY;
+            double y = Math.max(minY, Math.min(robotPose.getY(), maxY));
+            return new Pose2d(getNetX2() - distOffsetX, y, Rotation2d.kZero);
+        } else {
+            double minY = 0.5 + distOffsetY;
+            double maxY = 3.2 + distOffsetY;
+            double y = Math.max(minY, Math.min(robotPose.getY(), maxY));
+            return new Pose2d(getNetX2() + distOffsetX, y, Rotation2d.k180deg);
         }
     }
 

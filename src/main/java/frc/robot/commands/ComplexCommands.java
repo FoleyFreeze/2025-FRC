@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
 import frc.robot.util.Locations;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class ComplexCommands {
 
@@ -131,7 +133,11 @@ public class ComplexCommands {
                                         false)
                                 .alongWith(moveArmlol),
                         DriveCommands.driveToPoint(r, r.controlBoard::getAlgaePathPose, false),
-                        new InstantCommand(() -> hasGathered[0] = true),
+                        new InstantCommand(
+                                () -> {
+                                    hasGathered[0] = true;
+                                    r.state.setAlgae();
+                                }),
                         new WaitCommand(0.1),
                         new PathFollowingCommand(r, () -> r.pathCache.closestWaypoint(), true));
 
@@ -158,7 +164,7 @@ public class ComplexCommands {
     }
 
     public static Command scoreAlgaeNet() {
-        //lots of horizontal vel, lauches from PRENET
+        // lots of horizontal vel, lauches from PRENET
 
         SequentialCommandGroup launch = new SequentialCommandGroup();
         launch.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
@@ -184,42 +190,140 @@ public class ComplexCommands {
                                 () -> {
                                     r.hand.setVoltage(0);
                                     r.hand.setCurrentLim(algaeLowLim);
+                                    r.state.hasAlgae = false;
                                 });
 
         c.setName("ScoreAlgaeNet");
         return c;
     }
 
-    public static Command scoreAlgaeNet2(){
-        //less horizontal vel, launches from HOLD_ALGAE_IN
-        boolean[] midElevator = new boolean[1];
+    public static Command scoreAlgaeNet2() {
+        // less horizontal vel, launches from HOLD_ALGAE_IN
 
         SequentialCommandGroup launch = new SequentialCommandGroup();
         launch.addCommands(goToAlgaeHold());
-        launch.addCommands(new WaitUntilCommand(r.flysky.leftTriggerSWE.and(r.state.pathCompleteT)));
-        launch.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
-        launch.addCommands(r.hand.setVoltageCmd(superSuckAlgae));
-        launch.addCommands(new WaitCommand(0.1));
-        launch.addCommands(new InstantCommand(() -> midElevator[0] = true));
-        launch.addCommands(new InstantCommand(() -> r.elevator.setVoltage(6)));
-        launch.addCommands(new WaitUntilCommand(() -> r.elevator.getHeight().in(Inches) > 32).raceWith(new WaitCommand(0.5)));
-        launch.addCommands(r.hand.setVoltageCmd(releasePowerAlgae));
-        launch.addCommands(new WaitCommand(0.5));
-        launch.addCommands(new InstantCommand(() -> r.elevator.setVoltage(0)));
-        launch.addCommands(new InstantCommand(() -> midElevator[0] = false));
+        launch.addCommands(
+                new WaitUntilCommand(
+                        r.flysky.leftTriggerSWE.and(r.state.pathCompleteT).or(r.shootForNet)));
+        launch.addCommands(new InstantCommand(() -> r.state.algaeNetStage2 = true));
 
-        Command c = launch.finallyDo(() -> {
-                if(midElevator[0]){
-                        r.elevator.setVoltage(0);
-                        midElevator[0] = false;
-                }
+        launch.setName("ScoreAlgaeNet2");
+        return launch;
+    }
 
-                r.hand.setVoltage(0);
-                r.hand.setCurrentLim(algaeLowLim);
-                //r.elevator.goTo(() -> SuperstructureLocation.HOLD_ALGAE_IN);
-        });
-        
-        c.setName("launch");
+    public static Command netLaunch() {
+        double minEleVel = 10; // in/sec
+
+        SequentialCommandGroup scg = new SequentialCommandGroup();
+        scg.addCommands(new WaitCommand(0));
+        scg.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
+        scg.addCommands(r.hand.setVoltageCmd(superSuckAlgae));
+        scg.addCommands(new WaitCommand(0.1));
+
+        // launch elevator arm
+        scg.addCommands(
+                new InstantCommand(
+                        () -> {
+                            // r.arm.setVoltage(-2.5);
+                            r.elevator.setVoltage(4.5);
+                        }));
+
+        // wait to release ball
+        scg.addCommands(
+                new WaitUntilCommand(() -> r.elevator.getHeight().in(Inches) > 26)
+                        .raceWith(new WaitCommand(0.25)));
+        scg.addCommands(r.hand.setVoltageCmd(releasePowerAlgae));
+
+        // wait until ball is out
+        scg.addCommands(
+                new WaitCommand(0.08)
+                        .raceWith(
+                                new WaitUntilCommand(
+                                        () ->
+                                                r.elevator.getHeight().in(Inches) > 41
+                                                        || r.arm.getAngle().in(Degrees) < -50)));
+
+        // slow down
+        scg.addCommands(
+                new InstantCommand(
+                        () -> {
+                            // r.arm.setVoltage(1);
+                            r.elevator.setVoltage(-1);
+                        }));
+        scg.addCommands(
+                new WaitCommand(0.2)
+                        .raceWith(
+                                new ParallelCommandGroup(
+                                        new SequentialCommandGroup(
+                                                new WaitCommand(0.04),
+                                                new WaitUntilCommand(
+                                                        () -> r.elevator.getVelocity() < minEleVel),
+                                                new InstantCommand(
+                                                        () -> r.elevator.setVoltage(0))) /*,
+                                        new SequentialCommandGroup(
+                                                new WaitUntilCommand(
+                                                        () -> {
+                                                            double delta =
+                                                                    r.arm.getAngle().in(Degrees)
+                                                                            - armPosition[0];
+                                                            armPosition[0] =
+                                                                    r.arm.getAngle().in(Degrees);
+                                                            return delta > 0;
+                                                        }),
+                                                new InstantCommand(() -> r.arm.setVoltage(0)))*/)));
+
+        // stop
+        scg.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
+        scg.addCommands(
+                new InstantCommand(
+                        () -> {
+                            SuperstructureLocation loc = SuperstructureLocation.VERT_ALGAE;
+                            r.arm.setAngle(loc.armAngle);
+                            r.elevator.setHeight(loc.eleHeight);
+                            r.wrist.setAngle(loc);
+                            r.hand.setVoltage(0);
+                            r.state.algaeNetStage2 = false;
+                            r.state.hasAlgae = false;
+                        },
+                        r.elevator,
+                        r.arm,
+                        r.wrist,
+                        r.hand));
+
+        // super hack, watch out
+        Command pathWrapper =
+                new FunctionalCommand(
+                        () -> Logger.recordOutput("State/PathFirst", false),
+                        () -> {
+                            if (r.activePath != null) {
+                                // System.out.println("Path Not Null");
+                                r.activePath.execute();
+                            } else {
+                                // System.out.println("Path was null");
+                            }
+                        },
+                        (interrupted) -> {
+                            if (r.activePath != null) {
+                                if (!interrupted) {
+                                    Logger.recordOutput("State/PathFirst", true);
+                                }
+                                r.activePath.end(interrupted);
+                                r.activePath = null;
+                            }
+                        },
+                        () -> {
+                            if (r.activePath != null) {
+                                return r.activePath.isFinished();
+                            } else {
+                                return false;
+                            }
+                        },
+                        r.drive);
+
+        Command c =
+                scg.deadlineFor(pathWrapper)
+                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        c.setName("NetLaunch");
         return c;
     }
 
@@ -276,7 +380,7 @@ public class ComplexCommands {
     public static Command visionAlgaeScore() {
         Command c =
                 new ConditionalCommand(
-                        visionScoreAlgaeNet(),
+                        visionScoreAlgaeNet2(),
                         visionScoreAlgaeProc(),
                         // () -> r.controlBoard.selectedLevel == 4);
                         r.controlBoard::getAlgaeScoreLoc);
@@ -289,6 +393,12 @@ public class ComplexCommands {
         Command c =
                 DriveCommands.driveTo(r, () -> Locations.getNetPose(r.drive.getGlobalPose()), true)
                         .alongWith(new WaitCommand(0.25).andThen(scoreAlgaeNet2()));
+        c.setName("visionScoreAlgaeNet");
+        return c;
+    }
+
+    public static Command visionScoreAlgaeNet2() {
+        Command c = new BargePathFinder(r).alongWith(scoreAlgaeNet2());
         c.setName("visionScoreAlgaeNet");
         return c;
     }
@@ -554,7 +664,7 @@ public class ComplexCommands {
                         .andThen(
                                 r.wrist
                                         .setVoltage(0.5)
-                                        .alongWith(r.arm.setVoltage(2))
+                                        .alongWith(r.arm.setVoltageCmd(2))
                                         .alongWith(new InstantCommand(() -> midGather[0] = true)))
                         .andThen(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -15))
                         // .andThen(new PrintCommand("lift complete"))
@@ -593,7 +703,7 @@ public class ComplexCommands {
     }
 
     public static Command goToLocAlgae(Supplier<SuperstructureLocation> p) {
-        //no longer matters as we are out of coral gather when the switch is flipped
+        // no longer matters as we are out of coral gather when the switch is flipped
         Command toAlgaeFromCoralOld =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                         .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
@@ -603,11 +713,15 @@ public class ComplexCommands {
                                         .goTo(p)
                                         .alongWith(r.arm.goTo(p).alongWith(r.wrist.goTo(p))));
 
-        //safely get to algae gather position from center position
+        // safely get to algae gather position from center position
         Command toAlgaeFromCenter =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD_ALGAE_OUT)
                         .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD_ALGAE_OUT))
-                        .andThen(r.elevator.goTo(p).alongWith(r.arm.goTo(p)).alongWith(r.wrist.goTo(p)));
+                        .andThen(
+                                r.elevator
+                                        .goTo(p)
+                                        .alongWith(r.arm.goTo(p))
+                                        .alongWith(r.wrist.goTo(p)));
 
         Command toAlgaeFromAlgae = forceGoToLoc(p);
 
@@ -620,24 +734,23 @@ public class ComplexCommands {
         return c;
     }
 
-    //safely get to algae hold position from algae gather positions
-    public static Command goToAlgaeHold(){
+    // safely get to algae hold position from algae gather positions
+    public static Command goToAlgaeHold() {
         final SuperstructureLocation hold = SuperstructureLocation.HOLD_ALGAE_IN;
 
         SequentialCommandGroup scg = new SequentialCommandGroup();
 
-        //go up first
+        // go up first
         scg.addCommands(r.elevator.goTo(() -> hold));
-        scg.addCommands(r.arm.goTo(() -> hold)
-                .alongWith(r.wrist.goTo(() -> hold)));
+        scg.addCommands(r.arm.goTo(() -> hold).alongWith(r.wrist.goTo(() -> hold)));
         scg.addCommands(r.elevator.goTo(() -> hold));
 
         scg.setName("goToHoldAlgae");
 
-        //dont move if already there
+        // dont move if already there
         return new ConditionalCommand(
-                new InstantCommand(), 
-                scg, 
+                new InstantCommand(),
+                scg,
                 () -> r.elevator.atTarget(() -> hold, true) && r.arm.atTarget(() -> hold, true));
     }
 
@@ -723,11 +836,11 @@ public class ComplexCommands {
         c.addCommands(r.wrist.setVoltage(-1.5));
         c.addCommands(new WaitCommand(0.75));
         c.addCommands(r.wrist.setVoltage(-0.6));
-        c.addCommands(r.arm.setVoltage(-0.75));
+        c.addCommands(r.arm.setVoltageCmd(-0.75));
         c.addCommands(r.hand.setVoltageCmd(0));
         c.addCommands(new WaitCommand(1));
         c.addCommands(r.wrist.setVoltage(-0.1));
-        c.addCommands(r.arm.setVoltage(-0.1));
+        c.addCommands(r.arm.setVoltageCmd(-0.1));
 
         c.setName("GoToClimb");
         return c;
@@ -737,9 +850,9 @@ public class ComplexCommands {
         SequentialCommandGroup c = new SequentialCommandGroup();
         c.addCommands(r.wrist.setVoltage(0));
         c.addCommands(r.elevator.goTo(() -> SuperstructureLocation.HOLD));
-        c.addCommands(r.arm.setVoltage(2));
+        c.addCommands(r.arm.setVoltageCmd(2));
         c.addCommands(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -10));
-        c.addCommands(r.arm.setVoltage(0));
+        c.addCommands(r.arm.setVoltageCmd(0));
         c.addCommands(r.wrist.goTo(() -> SuperstructureLocation.HOLD));
         c.addCommands(r.arm.goTo(() -> SuperstructureLocation.HOLD));
 
@@ -777,7 +890,7 @@ public class ComplexCommands {
         liftArm.addCommands(r.wrist.setVoltage(-1));
         liftArm.addCommands(r.elevator.goTo(() -> SuperstructureLocation.HOLD));
         liftArm.addCommands(new WaitCommand(1.5));
-        liftArm.addCommands(r.arm.setVoltage(2));
+        liftArm.addCommands(r.arm.setVoltageCmd(2));
         liftArm.addCommands(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -10));
 
         SequentialCommandGroup c = new SequentialCommandGroup();
@@ -800,7 +913,7 @@ public class ComplexCommands {
         liftArm.addCommands(r.wrist.setVoltage(-1));
         liftArm.addCommands(r.elevator.goTo(() -> SuperstructureLocation.HOLD));
         liftArm.addCommands(new WaitCommand(1.5));
-        liftArm.addCommands(r.arm.setVoltage(2));
+        liftArm.addCommands(r.arm.setVoltageCmd(2));
         liftArm.addCommands(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -10));
 
         SequentialCommandGroup c = new SequentialCommandGroup();

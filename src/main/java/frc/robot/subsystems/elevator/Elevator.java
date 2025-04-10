@@ -64,6 +64,10 @@ public class Elevator extends SubsystemBase {
         return Inches.of(inputs.elevatorPositionInches);
     }
 
+    public double getVelocity() {
+        return inputs.elevatorVelocityInchesPerSec;
+    }
+
     public void setHeight(Distance height) {
         // convert from distance to motor rotations
         double position = (height.in(Inches));
@@ -121,7 +125,7 @@ public class Elevator extends SubsystemBase {
         io.setBrake(on);
     }
 
-    public void setVoltage(double volts){
+    public void setVoltage(double volts) {
         io.setElevatorVolts(volts);
     }
 }
