@@ -65,5 +65,7 @@ public class BotState {
         Logger.recordOutput("State/inLocalPosePhase", inLocalPosePhase);
         Logger.recordOutput("State/AlgaeStage2", algaeNetStage2);
         Logger.recordOutput("State/ShootForNet", r.shootForNet);
+        Logger.recordOutput("State/LeftTrigger", r.flysky.leftTriggerSWE);
+        Logger.recordOutput("State/RightTrigger", r.flysky.rightTriggerSWG);
     }
 }

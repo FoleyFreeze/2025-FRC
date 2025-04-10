@@ -557,6 +557,7 @@ public class Drive extends SubsystemBase {
     Set<Integer> reefTags = Set.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11);
     Set<Integer> gatherTags = Set.of(1, 2, 12, 13);
     Set<Integer> bargeTags = Set.of(4, 5, 14, 15);
+    Set<Integer> procTags = Set.of(3, 16);
 
     private boolean triggerAndId(int id) {
         boolean ret = true;
@@ -571,7 +572,16 @@ public class Drive extends SubsystemBase {
         if (r.flysky.rightTriggerSWG.getAsBoolean()) {
             if (r.controlBoard.algaeModeT.getAsBoolean()
                     || r.controlBoard.tempScoreAlgaeT.getAsBoolean()) {
-                ret = !bargeTags.contains(id); // reject barge tags
+                switch (r.controlBoard.selectedAlgaeTarget) {
+                    case NET:
+                        ret = bargeTags.contains(id);
+                    case PROC:
+                        ret = procTags.contains(id);
+                    case CLOSEST:
+                    default:
+                        // both, idk
+                        ret = bargeTags.contains(id) || procTags.contains(id);
+                }
             } else {
                 // in coral mode
                 ret = reefTags.contains(id); // accept all reef tags

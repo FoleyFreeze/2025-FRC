@@ -10,12 +10,17 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.controls.ControlBoard.ReefSticks;
 import java.util.ArrayList;
 import java.util.List;
+import org.littletonrobotics.junction.Logger;
 
 public class PathCache {
 
     // note cache is regenerated when alliance changes
     RobotContainer r;
     Pose2d[] waypointList;
+
+    Pose2d[] gatherList;
+
+    Translation2d reefPose;
 
     double velocityThreshold = 0.4;
 
@@ -30,6 +35,12 @@ public class PathCache {
         waypointList[3] = Locations.getAlgaeReefLocation(ReefSticks.G).plus(offset);
         waypointList[4] = Locations.getAlgaeReefLocation(ReefSticks.I).plus(offset);
         waypointList[5] = Locations.getAlgaeReefLocation(ReefSticks.K).plus(offset);
+
+        reefPose = Locations.getReef();
+
+        gatherList = new Pose2d[2];
+        gatherList[0] = Locations.getLeftGatherStationCenter();
+        gatherList[1] = Locations.getRightGatherStationCenter();
     }
 
     public List<Pose2d> getPathTo(Pose2d dest, boolean isGather) {
@@ -72,21 +83,33 @@ public class PathCache {
         // if velocity is high, point the path along the direction of velocity
 
         Translation2d travelVector;
+        Rotation2d travelAngle;
         if (Math.hypot(currentVel.vxMetersPerSecond, currentVel.vyMetersPerSecond)
                 > velocityThreshold) {
             travelVector =
                     new Translation2d(currentVel.vxMetersPerSecond, currentVel.vyMetersPerSecond);
+            travelAngle = travelVector.getAngle();
         } else {
-            if (count != 0) {
+            if (closeToGather(start)) {
+                // point along the robot vector
+                travelAngle = start.getRotation();
+            } else if (closeToReef(start)) {
+                // point along the reef to robot vector
+                travelVector = start.getTranslation().minus(reefPose);
+                // travelAngle = start.getRotation().plus(Rotation2d.k180deg);
+                travelAngle = travelVector.getAngle();
+            } else if (count != 0) {
                 // point the travel vector at the next waypoint
                 int inc = count / Math.abs(count);
                 travelVector =
                         waypointList[Math.floorMod(closeStart + inc, 6)]
                                 .getTranslation()
                                 .minus(currentLocation.getTranslation());
+                travelAngle = travelVector.getAngle();
             } else {
                 // or if there isnt one, at the destination
                 travelVector = dest.getTranslation().minus(currentLocation.getTranslation());
+                travelAngle = travelVector.getAngle();
             }
         }
 
@@ -95,7 +118,7 @@ public class PathCache {
                 waypointList[closeStart].getTranslation().minus(currentLocation.getTranslation());
         */
 
-        Pose2d startPose = new Pose2d(currentLocation.getTranslation(), travelVector.getAngle());
+        Pose2d startPose = new Pose2d(currentLocation.getTranslation(), travelAngle);
 
         // include all points between the closest start and dest waypoints.
         // ignore the closest points, as the convex hex + offset should allow going to dest from the
@@ -134,5 +157,27 @@ public class PathCache {
 
     public Pose2d closestWaypoint() {
         return r.drive.getGlobalPose().nearest(List.of(waypointList)).plus(extraBackup);
+    }
+
+    public boolean closeToGather(Pose2d bot) {
+        boolean isClose = false;
+        double dist = 20;
+        for (Pose2d p : gatherList) {
+            double newDist = p.getTranslation().getDistance(bot.getTranslation());
+            if (newDist < dist) dist = newDist;
+            if (dist < Units.inchesToMeters(30)) isClose = true;
+        }
+
+        Logger.recordOutput("State/GatherDist", Units.metersToInches(dist));
+        return isClose;
+    }
+
+    public boolean closeToReef(Pose2d bot) {
+        boolean isClose = false;
+        double dist = reefPose.getDistance(bot.getTranslation());
+        if (dist < Units.inchesToMeters(70)) isClose = true;
+
+        Logger.recordOutput("State/ReefDist", Units.metersToInches(dist));
+        return isClose;
     }
 }
