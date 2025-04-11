@@ -235,6 +235,42 @@ public class DriveCommands {
                 .beforeStarting(() -> angleController.reset(r.drive.getRotation().getRadians()));
     }
 
+    public static Command driveToAngle(RobotContainer r, Supplier<Rotation2d> angle) {
+        // Create PID controller
+        ProfiledPIDController angleController =
+                new ProfiledPIDController(
+                        ANGLE_KP,
+                        0.0,
+                        ANGLE_KD,
+                        new TrapezoidProfile.Constraints(2, ANGLE_MAX_ACCELERATION));
+        angleController.enableContinuousInput(-Math.PI, Math.PI);
+        angleController.setTolerance(Units.degreesToRadians(2));
+
+        // Construct command
+        return Commands.run(
+                        () -> {
+                            // Calculate angular speed
+                            double omega;
+                            // in pid mode
+                            omega =
+                                    angleController.calculate(
+                                            r.drive.getRotation().getRadians(),
+                                            angle.get().getRadians());
+                            if (angleController.atGoal()) {
+                                omega = 0;
+                            }
+
+                            // Convert to field relative speeds & send command
+                            ChassisSpeeds speeds = new ChassisSpeeds(0, 0, omega);
+
+                            r.drive.runVelocity(speeds);
+                        },
+                        r.drive)
+
+                // Reset PID controller when command starts
+                .beforeStarting(() -> angleController.reset(r.drive.getRotation().getRadians()));
+    }
+
     public static Command driveToPoint(
             RobotContainer r, Supplier<Pose2d> supplier, boolean isGather) {
         PIDController pidX = new PIDController(POS_KP, POS_KI, POS_KD);
@@ -520,6 +556,10 @@ public class DriveCommands {
     public static Command leaveReef(RobotContainer r) {
         return new RunCommand(() -> r.drive.runVelocity(new ChassisSpeeds(-2, 0, 0)))
                 .raceWith(new WaitCommand(0.5));
+    }
+
+    public static Command driveVel(RobotContainer r, ChassisSpeeds speeds) {
+        return new RunCommand(() -> r.drive.runVelocity(speeds), r.drive);
     }
 
     public static Command zeroDrive(RobotContainer r) {

@@ -27,7 +27,7 @@ public class Locations {
 
     public static Transform2d halfRobotNet =
             new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-1), 0, new Rotation2d());
-    // FIXME: go back to -7
+    // TODO: go back to -7?
     public static Transform2d halfRobotNet2 =
             new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-7 + 5), 0, new Rotation2d());
 
@@ -574,7 +574,7 @@ public class Locations {
         double quarterY = tags.getFieldWidth() / 4;
         double cageDeltaY = Units.inchesToMeters(43);
 
-        double driveDeltaX = Units.inchesToMeters(36);
+        double driveDeltaX = Units.inchesToMeters(42);
 
         if (isBlue()) {
             switch (r.controlBoard.selectedCage) {

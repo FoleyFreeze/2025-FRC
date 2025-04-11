@@ -20,10 +20,10 @@ public class CmdDriveCageTraj extends Command {
 
     RobotContainer r;
 
-    double maxVelocity = 0.3; // m/s
-    double maxAccel = 0.3; // m/s/s
-    double maxAngularAccel = 0.2; // rad/s
-    double maxAngularVelocity = 0.2; // rad/s/s
+    double maxVelocity = 1; // m/s
+    double maxAccel = 1; // m/s/s
+    double maxAngularAccel = 1; // rad/s
+    double maxAngularVelocity = 1; // rad/s/s
 
     PathConstraints pathConstraints =
             new PathConstraints(maxVelocity, maxAccel, maxAngularVelocity, maxAngularAccel);
@@ -108,9 +108,10 @@ public class CmdDriveCageTraj extends Command {
         Translation2d pathVector = pathEndLocation.minus(pathStart);
 
         // modify endLocation to be 6in further
-        Translation2d additionalDist = new Translation2d(Units.inchesToMeters(9), 0);
-        additionalDist.rotateBy(r.drive.getRotation());
-        pathEndLocation.plus(additionalDist);
+        Translation2d additionalDist = new Translation2d(Units.inchesToMeters(8), 0);
+        additionalDist =
+                additionalDist.rotateBy(Locations.isBlue() ? Rotation2d.kZero : Rotation2d.k180deg);
+        pathEndLocation = pathEndLocation.plus(additionalDist);
 
         List<Waypoint> wayPoints =
                 PathPlannerPath.waypointsFromPoses(
