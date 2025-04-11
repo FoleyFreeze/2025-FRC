@@ -16,6 +16,7 @@ public enum SuperstructureLocation {
     VERT_ALGAE(19, 8, 170),
     HOLD_ALGAE_OUT(14.7, 90, 228),
     HOLD_ALGAE_IN(22, 10, 163),
+    PRE_ALGAE_IN(30, 10, 163),
 
     // LEVEL1(0.25, 66, 15),
     LEVEL1(0.25, 65, 40),

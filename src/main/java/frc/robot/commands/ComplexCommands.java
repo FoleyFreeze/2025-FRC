@@ -737,11 +737,12 @@ public class ComplexCommands {
     // safely get to algae hold position from algae gather positions
     public static Command goToAlgaeHold() {
         final SuperstructureLocation hold = SuperstructureLocation.HOLD_ALGAE_IN;
+        final SuperstructureLocation preHold = SuperstructureLocation.PRE_ALGAE_IN;
 
         SequentialCommandGroup scg = new SequentialCommandGroup();
 
         // go up first
-        scg.addCommands(r.elevator.goTo(() -> hold));
+        scg.addCommands(r.elevator.goTo(() -> preHold));
         scg.addCommands(r.arm.goTo(() -> hold).alongWith(r.wrist.goTo(() -> hold)));
         scg.addCommands(r.elevator.goTo(() -> hold));
 

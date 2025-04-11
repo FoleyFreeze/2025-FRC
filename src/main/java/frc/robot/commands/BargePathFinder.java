@@ -28,7 +28,7 @@ public class BargePathFinder extends Command {
     private Command c;
 
     // vel, accel, rotvel, rotaccel
-    PathConstraints coarseConstraints = new PathConstraints(3, 4, 4, 4);
+    PathConstraints coarseConstraints = new PathConstraints(3, 3.5, 4, 4);
     PathConstraints midConstraints = new PathConstraints(1.5, 2.5, 4, 4);
     PathConstraints finalConstraints = new PathConstraints(1.2, 1, 3, 2);
 

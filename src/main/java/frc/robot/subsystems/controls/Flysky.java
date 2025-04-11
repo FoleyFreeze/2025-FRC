@@ -7,8 +7,22 @@ public class Flysky {
 
     public Joystick flysky;
 
-    public Trigger leftTriggerSWE = new Trigger(() -> flysky.getRawAxis(2) > .25);
-    public Trigger rightTriggerSWG = new Trigger(() -> flysky.getRawAxis(3) > .25);
+    // public Trigger leftTriggerSWE = new Trigger(() -> flysky.getRawAxis(2) > .25);
+    // public Trigger rightTriggerSWG = new Trigger(() -> flysky.getRawAxis(3) > .25);
+    public boolean leftTriggerBool = false;
+    public boolean rightTriggerBool = false;
+    public Trigger leftTriggerSWE =
+            new Trigger(
+                    () -> {
+                        leftTriggerBool = debounceHyst(flysky.getRawAxis(2), leftTriggerBool);
+                        return leftTriggerBool;
+                    });
+    public Trigger rightTriggerSWG =
+            new Trigger(
+                    () -> {
+                        rightTriggerBool = debounceHyst(flysky.getRawAxis(3), rightTriggerBool);
+                        return rightTriggerBool;
+                    });
 
     public Trigger upLTRIM = new Trigger(() -> flysky.getRawButton(10));
     public Trigger downLTRIM = new Trigger(() -> flysky.getRawButton(11));
@@ -54,5 +68,14 @@ public class Flysky {
 
     public double getRightDial() {
         return (flysky.getRawAxis(6) + 1) / 2.0;
+    }
+
+    // require > 0.5 to set and < -0.5 to unset
+    public boolean debounceHyst(double in, boolean prev) {
+        if (prev) {
+            return in > -0.5;
+        } else {
+            return in > 0.5;
+        }
     }
 }
