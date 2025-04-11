@@ -17,6 +17,7 @@ public class Hand extends SubsystemBase {
     private final HandIOInputsAutoLogged inputs = new HandIOInputsAutoLogged();
 
     private final Alert handDisconnectedAlert = new Alert("Hand Disconnected", AlertType.kError);
+    private final Alert handTempAlert = new Alert("Hand Motor Temp > 170", AlertType.kWarning);
 
     public double coralGatheredDist = 160;
 
@@ -51,6 +52,11 @@ public class Hand extends SubsystemBase {
         Logger.processInputs("Hand", inputs);
 
         handDisconnectedAlert.set(!inputs.handConnected);
+
+        handTempAlert.set(inputs.handTempF > 150);
+        if (inputs.handTempF > 150) {
+            handTempAlert.setText(String.format("Hand Motor Temp at %.0f", inputs.handTempF));
+        }
     }
 
     public double getCurrent() {
