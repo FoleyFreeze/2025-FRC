@@ -569,7 +569,15 @@ public class Drive extends SubsystemBase {
             ret = reefTags.contains(id);
         }
 
-        if (r.flysky.rightTriggerSWG.getAsBoolean()) {
+        if (r.controlBoard.selectedClimbMode) {
+            // if in cage mode, reject all april tags
+            if (r.state.inCageDrive) {
+                ret = false;
+            } else {
+                // for drive to front cage area accept all
+                ret = true;
+            }
+        } else if (r.flysky.rightTriggerSWG.getAsBoolean()) {
             if (r.controlBoard.algaeModeT.getAsBoolean()
                     || r.controlBoard.tempScoreAlgaeT.getAsBoolean()) {
                 switch (r.controlBoard.selectedAlgaeTarget) {

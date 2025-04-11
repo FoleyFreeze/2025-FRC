@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.util.Locations;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
@@ -44,10 +45,12 @@ public class CmdDriveCageTraj extends Command {
 
     @Override
     public void initialize() {
+        r.state.inCageDrive = true;
         if (r.cvision.hasCageImage()) {
             driveCommand = createPathFollower();
             driveCommand.initialize();
         } else {
+            System.out.println("No cage image, no drive");
             driveCommand = null;
         }
     }
@@ -62,7 +65,7 @@ public class CmdDriveCageTraj extends Command {
                 driveCommand.initialize();
             } else {
                 Translation2d distToGoal =
-                        pathEndLocation.minus(r.drive.getGlobalPose().getTranslation());
+                        pathEndLocation.minus(r.drive.getLocalPose().getTranslation());
 
                 Translation2d cageError = pathEndLocation.minus(r.cvision.getCachedCageLocation());
                 Logger.recordOutput("Vision/CageError", cageError);
@@ -85,6 +88,7 @@ public class CmdDriveCageTraj extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        r.state.inCageDrive = false;
         if (driveCommand != null) driveCommand.end(interrupted);
     }
 
@@ -100,20 +104,20 @@ public class CmdDriveCageTraj extends Command {
 
     public Command createPathFollower() {
         pathEndLocation = r.cvision.getCachedCageLocation();
-        Translation2d pathStart = r.drive.getGlobalPose().getTranslation();
+        Translation2d pathStart = r.drive.getLocalPose().getTranslation();
         Translation2d pathVector = pathEndLocation.minus(pathStart);
 
         // modify endLocation to be 6in further
-        Translation2d additionalDist = new Translation2d(Units.inchesToMeters(6), 0);
+        Translation2d additionalDist = new Translation2d(Units.inchesToMeters(9), 0);
         additionalDist.rotateBy(r.drive.getRotation());
         pathEndLocation.plus(additionalDist);
 
         List<Waypoint> wayPoints =
                 PathPlannerPath.waypointsFromPoses(
-                        new Pose2d(pathStart, getVelocityAngle(r.drive.getVelocity(), pathVector)),
+                        new Pose2d(pathStart, getSquareAngle(pathVector)),
                         new Pose2d(
                                 pathEndLocation,
-                                r.drive.getRotation().plus(Rotation2d.kCCW_90deg)));
+                                Locations.isBlue() ? Rotation2d.kZero : Rotation2d.k180deg));
 
         System.out.println("Created path starting at: " + wayPoints.get(0).toString());
         System.out.println("and Ending at: " + wayPoints.get(wayPoints.size() - 1).toString());
@@ -153,6 +157,22 @@ public class CmdDriveCageTraj extends Command {
                     ChassisSpeeds.fromRobotRelativeSpeeds(speed, r.drive.getRotation());
             return new Rotation2d(
                     Math.atan2(fieldRel.vyMetersPerSecond, fieldRel.vxMetersPerSecond));
+        }
+    }
+
+    double yThresh = Units.inchesToMeters(8);
+
+    public Rotation2d getSquareAngle(Translation2d directPath) {
+        // if close in Y, pick lower angles
+        if (Math.abs(directPath.getY()) < yThresh) {
+            double interpAngle = directPath.getY() / yThresh * 90;
+            return Rotation2d.fromDegrees(interpAngle);
+        }
+        // pick either 90 or 270deg based on what direction you need to go to square up
+        else if (directPath.getAngle().getSin() > 0) {
+            return Rotation2d.kCCW_90deg;
+        } else {
+            return Rotation2d.kCW_90deg;
         }
     }
 

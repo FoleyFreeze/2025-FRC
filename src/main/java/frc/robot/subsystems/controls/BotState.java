@@ -15,6 +15,7 @@ public class BotState {
     public boolean pathComplete = true; // default true when no path is running
     public boolean onTarget = false;
     public boolean inLocalPosePhase = false;
+    public boolean inCageDrive = false;
 
     public Trigger hasCoralT = new Trigger(() -> hasCoral);
     public Trigger hasAlgaeT = new Trigger(() -> hasAlgae);
@@ -26,7 +27,7 @@ public class BotState {
                             onTarget
                                     && (r.flysky.topRightSWD.getAsBoolean()
                                             || DriverStation.isAutonomous()));
-    public Trigger inLocalPosePhaseT = new Trigger(() -> inLocalPosePhase);
+    public Trigger inLocalPosePhaseT = new Trigger(() -> inLocalPosePhase || inCageDrive);
 
     public boolean algaeNetStage2 = false;
     public Trigger algaeNetStage2T = new Trigger(() -> algaeNetStage2);
@@ -67,5 +68,6 @@ public class BotState {
         Logger.recordOutput("State/ShootForNet", r.shootForNet);
         Logger.recordOutput("State/LeftTrigger", r.flysky.leftTriggerSWE);
         Logger.recordOutput("State/RightTrigger", r.flysky.rightTriggerSWG);
+        Logger.recordOutput("State/InCageDrive", inCageDrive);
     }
 }

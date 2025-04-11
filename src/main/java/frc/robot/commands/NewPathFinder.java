@@ -9,8 +9,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.RotationTarget;
 import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -61,7 +59,8 @@ public class NewPathFinder extends Command {
         Pose2d targetPose = poseSupplier.get();
 
         List<Waypoint> waypoints =
-                PathPlannerPath.waypointsFromPoses(r.pathCache.getPathTo(targetPose, isGather));
+                PathPlannerPath.waypointsFromPoses(
+                        r.pathCache.getPathTo(targetPose, isGather, isClimb));
 
         Pose2d flipPose;
         if (isGather) {
@@ -71,9 +70,9 @@ public class NewPathFinder extends Command {
         }
 
         // rotate 90deg right for climb align
-        if (isClimb) {
-            flipPose = targetPose.plus(new Transform2d(0, 0, Rotation2d.kCW_90deg));
-        }
+        // if (isClimb) {
+        //     flipPose = targetPose.plus(new Transform2d(0, 0, Rotation2d.kCW_90deg));
+        // }
 
         double startMovingThingsPosition;
         if (r.controlBoard.algaeModeT.getAsBoolean()) {

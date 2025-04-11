@@ -44,6 +44,10 @@ public class PathCache {
     }
 
     public List<Pose2d> getPathTo(Pose2d dest, boolean isGather) {
+        return getPathTo(dest, isGather, false);
+    }
+
+    public List<Pose2d> getPathTo(Pose2d dest, boolean isGather, boolean isClimb) {
         // find the waypoint closest to the start and dest
         Pose2d start = r.drive.chooseLocalPose();
         int closeStart = 0;
@@ -138,13 +142,36 @@ public class PathCache {
             }
         }
 
-        if (!isGather || true) {
+        if (isClimb) {
+            Pose2d finalPose;
+            Pose2d backPose;
+            if (Locations.isBlue()) {
+                backPose =
+                        new Pose2d(
+                                dest.getTranslation()
+                                        .plus(new Translation2d(Units.inchesToMeters(-20), 0)),
+                                Rotation2d.kZero);
+                finalPose = new Pose2d(dest.getTranslation(), Rotation2d.kZero);
+            } else {
+                backPose =
+                        new Pose2d(
+                                dest.getTranslation()
+                                        .plus(new Translation2d(Units.inchesToMeters(20), 0)),
+                                Rotation2d.k180deg);
+                finalPose = new Pose2d(dest.getTranslation(), Rotation2d.k180deg);
+            }
+            // the final straight drive in
+            poseList.add(backPose);
+            poseList.add(finalPose);
+
+        } else /*if (!isGather || true)*/ {
             // the final straight drive in
             poseList.add(
                     dest.transformBy(
                             new Transform2d(Units.inchesToMeters(-20), 0, Rotation2d.kZero)));
+
+            poseList.add(dest);
         }
-        poseList.add(dest);
 
         return poseList;
     }
