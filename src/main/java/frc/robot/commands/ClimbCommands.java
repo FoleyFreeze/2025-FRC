@@ -19,15 +19,15 @@ public class ClimbCommands {
         // TODO: rotate robot if close but at wrong angle
         SequentialCommandGroup sg =
                 new SequentialCommandGroup(
-                        //if not close drive close to the cage with pathfinder
+                        // if not close drive close to the cage with pathfinder
                         new ConditionalCommand(
                                 new NewPathFinder(
                                         r, () -> Locations.getCageLocation(r), false, true),
-                                new InstantCommand(),//TODO: swap with a angle drive
+                                new InstantCommand(), // TODO: swap with a angle drive
                                 () -> checkIfPathfindNeeded(r)),
-                        //drive into cage
+                        // drive into cage
                         new CmdDriveCageTraj(r),
-                        //do a little shake
+                        // do a little shake
                         DriveCommands.driveVel(r, new ChassisSpeeds(0, 0, 1))
                                 .raceWith(new WaitCommand(0.2)),
                         DriveCommands.driveVel(r, new ChassisSpeeds(0, 0, -1))
@@ -40,7 +40,7 @@ public class ClimbCommands {
                                                         : Rotation2d.kCCW_90deg)
                                 .raceWith(new WaitCommand(0.3)),
                         new InstantCommand(() -> r.drive.runVelocity(new ChassisSpeeds())),
-                        //never end until trigger released
+                        // never end until trigger released
                         new RunCommand(() -> {}));
 
         sg.setName("AutoDriveClimb");
