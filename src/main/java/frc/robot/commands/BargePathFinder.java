@@ -28,8 +28,8 @@ public class BargePathFinder extends Command {
     private Command c;
 
     // vel, accel, rotvel, rotaccel
-    PathConstraints coarseConstraints = new PathConstraints(3, 3.5, 4, 4);
-    PathConstraints midConstraints = new PathConstraints(1.5, 2.5, 4, 4);
+    PathConstraints coarseConstraints = new PathConstraints(3, 3.75, 4, 4);
+    PathConstraints midConstraints = new PathConstraints(2.5, 3.5, 4, 4);
     PathConstraints finalConstraints = new PathConstraints(1.2, 1, 3, 2);
 
     public BargePathFinder(RobotContainer r) {
@@ -80,7 +80,7 @@ public class BargePathFinder extends Command {
         if (minWaypoints < 0) minWaypoints = 0;
         EventMarker em2 = new EventMarker("InLocalPosePhase", minWaypoints, -1);
         EventMarker em3 =
-                new EventMarker("ShootForNet", waypoints.size() - 1.7, waypoints.size() - 1);
+                new EventMarker("ShootForNet", waypoints.size() - 2, waypoints.size() - 1);
 
         // ChassisSpeeds botVel = r.drive.getVelocity();
         // double speed = Math.hypot(botVel.vxMetersPerSecond, botVel.vyMetersPerSecond);

@@ -96,7 +96,7 @@ public class AutonCommands {
                                         ComplexCommands.goToLoc(
                                                 () -> r.controlBoard.getLevelLocation(level)),
                                         r.hand.setVoltageCmd(-5),
-                                        () -> r.hand.checkForCoral() || isFirst));
+                                        () -> r.hand.checkForCoralT() || isFirst));
 
         Command c =
                 DriveCommands.driveToAuto(r, () -> Locations.getReefLocation(reefSticks), false)
@@ -111,7 +111,7 @@ public class AutonCommands {
                                                                                 .getLevelLocation(
                                                                                         level)),
                                                         waitUntilPathCompleteThenScore,
-                                                        () -> r.hand.checkForCoral() || isFirst)))
+                                                        () -> r.hand.checkForCoralF() || isFirst)))
                         .andThen(ComplexCommands.releaseCoralAuton(level))
                         .alongWith(registerAutonCoralScore(reefSticks, level))
                         .raceWith(r.leds.setLEDMode(LED_MODES.BLUE));
@@ -125,7 +125,7 @@ public class AutonCommands {
                         DriveCommands.waitUntilClose(r, () -> station, 30)
                                 .andThen(r.leds.setLEDMode(LED_MODES.GREEN)))
                 // only abort the wait early if there is coral
-                .andThen(new WaitCommand(gatherStationWait).raceWith(r.hand.hasCoralInBucket()))
+                .andThen(new WaitCommand(gatherStationWait).raceWith(r.hand.hasCoralInBucketCmd()))
                 .deadlineFor(ComplexCommands.goToGather().andThen(ComplexCommands.pulseGather()))
                 // .raceWith(r.hand.hasCoralInBucket()) // abort early once the coral is there
                 .alongWith(registerAutonCoralGather(stationId));
@@ -137,12 +137,12 @@ public class AutonCommands {
                         .raceWith(
                                 new WaitUntilCommand(r.inSlowDrivePhase)
                                         .andThen(autonHandGatherAlgae(stick)))
-                        .andThen(new WaitCommand(0.1))
+                        .andThen(new WaitCommand(0.05)) // TODO: use dist sensor?
                         .andThen(
                                 new PathFollowingCommand(
                                                 r, () -> r.pathCache.closestWaypoint(), true)
                                         .deadlineFor(
-                                                new WaitCommand(0.5)
+                                                new WaitCommand(0.1)
                                                         .andThen(ComplexCommands.goToAlgaeHold())))
                         .alongWith(registerAutonAlgaeGather());
 
@@ -224,10 +224,10 @@ public class AutonCommands {
                                     hasGathered[0] = true;
                                     r.state.setAlgae();
                                 }),
-                        new WaitCommand(0.1),
+                        new WaitCommand(0.05), // TODO: use dist sensor?
                         new PathFollowingCommand(r, () -> r.pathCache.closestWaypoint(), true)
                                 .deadlineFor(
-                                        new WaitCommand(0.5)
+                                        new WaitCommand(0.1)
                                                 .andThen(ComplexCommands.goToAlgaeHold())));
 
         Command c = mainSQ.finallyDo(() -> r.controlBoard.tempScoreAlgae = hasGathered[0]);

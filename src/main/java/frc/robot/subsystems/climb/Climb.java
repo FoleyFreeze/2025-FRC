@@ -70,6 +70,14 @@ public class Climb extends SubsystemBase {
         io.setClimbVolts(volts);
     }
 
+    public Command overrideClimbVoltage(double volts) {
+        return new RunCommand(() -> overrideVolts(volts));
+    }
+
+    public void overrideVolts(double volts) {
+        io.setClimbVolts(volts);
+    }
+
     public void stop() {
         io.setClimbVolts(0);
     }

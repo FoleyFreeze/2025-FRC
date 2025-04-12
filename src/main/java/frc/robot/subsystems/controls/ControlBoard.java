@@ -28,6 +28,7 @@ public class ControlBoard {
     public LoggedDashboardChooser<Boolean> useShuffleboard;
     public LoggedDashboardChooser<GatherDist> stationDist;
     public LoggedDashboardChooser<CageLocation> cageLocation;
+    public LoggedDashboardChooser<Boolean> enableDistSensor;
 
     RobotContainer r;
 
@@ -44,6 +45,10 @@ public class ControlBoard {
         useShuffleboard = new LoggedDashboardChooser<>("UseShuffleboard");
         stationDist = new LoggedDashboardChooser<>("StationDist");
         cageLocation = new LoggedDashboardChooser<>("CageLoction");
+        enableDistSensor = new LoggedDashboardChooser<>("DistSensor");
+
+        enableDistSensor.addDefaultOption("Enable", true);
+        enableDistSensor.addOption("Disable", false);
 
         cageLocation.addDefaultOption("Left", CageLocation.LEFT);
         cageLocation.addOption("Middle", CageLocation.MIDDLE);
@@ -159,6 +164,8 @@ public class ControlBoard {
     public boolean autonAlgaeGather = false;
     public boolean autonAlgaeScore = false;
     public int autonTag = 0;
+
+    public boolean enableDistanceSensor = true;
 
     public int lastGatherStationTag = 0;
 
@@ -423,6 +430,8 @@ public class ControlBoard {
             selectedAlgae = algaeMode.get();
             useFarStation = stationDist.get();
         }
+
+        enableDistanceSensor = enableDistSensor.get();
 
         if (r.flysky.topLeftSWBHi.getAsBoolean()) {
             selectedAlgaeTarget = DestAlgae.NET;

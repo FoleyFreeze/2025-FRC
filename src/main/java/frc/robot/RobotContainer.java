@@ -326,6 +326,10 @@ public class RobotContainer {
         // get safely out of climb position
         controlBoard.climbModeT.onFalse(ComplexCommands.leaveClimb());
 
+        // climb jog override
+        controlBoard.climbModeT.and(controlBoard.jog1).whileTrue(r.climb.overrideClimbVoltage(12));
+        controlBoard.climbModeT.and(controlBoard.jog2).whileTrue(r.climb.overrideClimbVoltage(-12));
+
         // OTHER
 
         // stop button

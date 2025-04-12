@@ -19,7 +19,7 @@ public class Hand extends SubsystemBase {
     private final Alert handDisconnectedAlert = new Alert("Hand Disconnected", AlertType.kError);
     private final Alert handTempAlert = new Alert("Hand Motor Temp > 170", AlertType.kWarning);
 
-    public double coralGatheredDist = 160;
+    public double coralGatheredDist = 140; // 160 at states
 
     RobotContainer r;
 
@@ -53,6 +53,8 @@ public class Hand extends SubsystemBase {
 
         handDisconnectedAlert.set(!inputs.handConnected);
 
+        Logger.recordOutput("Hand/HasCoral", hasCoralInBucket());
+
         handTempAlert.set(inputs.handTempF > 150);
         if (inputs.handTempF > 150) {
             handTempAlert.setText(String.format("Hand Motor Temp at %.0f", inputs.handTempF));
@@ -83,16 +85,23 @@ public class Hand extends SubsystemBase {
         return new InstantCommand(() -> io.setHandVolts(0), this);
     }
 
-    public Command hasCoralInBucket() {
-        return new WaitUntilCommand(
-                () ->
-                        inputs.laserDistmm < coralGatheredDist
-                                && r.arm.atTarget(() -> SuperstructureLocation.INTAKE)
-                                && r.elevator.atTarget(() -> SuperstructureLocation.INTAKE)
-                                && r.wrist.atTarget(() -> SuperstructureLocation.INTAKE));
+    public boolean hasCoralInBucket() {
+        return inputs.laserDistmm < coralGatheredDist
+                && r.arm.atTarget(() -> SuperstructureLocation.INTAKE)
+                && r.elevator.atTarget(() -> SuperstructureLocation.INTAKE)
+                && r.wrist.atTarget(() -> SuperstructureLocation.INTAKE)
+                && r.controlBoard.enableDistanceSensor;
     }
 
-    public boolean checkForCoral() {
-        return inputs.laserDistmm < coralGatheredDist;
+    public Command hasCoralInBucketCmd() {
+        return new WaitUntilCommand(this::hasCoralInBucket);
+    }
+
+    public boolean checkForCoralT() {
+        return inputs.laserDistmm < coralGatheredDist || !r.controlBoard.enableDistanceSensor;
+    }
+
+    public boolean checkForCoralF() {
+        return inputs.laserDistmm < coralGatheredDist && r.controlBoard.enableDistanceSensor;
     }
 }

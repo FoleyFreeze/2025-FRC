@@ -32,10 +32,10 @@ public class NewPathFinder extends Command {
     private Command c;
 
     // vel, accel, rotvel, rotaccel
-    // PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 4.4, 6, 4);
-    PathConstraints coralGlobalConstraints = new PathConstraints(1, 1, 6, 4);
-    // PathConstraints algaeGlobalConstraints = new PathConstraints(3, 3.5, 4, 4);
-    PathConstraints algaeGlobalConstraints = new PathConstraints(1, 1, 4, 4);
+    PathConstraints coralGlobalConstraints = new PathConstraints(3.5, 4.4, 6, 4);
+    // PathConstraints coralGlobalConstraints = new PathConstraints(1, 1, 6, 4);
+    PathConstraints algaeGlobalConstraints = new PathConstraints(3, 3.5, 4, 4);
+    // PathConstraints algaeGlobalConstraints = new PathConstraints(1, 1, 4, 4);
     PathConstraints finalConstraints = new PathConstraints(1.25, 1.5, 3, 2);
     PathConstraints finalConstraintsAlgae = new PathConstraints(1.5, 1.5, 3, 2);
     PathConstraints finalGatherConstraints = new PathConstraints(2, 3, 6, 4);
@@ -116,8 +116,9 @@ public class NewPathFinder extends Command {
         EventMarker em =
                 new EventMarker(
                         "InSlowDrivePhase", startMovingThingsPosition, waypoints.size() - 1);
-        int minWaypoints = waypoints.size() - 3;
-        if (minWaypoints < 0) minWaypoints = 0;
+        // int minWaypoints = waypoints.size() - 3;
+        // if (minWaypoints < 0) minWaypoints = 0;
+        int minWaypoints = 0;
         EventMarker em2 = new EventMarker("InLocalPosePhase", minWaypoints, -1);
 
         // ChassisSpeeds botVel = r.drive.getVelocity();

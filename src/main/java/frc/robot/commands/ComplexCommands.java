@@ -45,7 +45,7 @@ public class ComplexCommands {
     static double superSuckAlgae = 6;
     static double algaeHighLim = 90;
     static double algaeLowLim = 40;
-    static double descoreAlgaePower = -4;
+    static double descoreAlgaePower = -6;
     static double stripTime = 0.75; // make smaller
 
     static double gatherPosition = 0;
@@ -140,7 +140,8 @@ public class ComplexCommands {
                                     r.state.setAlgae();
                                 }),
                         new WaitCommand(0.1),
-                        new PathFollowingCommand(r, () -> r.pathCache.closestWaypoint(), true));
+                        new PathFollowingCommand(r, () -> r.pathCache.closestWaypoint(), true)
+                                .deadlineFor(new WaitCommand(0.1).andThen(goToAlgaeHold())));
 
         Command c = mainSQ.finallyDo(() -> r.controlBoard.tempScoreAlgae = hasGathered[0]);
 
@@ -220,10 +221,10 @@ public class ComplexCommands {
         double minEleVel = 10; // in/sec
 
         SequentialCommandGroup scg = new SequentialCommandGroup();
-        scg.addCommands(new WaitCommand(0));
+        // scg.addCommands(new WaitCommand(0));
         scg.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
         scg.addCommands(r.hand.setVoltageCmd(superSuckAlgae));
-        scg.addCommands(new WaitCommand(0.1));
+        // scg.addCommands(new WaitCommand(0.1));
 
         // launch elevator arm
         scg.addCommands(
@@ -278,7 +279,7 @@ public class ComplexCommands {
                                                 new InstantCommand(() -> r.arm.setVoltage(0)))*/)));
 
         // stop
-        scg.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
+        scg.addCommands(r.hand.setCurrentLimCmd(algaeLowLim));
         scg.addCommands(
                 new InstantCommand(
                         () -> {
@@ -371,12 +372,12 @@ public class ComplexCommands {
                 DriveCommands.driveToAuto(r, r.controlBoard::getAlgaePathPose, false)
                         .raceWith(
                                 new WaitUntilCommand(r.inSlowDrivePhase).andThen(gatherAlgae(true)))
-                        .andThen(new WaitCommand(0.1))
+                        .andThen(new WaitCommand(0.05)) // TODO: use dist sensor?
                         .andThen(
                                 new PathFollowingCommand(
                                                 r, () -> r.pathCache.closestWaypoint(), true)
                                         .deadlineFor(
-                                                new WaitCommand(0.5).andThen(goToAlgaeHold())));
+                                                new WaitCommand(0.1).andThen(goToAlgaeHold())));
         c.setName("VisionAlgaeGather");
         return c;
     }
@@ -588,9 +589,9 @@ public class ComplexCommands {
         Command c =
                 DriveCommands.driveTo(r, r.controlBoard::selectCoralStation, true)
                         .alongWith(noDriveGather())
-                        .until(r.hand::checkForCoral)
+                        .until(r.hand::hasCoralInBucket)
                         .andThen(
-                                DriveCommands.driveVel(r, new ChassisSpeeds(1, 0, 0))
+                                DriveCommands.driveVel(r, new ChassisSpeeds(2.5, 0, 0))
                                         .raceWith(new WaitCommand(.5)));
         c.setName("VisionCoralGather");
         return c;
