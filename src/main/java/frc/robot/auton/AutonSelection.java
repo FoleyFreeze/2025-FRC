@@ -34,7 +34,7 @@ public class AutonSelection {
     }
 
     public enum ScoreType {
-        ONE, 
+        ONE,
         TWO,
         THREE,
         FOUR,
@@ -43,7 +43,7 @@ public class AutonSelection {
     }
 
     public enum PieceType {
-        CORAL, 
+        CORAL,
         ALGAE,
         NONE,
     }
@@ -185,7 +185,7 @@ public class AutonSelection {
             case CORAL:
                 c.addCommands(AutonCommands.scoreCoral(stick, level));
                 break;
-            //no algae allowed on first score
+                // no algae allowed on first score
             case ALGAE:
             case NONE:
             default:
@@ -200,16 +200,17 @@ public class AutonSelection {
         switch (type) {
             case CORAL:
                 c.addCommands(AutonCommands.coralStationGather(getGatherLocation(gather), gather));
-                c.addCommands(AutonCommands.scoreCoral(stick, level));                
+                c.addCommands(AutonCommands.scoreCoral(stick, level));
                 break;
             case ALGAE:
-                c.addCommands();
+                c.addCommands(AutonCommands.algaeGather(stick));
+                c.addCommands(AutonCommands.algaeScore(level));
+                break;
             case NONE:
             default:
                 return c;
         }
-        
-        
+
         // gather 2, score 3
         gather = gatherChoose2.get();
         stick = scoreLoc3.get();
@@ -218,16 +219,18 @@ public class AutonSelection {
         switch (type) {
             case CORAL:
                 c.addCommands(AutonCommands.coralStationGather(getGatherLocation(gather), gather));
-                c.addCommands(AutonCommands.scoreCoral(stick, level));                
+                c.addCommands(AutonCommands.scoreCoral(stick, level));
                 break;
             case ALGAE:
-                c.addCommands();
+                c.addCommands(AutonCommands.algaeGather(stick));
+                c.addCommands(AutonCommands.algaeScore(level));
+                break;
             case NONE:
             default:
                 return c;
         }
 
-        // gather 3
+        // gather 3, score 4
         gather = gatherChoose3.get();
         stick = scoreLoc4.get();
         level = scoreLevel4.get();
@@ -235,10 +238,12 @@ public class AutonSelection {
         switch (type) {
             case CORAL:
                 c.addCommands(AutonCommands.coralStationGather(getGatherLocation(gather), gather));
-                c.addCommands(AutonCommands.scoreCoral(stick, level));                
+                c.addCommands(AutonCommands.scoreCoral(stick, level));
                 break;
             case ALGAE:
-                c.addCommands();
+                c.addCommands(AutonCommands.algaeGather(stick));
+                c.addCommands(AutonCommands.algaeScore(level));
+                break;
             case NONE:
             default:
                 return c;
@@ -247,18 +252,20 @@ public class AutonSelection {
         Command cmd =
                 c.finallyDo(
                         () -> {
-                            r.controlBoard.autonGather = false;
-                            r.controlBoard.autonScore = false;
+                            r.controlBoard.autonCoralGather = false;
+                            r.controlBoard.autonCoralScore = false;
+                            r.controlBoard.autonAlgaeGather = false;
+                            r.controlBoard.autonAlgaeScore = false;
                         });
         cmd.setName("Auton");
         return cmd;
     }
 
     private PieceType checkConsistency(GatherType gType, ReefSticks stick, ScoreType sType) {
-        if(stick == ReefSticks.NONE){
+        if (stick == ReefSticks.NONE) {
             return PieceType.NONE;
         }
-        switch(gType){
+        switch (gType) {
             case LEFT_CLOSE:
             case LEFT_CENTER:
             case LEFT_FAR:
@@ -271,7 +278,7 @@ public class AutonSelection {
                     case THREE:
                     case FOUR:
                         return PieceType.CORAL;
-                
+
                     default:
                         return PieceType.NONE;
                 }
@@ -284,7 +291,7 @@ public class AutonSelection {
                         return PieceType.NONE;
                 }
             default:
-            return PieceType.NONE;
+                return PieceType.NONE;
         }
     }
 
@@ -322,9 +329,9 @@ public class AutonSelection {
         in.addOption("Right_Center", GatherType.RIGHT_CENTER);
         in.addOption("Right_Close", GatherType.RIGHT_CLOSE);
         in.addOption("Reef", GatherType.REEF);
-        in.addOption("Zone1", GatherType.ZONE1);
-        in.addOption("Zone2", GatherType.ZONE2);
-        in.addOption("Zone3", GatherType.ZONE3);
+        // in.addOption("Zone1", GatherType.ZONE1);
+        // in.addOption("Zone2", GatherType.ZONE2);
+        // in.addOption("Zone3", GatherType.ZONE3);
     }
 
     private Pose2d getGatherLocation(GatherType gathertype) {
@@ -348,7 +355,6 @@ public class AutonSelection {
             case RIGHT_FAR:
                 gatherLoc = Locations.getRightGatherStationFar();
                 break;
-            case REEF: // TODO: this
             default:
                 gatherLoc = null; // we done
         }

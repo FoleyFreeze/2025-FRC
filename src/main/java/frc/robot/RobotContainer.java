@@ -456,8 +456,8 @@ public class RobotContainer {
 
     public void updateMechanisms() {
         mechElevator.setLength(elevator.getHeight().in(Meters));
-        mechArm.setAngle(arm.getAngle().in(Degrees));
-        mechWrist.setAngle(wrist.getAngleRads().in(Degrees));
+        mechArm.setAngle(-arm.getAngle().in(Degrees));
+        mechWrist.setAngle(-wrist.getAngleRads().in(Degrees));
 
         Logger.recordOutput("Mechanism", mechBase);
     }

@@ -563,42 +563,47 @@ public class Drive extends SubsystemBase {
         boolean ret = true;
 
         // first handle auton
-        if (r.controlBoard.autonGather) {
+        if (r.controlBoard.autonCoralGather) {
             ret = gatherTags.contains(id);
-        } else if (r.controlBoard.autonScore) {
+        } else if (r.controlBoard.autonCoralScore) {
             ret = reefTags.contains(id);
-        }
+        } else if (r.controlBoard.autonAlgaeGather) {
+            ret = reefTags.contains(id);
+        } else if (r.controlBoard.autonAlgaeScore) {
+            ret = bargeTags.contains(id);
+        } else {
 
-        if (r.controlBoard.selectedClimbMode) {
-            // if in cage mode, reject all april tags
-            if (r.state.inCageDrive) {
-                ret = false;
-            } else {
-                // for drive to front cage area accept all
-                ret = true;
-            }
-        } else if (r.flysky.rightTriggerSWG.getAsBoolean()) {
-            if (r.controlBoard.algaeModeT.getAsBoolean()
-                    || r.controlBoard.tempScoreAlgaeT.getAsBoolean()) {
-                switch (r.controlBoard.selectedAlgaeTarget) {
-                    case NET:
-                        ret = bargeTags.contains(id);
-                    case PROC:
-                        ret = procTags.contains(id);
-                    case CLOSEST:
-                    default:
-                        // both, idk
-                        ret = bargeTags.contains(id) || procTags.contains(id);
+            if (r.controlBoard.selectedClimbMode) {
+                // if in cage mode, reject all april tags
+                if (r.state.inCageDrive) {
+                    ret = false;
+                } else {
+                    // for drive to front cage area accept all
+                    ret = true;
                 }
-            } else {
-                // in coral mode
-                ret = reefTags.contains(id); // accept all reef tags
-            }
-        } else if (r.flysky.leftTriggerSWE.getAsBoolean()) {
-            if (r.controlBoard.algaeModeT.getAsBoolean()) {
-                ret = reefTags.contains(id); // accept all reef tags
-            } else {
-                ret = gatherTags.contains(id); // accept all gather tags
+            } else if (r.flysky.rightTriggerSWG.getAsBoolean()) {
+                if (r.controlBoard.algaeModeT.getAsBoolean()
+                        || r.controlBoard.tempScoreAlgaeT.getAsBoolean()) {
+                    switch (r.controlBoard.selectedAlgaeTarget) {
+                        case NET:
+                            ret = bargeTags.contains(id);
+                        case PROC:
+                            ret = procTags.contains(id);
+                        case CLOSEST:
+                        default:
+                            // both, idk
+                            ret = bargeTags.contains(id) || procTags.contains(id);
+                    }
+                } else {
+                    // in coral mode
+                    ret = reefTags.contains(id); // accept all reef tags
+                }
+            } else if (r.flysky.leftTriggerSWE.getAsBoolean()) {
+                if (r.controlBoard.algaeModeT.getAsBoolean()) {
+                    ret = reefTags.contains(id); // accept all reef tags
+                } else {
+                    ret = gatherTags.contains(id); // accept all gather tags
+                }
             }
         }
 

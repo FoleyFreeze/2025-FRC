@@ -154,8 +154,10 @@ public class ControlBoard {
     public CageLocation selectedCage = CageLocation.LEFT;
     public DestAlgae selectedAlgaeTarget = DestAlgae.CLOSEST;
 
-    public boolean autonGather = false;
-    public boolean autonScore = false;
+    public boolean autonCoralGather = false;
+    public boolean autonCoralScore = false;
+    public boolean autonAlgaeGather = false;
+    public boolean autonAlgaeScore = false;
     public int autonTag = 0;
 
     public int lastGatherStationTag = 0;
@@ -442,8 +444,8 @@ public class ControlBoard {
         Logger.recordOutput("CB/SelectedCage", selectedCage);
         Logger.recordOutput("CB/SelectedAlgaeTarget", selectedAlgaeTarget);
 
-        Logger.recordOutput("CB/FakeAuto/Gather", autonGather);
-        Logger.recordOutput("CB/FakeAuto/Score", autonScore);
+        Logger.recordOutput("CB/FakeAuto/Gather", autonCoralGather);
+        Logger.recordOutput("CB/FakeAuto/Score", autonCoralScore);
         Logger.recordOutput("CB/FakeAuto/Tag", autonTag);
 
         Logger.recordOutput("CB/tempGatherAlgae", tempGatherAlgae);
@@ -594,7 +596,11 @@ public class ControlBoard {
     }
 
     public SuperstructureLocation getAlgaeReefHeight() {
-        switch (selectedReefPos) {
+        return getAlgaeReefHeight(selectedReefPos);
+    }
+
+    public SuperstructureLocation getAlgaeReefHeight(ReefSticks stick) {
+        switch (stick) {
             case A:
             case B:
             case E:

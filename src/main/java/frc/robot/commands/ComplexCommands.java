@@ -37,8 +37,8 @@ public class ComplexCommands {
 
     static double intakeAlgaeTime = 0.2;
     static double intakeCurrentAlgae = 50;
-    static double intakeAlgaePower = 10;
-    static double holdAlgaePower = 2;
+    public static double intakeAlgaePower = 10;
+    public static double holdAlgaePower = 2;
     static double releasePowerAlgae = -12;
     static double releaseTimeAlgae = 0.5;
     static double netAngle = 60;
@@ -213,6 +213,10 @@ public class ComplexCommands {
     }
 
     public static Command netLaunch() {
+        return netLaunch(true);
+    }
+
+    public static Command netLaunch(boolean drive) {
         double minEleVel = 10; // in/sec
 
         SequentialCommandGroup scg = new SequentialCommandGroup();
@@ -321,9 +325,15 @@ public class ComplexCommands {
                         },
                         r.drive);
 
-        Command c =
-                scg.deadlineFor(pathWrapper)
-                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        Command c;
+        if (drive) {
+            c =
+                    scg.deadlineFor(pathWrapper)
+                            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        } else {
+            c = scg;
+        }
+
         c.setName("NetLaunch");
         return c;
     }

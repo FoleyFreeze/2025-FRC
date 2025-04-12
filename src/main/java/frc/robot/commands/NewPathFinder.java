@@ -74,12 +74,15 @@ public class NewPathFinder extends Command {
         //     flipPose = targetPose.plus(new Transform2d(0, 0, Rotation2d.kCW_90deg));
         // }
 
+        boolean isAuto = DriverStation.isAutonomous();
+
         double startMovingThingsPosition;
-        if (r.controlBoard.algaeModeT.getAsBoolean()) {
+        if (r.controlBoard.algaeModeT.getAsBoolean() && !isAuto
+                || isAuto && r.controlBoard.autonAlgaeGather) {
             startMovingThingsPosition = 0.0;
         } else {
             // coral
-            if (r.controlBoard.selectedLevel == 4) {
+            if (r.controlBoard.selectedLevel == 4 || isAuto) {
                 startMovingThingsPosition = waypoints.size() - 2.8;
             } else if (r.controlBoard.selectedLevel == 1) {
                 startMovingThingsPosition = waypoints.size() - 2.8;
@@ -93,7 +96,8 @@ public class NewPathFinder extends Command {
 
         PathConstraints selectedConstraint;
         PathConstraints globalConstraint;
-        if (r.controlBoard.algaeModeT.getAsBoolean() && !DriverStation.isAutonomous()) {
+        if (r.controlBoard.algaeModeT.getAsBoolean() && !isAuto
+                || isAuto && r.controlBoard.autonAlgaeGather) {
             selectedConstraint = finalConstraintsAlgae;
             globalConstraint = algaeGlobalConstraints;
         } else {
