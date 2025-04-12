@@ -29,7 +29,7 @@ public class Locations {
             new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-1), 0, new Rotation2d());
     // TODO: go back to -7?
     public static Transform2d halfRobotNet2 =
-            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-7 + 5), 0, new Rotation2d());
+            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-7 + 10), 0, new Rotation2d());
 
     static double extraGatherX = 0.5; // 12
     static double extraGatherY = 20 - 4;
