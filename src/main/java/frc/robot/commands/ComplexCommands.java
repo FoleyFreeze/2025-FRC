@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -576,7 +577,11 @@ public class ComplexCommands {
         // gather
         Command c =
                 DriveCommands.driveTo(r, r.controlBoard::selectCoralStation, true)
-                        .alongWith(noDriveGather());
+                        .alongWith(noDriveGather())
+                        .until(r.hand::checkForCoral)
+                        .andThen(
+                                DriveCommands.driveVel(r, new ChassisSpeeds(1, 0, 0))
+                                        .raceWith(new WaitCommand(.5)));
         c.setName("VisionCoralGather");
         return c;
     }

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
 import frc.robot.auton.AutonSelection.GatherType;
+import frc.robot.auton.AutonSelection.ScoreType;
 import frc.robot.commands.ComplexCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.LEDs.LED.LED_MODES;
@@ -39,7 +40,25 @@ public class AutonCommands {
                 });
     }
 
-    public static Command scoreCoral(ReefSticks reefSticks, int level) {
+    public static Command scoreCoral(ReefSticks reefSticks, ScoreType levelType) {
+        int level;
+        switch(levelType){
+                case ONE:
+                        level = 1;
+                break;
+                case TWO:
+                        level = 2;
+                break;
+                case THREE:
+                        level = 3;
+                break;
+                case FOUR:
+                        level = 4;
+                break;
+                default:
+                        level = 4;
+
+        }
         Command waitUntilPathCompleteThenScore =
                 new WaitUntilCommand(r.state.pathCompleteT)
                         .andThen(

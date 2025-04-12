@@ -33,22 +33,37 @@ public class AutonSelection {
         ZONE3,
     }
 
+    public enum ScoreType {
+        ONE, 
+        TWO,
+        THREE,
+        FOUR,
+        NET,
+        PROC,
+    }
+
+    public enum PieceType {
+        CORAL, 
+        ALGAE,
+        NONE,
+    }
+
     private SettableLoggableChooser<Integer> startLocation;
 
     private SettableLoggableChooser<ReefSticks> scoreLoc1;
-    private SettableLoggableChooser<Integer> scoreLevel1;
+    private SettableLoggableChooser<ScoreType> scoreLevel1;
 
     private SettableLoggableChooser<GatherType> gatherChoose1;
     private SettableLoggableChooser<ReefSticks> scoreLoc2;
-    private SettableLoggableChooser<Integer> scoreLevel2;
+    private SettableLoggableChooser<ScoreType> scoreLevel2;
 
     private SettableLoggableChooser<GatherType> gatherChoose2;
     private SettableLoggableChooser<ReefSticks> scoreLoc3;
-    private SettableLoggableChooser<Integer> scoreLevel3;
+    private SettableLoggableChooser<ScoreType> scoreLevel3;
 
     private SettableLoggableChooser<GatherType> gatherChoose3;
     private SettableLoggableChooser<ReefSticks> scoreLoc4;
-    private SettableLoggableChooser<Integer> scoreLevel4;
+    private SettableLoggableChooser<ScoreType> scoreLevel4;
 
     private SettableLoggableChooser<String> presets;
 
@@ -162,57 +177,72 @@ public class AutonSelection {
         // c.addCommands(new InstantCommand(() -> r.drive.setPose(startLoc)));
 
         // score 1
+        GatherType gather = GatherType.LEFT_CENTER;
         ReefSticks stick = scoreLoc1.get();
-        Integer level = scoreLevel1.get();
-        if (stick == ReefSticks.NONE || level == null) {
-            return new InstantCommand();
+        ScoreType level = scoreLevel1.get();
+        PieceType type = checkConsistency(gather, stick, level);
+        switch (type) {
+            case CORAL:
+                c.addCommands(AutonCommands.scoreCoral(stick, level));
+                break;
+            //no algae allowed on first score
+            case ALGAE:
+            case NONE:
+            default:
+                return new InstantCommand();
         }
-        c.addCommands(AutonCommands.scoreCoral(scoreLoc1.get(), scoreLevel1.get()));
 
-        // gather 1
-        Pose2d gatherLoc = getGatherLocation(gatherChoose1.get());
-        if (gatherLoc == null) {
-            return c; // we done
-        }
-        c.addCommands(AutonCommands.coralStationGather(gatherLoc, gatherChoose1.get()));
-
-        // score 2
+        // gather 1, score 2
+        gather = gatherChoose1.get();
         stick = scoreLoc2.get();
         level = scoreLevel2.get();
-        if (stick == ReefSticks.NONE || level == null) {
-            return c;
+        type = checkConsistency(gather, stick, level);
+        switch (type) {
+            case CORAL:
+                c.addCommands(AutonCommands.coralStationGather(getGatherLocation(gather), gather));
+                c.addCommands(AutonCommands.scoreCoral(stick, level));                
+                break;
+            case ALGAE:
+                c.addCommands();
+            case NONE:
+            default:
+                return c;
         }
-        c.addCommands(AutonCommands.scoreCoral(scoreLoc2.get(), scoreLevel2.get()));
-
-        // gather 2
-        gatherLoc = getGatherLocation(gatherChoose2.get());
-        if (gatherLoc == null) {
-            return c; // we done
-        }
-        c.addCommands(AutonCommands.coralStationGather(gatherLoc, gatherChoose2.get()));
-
-        // score 3
+        
+        
+        // gather 2, score 3
+        gather = gatherChoose2.get();
         stick = scoreLoc3.get();
         level = scoreLevel3.get();
-        if (stick == ReefSticks.NONE || level == null) {
-            return c;
+        type = checkConsistency(gather, stick, level);
+        switch (type) {
+            case CORAL:
+                c.addCommands(AutonCommands.coralStationGather(getGatherLocation(gather), gather));
+                c.addCommands(AutonCommands.scoreCoral(stick, level));                
+                break;
+            case ALGAE:
+                c.addCommands();
+            case NONE:
+            default:
+                return c;
         }
-        c.addCommands(AutonCommands.scoreCoral(scoreLoc3.get(), scoreLevel3.get()));
 
         // gather 3
-        gatherLoc = getGatherLocation(gatherChoose3.get());
-        if (gatherLoc == null) {
-            return c; // we done
-        }
-        c.addCommands(AutonCommands.coralStationGather(gatherLoc, gatherChoose3.get()));
-
-        // score 4
+        gather = gatherChoose3.get();
         stick = scoreLoc4.get();
         level = scoreLevel4.get();
-        if (stick == ReefSticks.NONE || level == null) {
-            return c;
+        type = checkConsistency(gather, stick, level);
+        switch (type) {
+            case CORAL:
+                c.addCommands(AutonCommands.coralStationGather(getGatherLocation(gather), gather));
+                c.addCommands(AutonCommands.scoreCoral(stick, level));                
+                break;
+            case ALGAE:
+                c.addCommands();
+            case NONE:
+            default:
+                return c;
         }
-        c.addCommands(AutonCommands.scoreCoral(scoreLoc4.get(), scoreLevel4.get()));
 
         Command cmd =
                 c.finallyDo(
@@ -222,6 +252,40 @@ public class AutonSelection {
                         });
         cmd.setName("Auton");
         return cmd;
+    }
+
+    private PieceType checkConsistency(GatherType gType, ReefSticks stick, ScoreType sType) {
+        if(stick == ReefSticks.NONE){
+            return PieceType.NONE;
+        }
+        switch(gType){
+            case LEFT_CLOSE:
+            case LEFT_CENTER:
+            case LEFT_FAR:
+            case RIGHT_CENTER:
+            case RIGHT_CLOSE:
+            case RIGHT_FAR:
+                switch (sType) {
+                    case ONE:
+                    case TWO:
+                    case THREE:
+                    case FOUR:
+                        return PieceType.CORAL;
+                
+                    default:
+                        return PieceType.NONE;
+                }
+            case REEF:
+                switch (sType) {
+                    case NET:
+                    case PROC:
+                        return PieceType.ALGAE;
+                    default:
+                        return PieceType.NONE;
+                }
+            default:
+            return PieceType.NONE;
+        }
     }
 
     private void fillScoreLoc(SettableLoggableChooser<ReefSticks> in) {
@@ -240,11 +304,13 @@ public class AutonSelection {
         in.addOption("L", ReefSticks.L);
     }
 
-    private void fillScoreLevel(SettableLoggableChooser<Integer> in) {
-        in.addDefaultOption("1", 1);
-        in.addOption("2", 2);
-        in.addOption("3", 3);
-        in.addOption("4", 4);
+    private void fillScoreLevel(SettableLoggableChooser<ScoreType> in) {
+        in.addDefaultOption("1", ScoreType.ONE);
+        in.addOption("2", ScoreType.TWO);
+        in.addOption("3", ScoreType.THREE);
+        in.addOption("4", ScoreType.FOUR);
+        in.addOption("Net", ScoreType.NET);
+        in.addOption("Proc", ScoreType.PROC);
     }
 
     private void fillGatherLoc(SettableLoggableChooser<GatherType> in) {
