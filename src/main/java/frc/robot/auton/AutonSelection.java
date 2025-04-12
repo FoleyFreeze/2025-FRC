@@ -183,7 +183,7 @@ public class AutonSelection {
         PieceType type = checkConsistency(gather, stick, level);
         switch (type) {
             case CORAL:
-                c.addCommands(AutonCommands.scoreCoral(stick, level));
+                c.addCommands(AutonCommands.scoreCoral(stick, level, true));
                 break;
                 // no algae allowed on first score
             case ALGAE:

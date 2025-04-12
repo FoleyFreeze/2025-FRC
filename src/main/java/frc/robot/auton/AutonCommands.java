@@ -67,6 +67,10 @@ public class AutonCommands {
     }
 
     public static Command scoreCoral(ReefSticks reefSticks, ScoreType levelType) {
+        return scoreCoral(reefSticks, levelType, false);
+    }
+
+    public static Command scoreCoral(ReefSticks reefSticks, ScoreType levelType, boolean isFirst) {
         int level;
         switch (levelType) {
             case ONE:
@@ -84,6 +88,7 @@ public class AutonCommands {
             default:
                 level = 4;
         }
+
         Command waitUntilPathCompleteThenScore =
                 new WaitUntilCommand(r.state.pathCompleteT)
                         .andThen(
@@ -91,7 +96,7 @@ public class AutonCommands {
                                         ComplexCommands.goToLoc(
                                                 () -> r.controlBoard.getLevelLocation(level)),
                                         r.hand.setVoltageCmd(-5),
-                                        () -> r.hand.checkForCoral()));
+                                        () -> r.hand.checkForCoral() || isFirst));
 
         Command c =
                 DriveCommands.driveToAuto(r, () -> Locations.getReefLocation(reefSticks), false)
@@ -106,7 +111,7 @@ public class AutonCommands {
                                                                                 .getLevelLocation(
                                                                                         level)),
                                                         waitUntilPathCompleteThenScore,
-                                                        () -> r.hand.checkForCoral())))
+                                                        () -> r.hand.checkForCoral() || isFirst)))
                         .andThen(ComplexCommands.releaseCoralAuton(level))
                         .alongWith(registerAutonCoralScore(reefSticks, level))
                         .raceWith(r.leds.setLEDMode(LED_MODES.BLUE));
