@@ -3,6 +3,7 @@ package frc.robot.util;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -29,7 +30,7 @@ public class Locations {
             new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-1), 0, new Rotation2d());
     // TODO: go back to -7?
     public static Transform2d halfRobotNet2 =
-            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-7 - 5), 0, new Rotation2d());
+            new Transform2d(robotLength / 2.0 + Units.inchesToMeters(-7 - 1), 0, new Rotation2d());
 
     static double extraGatherX = 0.5; // 12
     static double extraGatherY = 20 - 4;
@@ -179,15 +180,47 @@ public class Locations {
         }
     }
 
+    public static boolean yValInThresh(double y) {
+        double delta = Units.inchesToMeters(3);
+        if (isBlue()) {
+            return y - delta <= yValThresh;
+        } else {
+            return y + delta >= yValThresh;
+        }
+    }
+
+    public static Pose2d getNetWaypoint() {
+        Pose3d barge;
+        Pose3d reef;
+        if (isBlue()) {
+            barge = tags.getTagPose(14).get();
+            reef = tags.getTagPose(21).get();
+            double x = barge.getX() * 0.5 + reef.getX() * 0.5;
+            double y = barge.getY() * 0.66 + reef.getY() * 0.33;
+            return new Pose2d(x, y, Rotation2d.fromDegrees(60));
+        } else {
+            barge = tags.getTagPose(5).get();
+            reef = tags.getTagPose(10).get();
+            double x = barge.getX() * 0.5 + reef.getX() * 0.5;
+            double y = barge.getY() * 0.66 + reef.getY() * 0.33;
+            return new Pose2d(x, y, Rotation2d.fromDegrees(240));
+        }
+    }
+
+    private static double yValThresh = 0;
+    static double bargeShrinkage = 0.7;
+
     public static Pose2d getDriveToNetPose(Pose2d robotPose) {
         if (isBlue()) {
-            double minY = 4.8 - distOffsetY;
+            double minY = 4.8 - distOffsetY + bargeShrinkage;
             double maxY = 7.5 - distOffsetY;
+            yValThresh = minY;
             double y = Math.max(minY, Math.min(robotPose.getY(), maxY));
             return new Pose2d(getNetX2() - distOffsetX, y, Rotation2d.kZero);
         } else {
             double minY = 0.5 + distOffsetY;
-            double maxY = 3.2 + distOffsetY;
+            double maxY = 3.2 + distOffsetY - bargeShrinkage;
+            yValThresh = maxY;
             double y = Math.max(minY, Math.min(robotPose.getY(), maxY));
             return new Pose2d(getNetX2() + distOffsetX, y, Rotation2d.k180deg);
         }

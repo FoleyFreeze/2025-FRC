@@ -402,16 +402,6 @@ public class RobotContainer {
 
         SmartDashboard.putNumber("BotAngle", botPose.getRotation().getDegrees());
 
-        /*
-        double distToTag =
-                r.drive
-                        .getPose()
-                        .getTranslation()
-                        .getDistance(
-                                Locations.tags.getTagPose(7).get().toPose2d().getTranslation());
-        Logger.recordOutput("DistTo7", distToTag);
-        */
-
         SmartDashboard.putNumber("ClimbPos", climb.inputs.climbAbsPosition);
 
         state.periodic();

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
+import frc.robot.auton.AutonCommands;
 import frc.robot.util.Locations;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -220,14 +221,14 @@ public class ComplexCommands {
     public static Command netLaunch(boolean drive) {
         double minEleVel = 10; // in/sec
 
-        SequentialCommandGroup scg = new SequentialCommandGroup();
+        SequentialCommandGroup scg1 = new SequentialCommandGroup();
         // scg.addCommands(new WaitCommand(0));
-        scg.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
-        scg.addCommands(r.hand.setVoltageCmd(superSuckAlgae));
+        scg1.addCommands(r.hand.setCurrentLimCmd(algaeHighLim));
+        scg1.addCommands(r.hand.setVoltageCmd(superSuckAlgae));
         // scg.addCommands(new WaitCommand(0.1));
 
         // launch elevator arm
-        scg.addCommands(
+        scg1.addCommands(
                 new InstantCommand(
                         () -> {
                             // r.arm.setVoltage(-2.5);
@@ -235,13 +236,13 @@ public class ComplexCommands {
                         }));
 
         // wait to release ball
-        scg.addCommands(
+        scg1.addCommands(
                 new WaitUntilCommand(() -> r.elevator.getHeight().in(Inches) > 26)
                         .raceWith(new WaitCommand(0.25)));
-        scg.addCommands(r.hand.setVoltageCmd(releasePowerAlgae));
+        scg1.addCommands(r.hand.setVoltageCmd(releasePowerAlgae));
 
         // wait until ball is out
-        scg.addCommands(
+        scg1.addCommands(
                 new WaitCommand(0.08)
                         .raceWith(
                                 new WaitUntilCommand(
@@ -249,14 +250,15 @@ public class ComplexCommands {
                                                 r.elevator.getHeight().in(Inches) > 41
                                                         || r.arm.getAngle().in(Degrees) < -50)));
 
+        SequentialCommandGroup scg2 = new SequentialCommandGroup();
         // slow down
-        scg.addCommands(
+        scg2.addCommands(
                 new InstantCommand(
                         () -> {
                             // r.arm.setVoltage(1);
                             r.elevator.setVoltage(-1);
                         }));
-        scg.addCommands(
+        scg2.addCommands(
                 new WaitCommand(0.2)
                         .raceWith(
                                 new ParallelCommandGroup(
@@ -279,8 +281,8 @@ public class ComplexCommands {
                                                 new InstantCommand(() -> r.arm.setVoltage(0)))*/)));
 
         // stop
-        scg.addCommands(r.hand.setCurrentLimCmd(algaeLowLim));
-        scg.addCommands(
+        scg2.addCommands(r.hand.setCurrentLimCmd(algaeLowLim));
+        scg2.addCommands(
                 new InstantCommand(
                         () -> {
                             SuperstructureLocation loc = SuperstructureLocation.VERT_ALGAE;
@@ -329,10 +331,18 @@ public class ComplexCommands {
         Command c;
         if (drive) {
             c =
-                    scg.deadlineFor(pathWrapper)
+                    scg1.deadlineFor(pathWrapper)
+                            .andThen(
+                                    scg2.deadlineFor(
+                                            DriveCommands.driveFieldVel(
+                                                    r, new ChassisSpeeds(-3.5, 0, 0))))
                             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
         } else {
-            c = scg;
+            c =
+                    scg1.andThen(
+                                    new InstantCommand(
+                                            () -> AutonCommands.specialBargeDriveAbortFlag = true))
+                            .andThen(scg2);
         }
 
         c.setName("NetLaunch");

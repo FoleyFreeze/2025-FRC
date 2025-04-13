@@ -559,7 +559,22 @@ public class DriveCommands {
     }
 
     public static Command driveVel(RobotContainer r, ChassisSpeeds speeds) {
-        return new RunCommand(() -> r.drive.runVelocity(speeds), r.drive);
+        return new RunCommand(() -> r.drive.runVelocity(speeds), r.drive).finallyDo(r.drive::stop);
+    }
+
+    public static Command driveFieldVel(RobotContainer r, ChassisSpeeds speeds) {
+        return new RunCommand(
+                () -> {
+                    if (Locations.isBlue()) {
+                        r.drive.runVelocity(
+                                ChassisSpeeds.fromFieldRelativeSpeeds(
+                                        speeds, r.drive.getRotation()));
+                    } else {
+                        r.drive.runVelocity(
+                                ChassisSpeeds.fromFieldRelativeSpeeds(
+                                        speeds, r.drive.getRotation().plus(Rotation2d.k180deg)));
+                    }
+                });
     }
 
     public static Command zeroDrive(RobotContainer r) {

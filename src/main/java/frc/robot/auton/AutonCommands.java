@@ -1,6 +1,7 @@
 package frc.robot.auton;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -27,6 +28,8 @@ public class AutonCommands {
 
     static double gatherStationWait = 0.8;
     static double gatherPowerForExtraTime = 0.7;
+
+    public static boolean specialBargeDriveAbortFlag = false;
 
     public static Command registerAutonCoralScore(ReefSticks reef, int level) {
         return new InstantCommand(
@@ -179,9 +182,18 @@ public class AutonCommands {
         Command c =
                 new SequentialCommandGroup(
                                 ComplexCommands.goToAlgaeHold(),
-                                new WaitUntilCommand(r.state.pathCompleteT.or(r.shootForNet)),
+                                new WaitUntilCommand(r.shootForNet),
                                 ComplexCommands.netLaunch(false))
-                        .deadlineFor(new BargePathFinder(r));
+                        .deadlineFor(
+                                new BargePathFinder(r)
+                                        .alongWith(
+                                                new InstantCommand(
+                                                        () -> specialBargeDriveAbortFlag = false))
+                                        .until(() -> specialBargeDriveAbortFlag)
+                                        .andThen(
+                                                DriveCommands.driveFieldVel(
+                                                                r, new ChassisSpeeds(-2, 0, 0))
+                                                        .raceWith(new WaitCommand(0.5))));
 
         c.setName("AutonScoreAlgaeNet");
         return c;

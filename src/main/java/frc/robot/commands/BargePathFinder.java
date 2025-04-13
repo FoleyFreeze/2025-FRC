@@ -28,8 +28,8 @@ public class BargePathFinder extends Command {
     private Command c;
 
     // vel, accel, rotvel, rotaccel
-    PathConstraints coarseConstraints = new PathConstraints(3, 3.75, 4, 4);
-    PathConstraints midConstraints = new PathConstraints(2.5, 3.5, 4, 4);
+    PathConstraints coarseConstraints = new PathConstraints(3, 3.5, 4, 4);
+    PathConstraints midConstraints = new PathConstraints(2.2, 3, 4, 4);
     PathConstraints finalConstraints = new PathConstraints(1.2, 1, 3, 2);
 
     public BargePathFinder(RobotContainer r) {
@@ -43,7 +43,7 @@ public class BargePathFinder extends Command {
 
         List<Pose2d> poseList = r.pathCache.getPathTo(targetPose, true);
 
-        // use our own offset to generate the last 2 waypoints
+        // use our own offset to generate the last 2, make that 3 waypoints
         Translation2d finalVector = Locations.getDriveToNetOffset();
         Pose2d penultimatePose = new Pose2d(targetPose.getTranslation(), finalVector.getAngle());
         Pose2d finalPose =
@@ -51,8 +51,36 @@ public class BargePathFinder extends Command {
                         targetPose.getTranslation().plus(Locations.getDriveToNetOffset()),
                         finalVector.getAngle());
 
-        poseList.set(poseList.size() - 2, penultimatePose);
-        poseList.set(poseList.size() - 1, finalPose);
+        double extraMidBuffer = 0;
+        if (Locations.yValInThresh(targetPose.getY()) && false) {
+            // add third waypoint
+            Pose2d theThird = Locations.getNetWaypoint();
+
+            // modify target pose to shift a bit more left
+            targetPose =
+                    new Pose2d(
+                            targetPose.getX(),
+                            // this is a delta of ~24in inverted for red
+                            targetPose.getY() + finalVector.getY() * 4,
+                            targetPose.getRotation());
+
+            // recalc final poses
+            penultimatePose = new Pose2d(targetPose.getTranslation(), finalVector.getAngle());
+            finalPose =
+                    new Pose2d(
+                            targetPose.getTranslation().plus(Locations.getDriveToNetOffset()),
+                            finalVector.getAngle());
+
+            poseList.set(poseList.size() - 2, theThird);
+            poseList.set(poseList.size() - 1, penultimatePose);
+            poseList.add(finalPose);
+
+            extraMidBuffer = 0.75;
+        } else {
+            // just drive
+            poseList.set(poseList.size() - 2, penultimatePose);
+            poseList.set(poseList.size() - 1, finalPose);
+        }
 
         List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(poseList);
 
@@ -70,7 +98,10 @@ public class BargePathFinder extends Command {
         ConstraintsZone cz =
                 new ConstraintsZone(waypoints.size() - 2, waypoints.size() - 1, finalConstraints);
         ConstraintsZone cz2 =
-                new ConstraintsZone(waypoints.size() - 2.5, waypoints.size() - 2, midConstraints);
+                new ConstraintsZone(
+                        waypoints.size() - 2.5 - extraMidBuffer,
+                        waypoints.size() - 2,
+                        midConstraints);
 
         RotationTarget rt = new RotationTarget(waypoints.size() - 2, flipPose.getRotation());
         EventMarker em =

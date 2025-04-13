@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -246,6 +247,11 @@ public class Vision extends SubsystemBase {
                         observation.timestamp(),
                         VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev),
                         observation.tagId());
+
+                // print out info about this image
+                String name = "Cam" + cameraIndex;
+                SmartDashboard.putNumber(
+                        name, Units.metersToInches(observation.averageTagDistance()));
 
                 // find closest tag in shot to robot
 
