@@ -105,8 +105,14 @@ public class AutonSelection {
         fillScoreLevel(scoreLevel4);
 
         presets = new SettableLoggableChooser<>("Presets", tab, 2, 4);
-        presets.addDefaultOption("Score1Gather1", "Left,H,3,None,None,1,None,None,1,None,None,1");
-        presets.addOption("Score2Gather1", "Mid,K,3,Left_Far,None,1,None,None,1,None,None,1");
+        presets.addDefaultOption(
+                "LeftSideSkipThree", "Left,I,4,Left_Far,L,4,Left_Far,A,4,Left_Far,B,4");
+        presets.addOption(
+                "RightSideSkipThree", "Right,F,4,Right_Far,C,4,Right_Far,B,4,Right_Far,A,4");
+        presets.addOption("CenterCoralAlgae", "Center,H,4,Reef,H,Net,Reef,I,Net,Reef,K,Net");
+        presets.addOption("LeftAwesomeness", "Left,I,4,Left_Far,L,4,Left_Far,A,2,Left_Far,B,2");
+        presets.addOption(
+                "RightAwesomeness", "Right,F,4,Right_Far,C,4,Right_Far,B,2,Right_Far,A,2");
     }
 
     public void periodic() {
@@ -140,9 +146,23 @@ public class AutonSelection {
 
     public void updateToPreset(String in) {
         String[] parts = in.split(",");
+        if (parts.length < 12) return; // dont explode por favor
+
         startLocation.setDefault(parts[0]);
         scoreLoc1.setDefault(parts[1]);
         scoreLevel1.setDefault(parts[2]);
+
+        gatherChoose1.setDefault(parts[3]);
+        scoreLoc2.setDefault(parts[4]);
+        scoreLevel2.setDefault(parts[5]);
+
+        gatherChoose2.setDefault(parts[6]);
+        scoreLoc3.setDefault(parts[7]);
+        scoreLevel3.setDefault(parts[8]);
+
+        gatherChoose3.setDefault(parts[9]);
+        scoreLoc4.setDefault(parts[10]);
+        scoreLevel4.setDefault(parts[11]);
     }
 
     public String readString() {

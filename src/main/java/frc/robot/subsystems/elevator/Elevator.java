@@ -129,7 +129,7 @@ public class Elevator extends SubsystemBase {
         io.setElevatorVolts(volts);
     }
 
-    public Command setVoltageCmd(double volts){
+    public Command setVoltageCmd(double volts) {
         return new InstantCommand(() -> setVoltage(volts), this);
     }
 }

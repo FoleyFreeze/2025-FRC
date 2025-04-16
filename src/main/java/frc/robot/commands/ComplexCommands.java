@@ -702,13 +702,12 @@ public class ComplexCommands {
                         .andThen(r.elevator.goTo(p))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
 
-        Command inGatherPower = 
-                r.elevator.setVoltageCmd(-3).alongWith(new InstantCommand(() -> midGather[0] = true))
+        Command inGatherPower =
+                r.elevator
+                        .setVoltageCmd(-3)
+                        .alongWith(new InstantCommand(() -> midGather[0] = true))
                         .andThen(new WaitCommand(0.08))
-                        .andThen(
-                                r.wrist
-                                        .setVoltage(0.5)
-                                        .alongWith(r.arm.setVoltageCmd(2)))
+                        .andThen(r.wrist.setVoltage(0.5).alongWith(r.arm.setVoltageCmd(2)))
                         .andThen(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -15))
                         .andThen(
                                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
