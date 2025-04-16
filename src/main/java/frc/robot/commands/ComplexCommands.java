@@ -702,6 +702,21 @@ public class ComplexCommands {
                         .andThen(r.elevator.goTo(p))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
 
+        Command inGatherPower = 
+                r.elevator.setVoltageCmd(-3).alongWith(new InstantCommand(() -> midGather[0] = true))
+                        .andThen(new WaitCommand(0.08))
+                        .andThen(
+                                r.wrist
+                                        .setVoltage(0.5)
+                                        .alongWith(r.arm.setVoltageCmd(2)))
+                        .andThen(new WaitUntilCommand(() -> r.arm.getAngle().in(Degrees) > -15))
+                        .andThen(
+                                r.arm.goTo(() -> SuperstructureLocation.HOLD)
+                                        .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
+                                        .alongWith(new InstantCommand(() -> midGather[0] = false)))
+                        .andThen(r.elevator.goTo(p))
+                        .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
+
         Command c =
                 new ConditionalCommand(
                         inGather,
@@ -715,6 +730,7 @@ public class ComplexCommands {
                             if (midGather[0]) {
                                 r.wrist.goTo(() -> SuperstructureLocation.HOLD).execute();
                                 r.arm.goTo(() -> SuperstructureLocation.HOLD).execute();
+                                r.elevator.goTo(() -> SuperstructureLocation.HOLD).execute();
                                 midGather[0] = false;
                             }
                         });
