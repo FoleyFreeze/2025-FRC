@@ -116,7 +116,9 @@ public class AutonSelection {
     }
 
     public void periodic() {
-        if (!presets.get().equals(lastPresetString)) {
+        String presetString = presets.get();
+
+        if (presetString != null && !presetString.equals(lastPresetString)) {
             lastPresetString = presets.get();
             updateToPreset(lastPresetString);
             System.out.println("UpdatePresets");
