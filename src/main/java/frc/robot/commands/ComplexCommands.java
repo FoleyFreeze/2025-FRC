@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -22,6 +23,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class ComplexCommands {
+    Timer t;
 
     public static double holdPowerCoral = 0.4;
     static double releasePowerCoral23 = -1.75;
@@ -625,10 +627,10 @@ public class ComplexCommands {
     public static Command visionCoralScore() {
         Command c =
                 DriveCommands.driveTo(r, r.controlBoard::getPathPose, false)
-                        .raceWith(
+                        .alongWith(
                                 new WaitUntilCommand(r.inSlowDrivePhase)
                                         .andThen(
-                                                goToLoc(r.controlBoard::getCoralLevel)
+                                                goToLoc(r.controlBoard::getCoralLevel, true)
                                                         .alongWith(holdCoral())
                                                         .andThen(
                                                                 new WaitUntilCommand(
@@ -660,15 +662,27 @@ public class ComplexCommands {
     }
 
     // IMPORTANT/COMMONLY USED
+    public static Command goToLoc(Supplier<SuperstructureLocation> p) {
+        return goToLoc(p, false);
+    }
 
     // moves elevator to a height with arm tucked up, then deploys arm
-    public static Command goToLoc(Supplier<SuperstructureLocation> p) {
+    public static Command goToLoc(Supplier<SuperstructureLocation> p, boolean waitForPathIn4) {
         final boolean[] midGather = new boolean[1];
 
         Command notInGather =
                 r.arm.goTo(() -> SuperstructureLocation.HOLD)
                         .deadlineFor(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
                         .andThen(r.elevator.goTo(p))
+                        .andThen(
+                                new WaitUntilCommand(
+                                        () ->
+                                                !(waitForPathIn4
+                                                                && p.get()
+                                                                        .equals(
+                                                                                SuperstructureLocation
+                                                                                        .LEVEL4))
+                                                        || r.state.pathComplete))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
 
         Command inGatherOld =
@@ -714,6 +728,15 @@ public class ComplexCommands {
                                         .alongWith(r.wrist.goTo(() -> SuperstructureLocation.HOLD))
                                         .alongWith(new InstantCommand(() -> midGather[0] = false)))
                         .andThen(r.elevator.goTo(p))
+                        .andThen(
+                                new WaitUntilCommand(
+                                        () ->
+                                                !(waitForPathIn4
+                                                                && p.get()
+                                                                        .equals(
+                                                                                SuperstructureLocation
+                                                                                        .LEVEL4))
+                                                        || r.state.pathComplete))
                         .andThen(r.arm.goTo(p).alongWith(r.wrist.goTo(p)));
 
         Command c =
