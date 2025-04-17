@@ -89,9 +89,7 @@ public class Locations {
 
     public static Transform2d halfRobotLevel1Right =
             new Transform2d(
-                    Units.inchesToMeters(0),
-                    Units.inchesToMeters(52),
-                    Rotation2d.fromDegrees(83));
+                    Units.inchesToMeters(0), Units.inchesToMeters(52), Rotation2d.fromDegrees(83));
 
     public static Transform2d supercycleBackup =
             new Transform2d(Units.inchesToMeters(-8), 0, Rotation2d.kZero);
