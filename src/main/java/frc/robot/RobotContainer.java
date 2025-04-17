@@ -201,10 +201,8 @@ public class RobotContainer {
         controlBoard.shiftT.and(controlBoard.submergeT).onTrue(ComplexCommands.rezeroWrist());
         controlBoard.shiftT.negate().and(controlBoard.submergeT).onTrue(ComplexCommands.freeBird());
 
-        //algae button
-        controlBoard.shiftT
-                .and(controlBoard.algaeButtonT)
-                .onTrue(ComplexCommands.goToAlgaeHold());
+        // algae button
+        controlBoard.shiftT.and(controlBoard.algaeButtonT).onTrue(ComplexCommands.goToAlgaeHold());
 
         // left trigger commands
         // gather coral camera
@@ -305,7 +303,7 @@ public class RobotContainer {
                         ComplexCommands.blindAlgaeScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
-        //net launch part 2
+        // net launch part 2
         flysky.rightTriggerSWG // score sw
                 .and(controlBoard.algaeModeT.or(controlBoard.tempScoreAlgaeT)) // algae sw
                 .and(flysky.topRightSWD.negate()) // no cam sw means dont drive

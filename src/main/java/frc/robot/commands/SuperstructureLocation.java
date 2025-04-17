@@ -16,9 +16,9 @@ public enum SuperstructureLocation {
     VERT_ALGAE(19, 8, 170),
     HOLD_ALGAE_OUT(14.7, 90, 228),
 
-    HOLD_ALGAE_IN(22+2, 40, 195),//sequence is HIGH -> LOW -> HOLD
-    PRE_ALGAE_IN_HIGH(30,10,163),
-    PRE_ALGAE_IN_LOW(22, 10, 163),
+    HOLD_ALGAE_IN(22 + 2, 10, 195), // sequence is HIGH -> LOW -> HOLD
+    PRE_ALGAE_IN_HIGH(34, 40, 163),
+    PRE_ALGAE_IN_LOW(22, 40, 163),
 
     // LEVEL1(0.25, 66, 15),
     LEVEL1(0.25, 65, 40),
