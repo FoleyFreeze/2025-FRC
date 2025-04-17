@@ -112,8 +112,7 @@ public class AutonCommands {
                                                                 () ->
                                                                         r.controlBoard
                                                                                 .getLevelLocation(
-                                                                                        level),
-                                                                true),
+                                                                                        level)),
                                                         waitUntilPathCompleteThenScore,
                                                         () -> r.hand.checkForCoralF() || isFirst)))
                         .andThen(ComplexCommands.releaseCoralAuton(level))
