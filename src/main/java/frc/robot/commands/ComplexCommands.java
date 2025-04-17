@@ -51,8 +51,8 @@ public class ComplexCommands {
 
     static double gatherPosition = 0;
 
-    static double pulseGatherOn = 0.25;
-    static double pulseGatherOff = 0.15;
+    static double pulseGatherOn = 0.50; // .25
+    static double pulseGatherOff = 0.10; // .15
     static double pulseGatherOffPwr = -0.2; // 0.05
 
     public static RobotContainer r;
@@ -718,7 +718,7 @@ public class ComplexCommands {
 
         Command c =
                 new ConditionalCommand(
-                        inGather,
+                        inGatherPower,
                         notInGather,
                         () -> atLocation(SuperstructureLocation.INTAKE, true));
 
@@ -779,14 +779,17 @@ public class ComplexCommands {
     // safely get to algae hold position from algae gather positions
     public static Command goToAlgaeHold() {
         final SuperstructureLocation hold = SuperstructureLocation.HOLD_ALGAE_IN;
-        final SuperstructureLocation preHold = SuperstructureLocation.PRE_ALGAE_IN;
+        final SuperstructureLocation preHoldLow = SuperstructureLocation.PRE_ALGAE_IN_LOW;
+        final SuperstructureLocation preHoldHigh = SuperstructureLocation.PRE_ALGAE_IN_HIGH;
 
         SequentialCommandGroup scg = new SequentialCommandGroup();
 
         // go up first
-        scg.addCommands(r.elevator.goTo(() -> preHold));
-        scg.addCommands(r.arm.goTo(() -> hold).alongWith(r.wrist.goTo(() -> hold)));
+        scg.addCommands(r.elevator.goTo(() -> preHoldHigh));
+        scg.addCommands(r.arm.goTo(() -> preHoldHigh).alongWith(r.wrist.goTo(() -> preHoldHigh)));
+        scg.addCommands(r.elevator.goTo(() -> preHoldLow));
         scg.addCommands(r.elevator.goTo(() -> hold));
+        scg.addCommands(r.arm.goTo(() -> hold).alongWith(r.wrist.goTo(() -> hold)));
 
         scg.setName("goToHoldAlgae");
 

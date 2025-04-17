@@ -89,8 +89,8 @@ public class ControlBoard {
         useShuffleboard.addDefaultOption("No", false);
         useShuffleboard.addOption("Yes", true);
 
-        // only allow temp algae when in coral mode
-        algaeButtonT.onTrue(
+        // only allow temp algae when in coral mode and not shifted
+        shiftT.negate().and(algaeButtonT).onTrue(
                 new InstantCommand(
                                 () -> {
                                     if (!tempScoreAlgae && !selectedAlgae)

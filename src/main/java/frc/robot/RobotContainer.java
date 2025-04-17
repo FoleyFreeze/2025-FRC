@@ -201,6 +201,11 @@ public class RobotContainer {
         controlBoard.shiftT.and(controlBoard.submergeT).onTrue(ComplexCommands.rezeroWrist());
         controlBoard.shiftT.negate().and(controlBoard.submergeT).onTrue(ComplexCommands.freeBird());
 
+        //algae button
+        controlBoard.shiftT
+                .and(controlBoard.algaeButtonT)
+                .onTrue(ComplexCommands.goToAlgaeHold());
+
         // left trigger commands
         // gather coral camera
         // gather coral nocam
