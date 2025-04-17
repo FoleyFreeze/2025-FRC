@@ -305,12 +305,19 @@ public class RobotContainer {
                         ComplexCommands.blindAlgaeScore()
                                 .alongWith(new InstantCommand(() -> state.hasStop = false)));
 
+        //net launch part 2
         flysky.rightTriggerSWG // score sw
                 .and(controlBoard.algaeModeT.or(controlBoard.tempScoreAlgaeT)) // algae sw
-                // .and(flysky.topRightSWD.negate()) // no cam sw as behavior is the same
+                .and(flysky.topRightSWD.negate()) // no cam sw means dont drive
                 .and(controlBoard.climbModeT.negate()) // climb sw
                 .and(state.algaeNetStage2T)
-                .onTrue(ComplexCommands.netLaunch());
+                .onTrue(ComplexCommands.netLaunch(false));
+        flysky.rightTriggerSWG // score sw
+                .and(controlBoard.algaeModeT.or(controlBoard.tempScoreAlgaeT)) // algae sw
+                .and(flysky.topRightSWD) // cam sw means drive
+                .and(controlBoard.climbModeT.negate()) // climb sw
+                .and(state.algaeNetStage2T)
+                .onTrue(ComplexCommands.netLaunch(true));
 
         // CLIMB THINGS
 

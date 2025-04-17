@@ -19,7 +19,7 @@ public class Hand extends SubsystemBase {
     private final Alert handDisconnectedAlert = new Alert("Hand Disconnected", AlertType.kError);
     private final Alert handTempAlert = new Alert("Hand Motor Temp > 170", AlertType.kWarning);
 
-    public double coralGatheredDist = 140; // 160 at states
+    public double coralGatheredDist = 160;
 
     RobotContainer r;
 

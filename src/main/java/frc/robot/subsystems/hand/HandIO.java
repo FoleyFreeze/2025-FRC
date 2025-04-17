@@ -11,6 +11,7 @@ public interface HandIO {
         public double handTempF = 0;
         public int laserStatus = 0;
         public double laserDistmm = 0;
+        public double handPosition = 0;
     }
 
     public default void updateInputs(HandIOInputs inputs) {}

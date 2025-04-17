@@ -2,6 +2,7 @@ package frc.robot.subsystems.hand;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Fahrenheit;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
@@ -93,6 +94,7 @@ public class HandIOHardware implements HandIO {
         inputs.handAppliedVolts = handAppliedVolts.getValue().in(Volts);
         inputs.handCurrent = handCurrent.getValue().in(Amps);
         inputs.handTempF = handTemp.getValue().in(Fahrenheit);
+        inputs.handPosition = handPosition.getValue().in(Rotations);
 
         LaserCan.Measurement measurement = laserCan.getMeasurement();
         inputs.laserStatus = measurement.status;
