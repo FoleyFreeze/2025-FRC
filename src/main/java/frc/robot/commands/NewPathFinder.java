@@ -77,6 +77,8 @@ public class NewPathFinder extends Command {
 
         boolean isAuto = DriverStation.isAutonomous();
 
+        // double leftWheelModifier = r.flysky.getLeftDial();
+
         double startMovingThingsPosition;
         if (r.controlBoard.algaeModeT.getAsBoolean() && !isAuto
                 || isAuto && r.controlBoard.autonAlgaeGather) {
@@ -84,7 +86,9 @@ public class NewPathFinder extends Command {
         } else {
             // coral
             if (r.controlBoard.selectedLevel == 4 || isAuto) {
-                startMovingThingsPosition = waypoints.size() - 2.8;
+                startMovingThingsPosition = waypoints.size() - 2.6;
+                // startMovingThingsPosition = waypoints.size() - (2.0 + leftWheelModifier);
+                // SmartDashboard.putNumber("LDial-Applied", startMovingThingsPosition);
             } else if (r.controlBoard.selectedLevel == 1) {
                 startMovingThingsPosition = waypoints.size() - 2.8;
             } else {

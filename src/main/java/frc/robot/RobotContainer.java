@@ -391,7 +391,11 @@ public class RobotContainer {
 
     public void robotPeriodic() {
         controlBoard.periodic();
-        // controlBoard.selectApproachingStation(); // TODO: delete me
+
+        SmartDashboard.putNumber("LDial", flysky.getLeftDial());
+        SmartDashboard.putNumber("RDial", flysky.getRightDial());
+        // ComplexCommands.releasePowerCoral1 = -1 - flysky.getRightDial() * 3;
+        // SmartDashboard.putNumber("Lvl1Adjusted", ComplexCommands.releasePowerCoral1);
 
         Logger.recordOutput("State/DisableBtn", !dio1.get());
 
