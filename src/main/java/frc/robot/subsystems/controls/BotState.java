@@ -1,5 +1,7 @@
 package frc.robot.subsystems.controls;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
@@ -25,8 +27,9 @@ public class BotState {
             new Trigger(
                     () ->
                             onTarget
-                                    && (r.flysky.topRightSWD.getAsBoolean()
-                                            || DriverStation.isAutonomous()));
+                                    && ((r.flysky.topRightSWD.getAsBoolean()
+                                                    && r.elevator.getHeight().in(Inches) < 40
+                                            || DriverStation.isAutonomous())));
     public Trigger inLocalPosePhaseT = new Trigger(() -> inLocalPosePhase || inCageDrive);
 
     public boolean algaeNetStage2 = false;
