@@ -275,7 +275,17 @@ public class DriveCommands {
             RobotContainer r, Supplier<Pose2d> supplier, boolean isGather) {
         PIDController pidX = new PIDController(POS_KP, POS_KI, POS_KD);
         PIDController pidY = new PIDController(POS_KP, POS_KI, POS_KD);
+        ProfiledPIDController pidR =
+                new ProfiledPIDController(
+                        ANGLE_KP,
+                        0.0,
+                        ANGLE_KD,
+                        new TrapezoidProfile.Constraints(2, ANGLE_MAX_ACCELERATION));
+        pidR.enableContinuousInput(-Math.PI, Math.PI);
+        pidR.setTolerance(Units.degreesToRadians(0.5));
+
         final double POS_TOL;
+
         if (isGather) {
             POS_TOL = POS_TOL_GATHER;
         } else {
@@ -298,13 +308,23 @@ public class DriveCommands {
                             Logger.recordOutput("Odometry/PointErr", pointErr);
                             Logger.recordOutput("Odometry/PointErrNorm", error[0]);
 
+                            Rotation2d rotErr = target.getRotation().minus(meas.getRotation());
+                            Logger.recordOutput("Odometry/AngleErr", rotErr.getDegrees());
+
                             double xVel = pidX.calculate(meas.getX(), target.getX());
                             double yVel = pidY.calculate(meas.getY(), target.getY());
+                            double omega =
+                                    pidR.calculate(
+                                            meas.getRotation().getRadians(),
+                                            target.getRotation().getRadians());
 
                             xVel = MathUtil.clamp(xVel, -POS_MAX_VEL, POS_MAX_VEL);
                             yVel = MathUtil.clamp(yVel, -POS_MAX_VEL, POS_MAX_VEL);
+                            omega = MathUtil.clamp(omega, -POS_MAX_VEL, POS_MAX_VEL);
 
                             // TODO: run angle PID in parallel
+                            if (r.controlBoard.selectedLevel == 1 && r.flysky.rightTriggerBool) {}
+
                             r.drive.runVelocity(
                                     ChassisSpeeds.fromFieldRelativeSpeeds(
                                             new ChassisSpeeds(xVel, yVel, 0),

@@ -337,8 +337,6 @@ public class RobotContainer {
         // get safely out of climb position
         controlBoard.climbModeT.onFalse(ComplexCommands.leaveClimb());
 
-        
-
         // OTHER
 
         // stop button
@@ -380,34 +378,54 @@ public class RobotContainer {
         controlBoard.gatherBtn.and(controlBoard.shiftT).onFalse(hand.setVoltageCmd(0));
 
         // jogs ew cardio
-        //wrist
-        controlBoard.jogA
+        // wrist
+        controlBoard
+                .jogA
                 .and(controlBoard.shiftT.negate())
                 .and(controlBoard.climbModeT.negate())
                 .onTrue(new InstantCommand(wrist::jogDown).ignoringDisable(true));
-        controlBoard.jogB
+        controlBoard
+                .jogB
                 .and(controlBoard.shiftT.negate())
                 .and(controlBoard.climbModeT.negate())
                 .onTrue(new InstantCommand(wrist::jogUp).ignoringDisable(true));
 
-        //lvl 1 angle
-        controlBoard.jog1
+        // lvl 1 angle
+        Locations.modifyL1Offset(0, 0); // write once
+        controlBoard
+                .jog1
                 .and(controlBoard.shiftT.negate())
                 .and(controlBoard.climbModeT.negate())
-                .onTrue(Locations.modifyL1OffsetCmd(0.5).ignoringDisable(true));
-        
-        controlBoard.jog2
+                .onTrue(Locations.modifyL1OffsetCmd(0.5, 0).ignoringDisable(true));
+
+        controlBoard
+                .jog2
                 .and(controlBoard.shiftT.negate())
                 .and(controlBoard.climbModeT.negate())
-                .onTrue(Locations.modifyL1OffsetCmd(-0.5).ignoringDisable(true));
-        
+                .onTrue(Locations.modifyL1OffsetCmd(-0.5, 0).ignoringDisable(true));
+
+        // l1 dist
+        controlBoard
+                .jog1
+                .and(controlBoard.shiftT)
+                .and(controlBoard.climbModeT.negate())
+                .onTrue(Locations.modifyL1OffsetCmd(0, 1).ignoringDisable(true));
+
+        controlBoard
+                .jog2
+                .and(controlBoard.shiftT)
+                .and(controlBoard.climbModeT.negate())
+                .onTrue(Locations.modifyL1OffsetCmd(0, -1).ignoringDisable(true));
+
         // climb jog override
-        controlBoard.jog1
+        controlBoard
+                .jog1
                 .and(controlBoard.shiftT.negate())
                 .and(controlBoard.climbModeT)
                 .whileTrue(r.climb.overrideClimbVoltage(12));
-        controlBoard.jog2
-                .and(controlBoard.shiftT.negate())        
+        controlBoard
+                .jog2
+                .and(controlBoard.shiftT.negate())
                 .and(controlBoard.climbModeT)
                 .whileTrue(r.climb.overrideClimbVoltage(-12));
 

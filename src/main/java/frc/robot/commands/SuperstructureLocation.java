@@ -21,7 +21,7 @@ public enum SuperstructureLocation {
     PRE_ALGAE_IN_LOW(22, 40, 163),
 
     // LEVEL1(0.25, 66, 15),
-    LEVEL1(0.25, 65, 40),
+    LEVEL1(0.25, 65, 40 - 4),
     LEVEL2(5.25, 27, 74),
     LEVEL3(18.5, 27, 74),
     LEVEL4(43.45, 33, 95),

@@ -17,6 +17,7 @@ import frc.robot.RobotContainer;
 import frc.robot.auton.AutonSelection.GatherType;
 import frc.robot.subsystems.controls.ControlBoard;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class Locations {
 
@@ -88,32 +89,37 @@ public class Locations {
             new Transform2d(
                     Units.inchesToMeters(0),
                     Units.inchesToMeters(-52),
-                    Rotation2d.fromDegrees(-83 - 1));
+                    Rotation2d.fromDegrees(-83));
 
     public static Transform2d halfRobotLevel1Right =
             new Transform2d(
-                    Units.inchesToMeters(0),
-                    Units.inchesToMeters(52),
-                    Rotation2d.fromDegrees(83 + 1));
+                    Units.inchesToMeters(0), Units.inchesToMeters(52), Rotation2d.fromDegrees(83));
 
-    public static double l1Offset = 1;
-    public static void modifyL1Offset(double delta){
-        l1Offset += delta;
-        SmartDashboard.putNumber("L1Offset", l1Offset);
+    public static double l1OffsetR = 1;
+    public static double l1OffsetY = 7;
+
+    public static void modifyL1Offset(double deltaR, double deltaY) {
+        l1OffsetR += deltaR;
+        l1OffsetY += deltaY;
+        Logger.recordOutput("Jog/L1OffsetR", l1OffsetR);
+        Logger.recordOutput("Jog/L1OffsetY", l1OffsetY);
+        SmartDashboard.putNumber("L1OffsetR", l1OffsetR);
+        SmartDashboard.putNumber("L1OffsetY", l1OffsetY);
 
         halfRobotLevel1Left =
-            new Transform2d(
-                    Units.inchesToMeters(0),
-                    Units.inchesToMeters(-52),
-                    Rotation2d.fromDegrees(-83 - l1Offset));
+                new Transform2d(
+                        Units.inchesToMeters(0),
+                        Units.inchesToMeters(-52 + l1OffsetY),
+                        Rotation2d.fromDegrees(-83 + l1OffsetR));
         halfRobotLevel1Right =
-            new Transform2d(
-                    Units.inchesToMeters(0),
-                    Units.inchesToMeters(52),
-                    Rotation2d.fromDegrees(83 + l1Offset));
+                new Transform2d(
+                        Units.inchesToMeters(0),
+                        Units.inchesToMeters(52 - l1OffsetY),
+                        Rotation2d.fromDegrees(83 - l1OffsetR));
     }
-    public static Command modifyL1OffsetCmd(double delta){
-        return new InstantCommand(() -> modifyL1Offset(delta));
+
+    public static Command modifyL1OffsetCmd(double deltaR, double deltaY) {
+        return new InstantCommand(() -> modifyL1Offset(deltaR, deltaY));
     }
 
     public static Transform2d supercycleBackup =
