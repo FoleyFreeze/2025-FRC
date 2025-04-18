@@ -52,7 +52,7 @@ public class ComplexCommands {
     static double gatherPosition = 0;
 
     static double pulseGatherOn = 0.50; // .25
-    static double pulseGatherOff = 0.10; // .15
+    static double pulseGatherOff = 0.15; // .15
     static double pulseGatherOffPwr = -0.2; // 0.05
 
     public static RobotContainer r;

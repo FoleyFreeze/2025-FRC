@@ -40,11 +40,18 @@ public class Flysky {
     public Trigger topLeftSWBHi = new Trigger(() -> flysky.getRawButton(2));
     public Trigger topLeftSWBLo = new Trigger(() -> flysky.getRawButton(3));
     public Trigger topRightMomentSWC = new Trigger(() -> flysky.getRawButton(4));
-    public Trigger botLeftSWFHi = new Trigger(() -> flysky.getRawButton(7));
-    public Trigger botLeftSWFLo = new Trigger(() -> flysky.getRawButton(6));
-    public Trigger botRightSWHHi = new Trigger(() -> flysky.getRawButton(9));
-    public Trigger botRightSWHLo = new Trigger(() -> flysky.getRawButton(8));
+
     public Trigger fillerButton = new Trigger(() -> flysky.getRawButton(0));
+
+    // TODO: flip back when switching flyskys
+    // public Trigger botRightSWHHi = new Trigger(() -> flysky.getRawButton(9));
+    // public Trigger botRightSWHLo = new Trigger(() -> flysky.getRawButton(8));
+    // public Trigger botLeftSWFHi = new Trigger(() -> flysky.getRawButton(7));
+    // public Trigger botLeftSWFLo = new Trigger(() -> flysky.getRawButton(6));
+    public Trigger botRightSWHHi = new Trigger(() -> flysky.getRawButton(8));
+    public Trigger botRightSWHLo = new Trigger(() -> flysky.getRawButton(9));
+    public Trigger botLeftSWFHi = new Trigger(() -> flysky.getRawButton(6));
+    public Trigger botLeftSWFLo = new Trigger(() -> flysky.getRawButton(7));
 
     public Flysky() {
         flysky = new Joystick(0);
@@ -71,11 +78,14 @@ public class Flysky {
     }
 
     // require > 0.5 to set and < -0.5 to unset
+    // TODO: switch back if we go back to the main flysky
     public boolean debounceHyst(double in, boolean prev) {
         if (prev) {
-            return in > -0.5;
+            // return in > -0.5;
+            return in > 0.25;
         } else {
-            return in > 0.5;
+            // return in > 0.5;
+            return in > 0.75;
         }
     }
 }
