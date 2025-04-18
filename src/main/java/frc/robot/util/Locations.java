@@ -10,6 +10,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.RobotContainer;
 import frc.robot.auton.AutonSelection.GatherType;
 import frc.robot.subsystems.controls.ControlBoard;
@@ -92,6 +95,26 @@ public class Locations {
                     Units.inchesToMeters(0),
                     Units.inchesToMeters(52),
                     Rotation2d.fromDegrees(83 + 1));
+
+    public static double l1Offset = 1;
+    public static void modifyL1Offset(double delta){
+        l1Offset += delta;
+        SmartDashboard.putNumber("L1Offset", l1Offset);
+
+        halfRobotLevel1Left =
+            new Transform2d(
+                    Units.inchesToMeters(0),
+                    Units.inchesToMeters(-52),
+                    Rotation2d.fromDegrees(-83 - l1Offset));
+        halfRobotLevel1Right =
+            new Transform2d(
+                    Units.inchesToMeters(0),
+                    Units.inchesToMeters(52),
+                    Rotation2d.fromDegrees(83 + l1Offset));
+    }
+    public static Command modifyL1OffsetCmd(double delta){
+        return new InstantCommand(() -> modifyL1Offset(delta));
+    }
 
     public static Transform2d supercycleBackup =
             new Transform2d(Units.inchesToMeters(-8), 0, Rotation2d.kZero);

@@ -54,6 +54,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.hand.Hand;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.wrist.Wrist;
+import frc.robot.util.Locations;
 import frc.robot.util.PathCache;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
@@ -336,9 +337,7 @@ public class RobotContainer {
         // get safely out of climb position
         controlBoard.climbModeT.onFalse(ComplexCommands.leaveClimb());
 
-        // climb jog override
-        controlBoard.climbModeT.and(controlBoard.jog1).whileTrue(r.climb.overrideClimbVoltage(12));
-        controlBoard.climbModeT.and(controlBoard.jog2).whileTrue(r.climb.overrideClimbVoltage(-12));
+        
 
         // OTHER
 
@@ -381,8 +380,36 @@ public class RobotContainer {
         controlBoard.gatherBtn.and(controlBoard.shiftT).onFalse(hand.setVoltageCmd(0));
 
         // jogs ew cardio
-        controlBoard.jogA.onTrue(new InstantCommand(wrist::jogDown).ignoringDisable(true));
-        controlBoard.jogB.onTrue(new InstantCommand(wrist::jogUp).ignoringDisable(true));
+        //wrist
+        controlBoard.jogA
+                .and(controlBoard.shiftT.negate())
+                .and(controlBoard.climbModeT.negate())
+                .onTrue(new InstantCommand(wrist::jogDown).ignoringDisable(true));
+        controlBoard.jogB
+                .and(controlBoard.shiftT.negate())
+                .and(controlBoard.climbModeT.negate())
+                .onTrue(new InstantCommand(wrist::jogUp).ignoringDisable(true));
+
+        //lvl 1 angle
+        controlBoard.jog1
+                .and(controlBoard.shiftT.negate())
+                .and(controlBoard.climbModeT.negate())
+                .onTrue(Locations.modifyL1OffsetCmd(0.5).ignoringDisable(true));
+        
+        controlBoard.jog2
+                .and(controlBoard.shiftT.negate())
+                .and(controlBoard.climbModeT.negate())
+                .onTrue(Locations.modifyL1OffsetCmd(-0.5).ignoringDisable(true));
+        
+        // climb jog override
+        controlBoard.jog1
+                .and(controlBoard.shiftT.negate())
+                .and(controlBoard.climbModeT)
+                .whileTrue(r.climb.overrideClimbVoltage(12));
+        controlBoard.jog2
+                .and(controlBoard.shiftT.negate())        
+                .and(controlBoard.climbModeT)
+                .whileTrue(r.climb.overrideClimbVoltage(-12));
 
         // neutral switch
         neutralSwitch.onTrue(ComplexCommands.setBrakeSuperStructure(false).ignoringDisable(true));
