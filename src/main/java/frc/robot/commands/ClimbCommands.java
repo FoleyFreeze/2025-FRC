@@ -24,7 +24,8 @@ public class ClimbCommands {
                                 new NewPathFinder(
                                         r, () -> Locations.getCageLocation(r), false, true),
                                 new InstantCommand(), // TODO: swap with a angle drive
-                                () -> checkIfPathfindNeeded(r)),
+                                // () -> checkIfPathfindNeeded(r)),
+                                () -> false),
                         // drive into cage
                         new CmdDriveCageTraj(r),
                         // do a little shake
