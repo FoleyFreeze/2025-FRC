@@ -29,9 +29,9 @@ public class CmdDriveCageTraj extends Command {
             new PathConstraints(maxVelocity, maxAccel, maxAngularVelocity, maxAngularAccel);
 
     // only recalc path if the cage has moved more than x distance
-    double recalcError = Units.inchesToMeters(8);
+    double recalcError = Units.inchesToMeters(4);
     // only recalc path if the cage is further away than x distance
-    double recalcBounds = Units.inchesToMeters(24);
+    double recalcBounds = Units.inchesToMeters(30);
 
     Command driveCommand;
 
@@ -108,7 +108,7 @@ public class CmdDriveCageTraj extends Command {
         Translation2d pathVector = pathEndLocation.minus(pathStart);
 
         // modify endLocation to be 6in further
-        Translation2d additionalDist = new Translation2d(Units.inchesToMeters(8), 0);
+        Translation2d additionalDist = new Translation2d(Units.inchesToMeters(12), 0);
         additionalDist =
                 additionalDist.rotateBy(Locations.isBlue() ? Rotation2d.kZero : Rotation2d.k180deg);
         pathEndLocation = pathEndLocation.plus(additionalDist);
