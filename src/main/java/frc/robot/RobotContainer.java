@@ -197,9 +197,11 @@ public class RobotContainer {
 
         // rezero superstructure
         flysky.upRTRIM.onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
+        flysky.leftRTRIM.onTrue(ComplexCommands.zeroSuperstructure().ignoringDisable(true));
 
         // force wrist rezero
-        controlBoard.shiftT.and(controlBoard.submergeT).onTrue(ComplexCommands.rezeroWrist());
+        // controlBoard.shiftT.and(controlBoard.submergeT).onTrue(ComplexCommands.rezeroWrist());
+        controlBoard.shiftT.and(controlBoard.submergeT).onTrue(ComplexCommands.freeBird());
         controlBoard.shiftT.negate().and(controlBoard.submergeT).onTrue(ComplexCommands.freeBird());
 
         // algae button
