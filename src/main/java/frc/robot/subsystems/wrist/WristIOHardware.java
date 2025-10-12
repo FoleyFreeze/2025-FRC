@@ -41,7 +41,7 @@ public class WristIOHardware implements WristIO {
 
         config.absoluteEncoder.zeroCentered(true);
         // add positives and subtract negatives
-        config.absoluteEncoder.zeroOffset(0.3170 + 0.0420 + 0.0618 + 0.335);
+        config.absoluteEncoder.zeroOffset(0.3170 + 0.0420 + 0.0618 + 0.335 + 0.088 + 0.105 - 0.296);
         config.absoluteEncoder.positionConversionFactor(1);
 
         PhoenixUtil.tryUntilOkRev(
@@ -108,8 +108,11 @@ public class WristIOHardware implements WristIO {
             absEncVal -= 1;
         }
         // 0.4515abs == 0 deg rel
-        encoder.setPosition(absEncVal / k.gearRatioToAbsEncoder - Units.degreesToRotations(69.5));
         // encoder.setPosition(convertAbsToRel(absEncVal, encoder.getPosition()));
+
+        encoder.setPosition(absEncVal / k.gearRatioToAbsEncoder - Units.degreesToRotations(69.5));
+        // for relative only resets
+        // encoder.setPosition(Units.degreesToRotations(-69.5));
     }
 
     @Override

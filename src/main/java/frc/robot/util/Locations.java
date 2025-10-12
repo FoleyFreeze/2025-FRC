@@ -84,6 +84,11 @@ public class Locations {
                     robotLength / 2.0 + Units.inchesToMeters(2.5),
                     Units.inchesToMeters(-2.5 - 1.5), // offset 2in right @ goonettes
                     Rotation2d.kZero);
+    public static Transform2d halfRobotAlgaeRight =
+            new Transform2d(
+                    robotLength / 2.0 + Units.inchesToMeters(2.5),
+                    Units.inchesToMeters(-2.5 - 0), // less offset from this side
+                    Rotation2d.kZero);
 
     public static Transform2d halfRobotLevel1Left =
             new Transform2d(
@@ -428,50 +433,59 @@ public class Locations {
         }
     }
 
+    // TODO: this has been modified specifically to support stripping, not algae gather, use with
+    // caution
     public static Pose2d getAlgaeReefLocation(ControlBoard.ReefSticks position) {
+        Transform2d algaeDelta = halfRobotAlgaeRight;
         switch (position) {
             case A:
+                algaeDelta = halfRobotAlgae;
             case B:
             default:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(18).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(18).get().toPose2d().plus(algaeDelta));
                 } else {
-                    return invert(tags.getTagPose(7).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(7).get().toPose2d().plus(algaeDelta));
                 }
             case C:
+                algaeDelta = halfRobotAlgae;
             case D:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(17).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(17).get().toPose2d().plus(algaeDelta));
                 } else {
-                    return invert(tags.getTagPose(8).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(8).get().toPose2d().plus(algaeDelta));
                 }
             case E:
+                algaeDelta = halfRobotAlgae;
             case F:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(22).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(22).get().toPose2d().plus(algaeDelta));
                 } else {
-                    return invert(tags.getTagPose(9).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(9).get().toPose2d().plus(algaeDelta));
                 }
             case G:
+                algaeDelta = halfRobotAlgae;
             case H:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(21).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(21).get().toPose2d().plus(algaeDelta));
                 } else {
-                    return invert(tags.getTagPose(10).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(10).get().toPose2d().plus(algaeDelta));
                 }
             case I:
+                algaeDelta = halfRobotAlgae;
             case J:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(20).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(20).get().toPose2d().plus(algaeDelta));
                 } else {
-                    return invert(tags.getTagPose(11).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(11).get().toPose2d().plus(algaeDelta));
                 }
             case K:
+                algaeDelta = halfRobotAlgae;
             case L:
                 if (isBlue()) {
-                    return invert(tags.getTagPose(19).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(19).get().toPose2d().plus(algaeDelta));
                 } else {
-                    return invert(tags.getTagPose(6).get().toPose2d().plus(halfRobotAlgae));
+                    return invert(tags.getTagPose(6).get().toPose2d().plus(algaeDelta));
                 }
         }
     }

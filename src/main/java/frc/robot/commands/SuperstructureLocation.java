@@ -24,7 +24,7 @@ public enum SuperstructureLocation {
     LEVEL1(0.25, 65, 40 - 4),
     LEVEL2(5.25, 27, 74),
     LEVEL3(18.5, 27, 74),
-    LEVEL4(43.45, 33, 95),
+    LEVEL4(43.45, 33, 95 + 4), // jog wrist down
     ALGAE_DESCORE2_3(28.5 - 4.5 - 1.5, 115 - 22, 42),
     ALGAE_DESCORE3_4(41.4 - 3.5 - 1, 115 - 22, 42),
     ALGAE_DESCORE2_3_LOW(26.5 - 4.5 - 1.5, 115 - 22, 42),
