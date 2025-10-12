@@ -123,7 +123,8 @@ public class Locations {
     }
 
     public static Transform2d supercycleBackup =
-            new Transform2d(Units.inchesToMeters(-8), 0, Rotation2d.kZero);
+            new Transform2d(
+                    Units.inchesToMeters(-8 - 4), 0, Rotation2d.kZero); // backup more for strip
 
     // TODO: make code that uses this
     // public static Transform2d halfRobotCoralLevel1 =
