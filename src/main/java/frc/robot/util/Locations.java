@@ -87,7 +87,7 @@ public class Locations {
     public static Transform2d halfRobotAlgaeRight =
             new Transform2d(
                     robotLength / 2.0 + Units.inchesToMeters(2.5),
-                    Units.inchesToMeters(-2.5 - 0), // less offset from this side
+                    Units.inchesToMeters(-2.5 + 1.2), // less offset from this side
                     Rotation2d.kZero);
 
     public static Transform2d halfRobotLevel1Left =
